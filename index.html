@@ -1,0 +1,2329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Месячный график работ (Гант) — ред</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --border: #dce3ed;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --accent: #1a56db;
+            --accent-hover: #1745a8;
+            --success: #0f973d;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --info: #0891b2;
+            --purple: #7c3aed;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 1700px; }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1a56db 100%);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(26, 86, 219, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+        .header .subtitle { font-size: 0.9rem; opacity: 0.85; margin-top: 6px; font-weight: 400; }
+        .header-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .header-badge .dot {
+            width: 10px; height: 10px; border-radius: 50%; background: #4ade80;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.4); }
+        }
+
+        .toolbar {
+            display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
+        }
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 18px; border-radius: 50px;
+            font-weight: 600; font-size: 0.82rem; border: none; cursor: pointer;
+            transition: all 0.25s ease; font-family: var(--font);
+            letter-spacing: 0.3px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+        }
+        .btn-excel { background: #0f973d; color: #fff; }
+        .btn-excel:hover { background: #0b7a31; transform: translateY(-1px); }
+        .btn-csv { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+        .btn-csv:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-print { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+        .btn-print:hover { border-color: var(--purple); color: var(--purple); }
+        .btn-add { background: var(--accent); color: #fff; }
+        .btn-add:hover { background: var(--accent-hover); }
+        .btn-reset { background: #fff; color: var(--danger); border: 1.5px solid #fecaca; }
+        .btn-reset:hover { background: #fef2f2; border-color: var(--danger); }
+        .btn-json-save { background: #7c3aed; color: #fff; }
+        .btn-json-save:hover { background: #6d28d9; transform: translateY(-1px); }
+        .btn-json-load { background: #fff; color: #7c3aed; border: 1.5px solid #ddd6fe; }
+        .btn-json-load:hover { background: #f5f3ff; border-color: #7c3aed; }
+        .btn-catalog { background: #0891b2; color: #fff; }
+        .btn-catalog:hover { background: #0e7490; transform: translateY(-1px); }
+        .btn-help { background: #0891b2; color: #fff; }
+        .btn-help:hover { background: #0e7490; transform: translateY(-1px); }
+        .btn-pencil { background: #f59e0b; color: #fff; }
+        .btn-pencil:hover { background: #d97706; transform: translateY(-1px); }
+        .btn-pencil.active { background: #dc2626; }
+        .btn-pencil.active:hover { background: #b91c1c; }
+
+        .stats-summary { display: flex; gap: 10px; flex-wrap: wrap; margin-left: auto; }
+        .stat-chip {
+            background: #fff; border: 1px solid var(--border); border-radius: 50px;
+            padding: 8px 16px; font-size: 0.8rem; font-weight: 600;
+            display: flex; align-items: center; gap: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        .stat-chip .num { color: var(--accent); font-size: 1.05rem; }
+
+        .month-selector {
+            display: flex; align-items: center; gap: 10px;
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+        }
+        .month-selector label {
+            font-size: 0.82rem; font-weight: 600; color: var(--text);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .month-selector input[type="month"] {
+            padding: 8px 12px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.85rem; color: var(--text);
+            cursor: pointer;
+        }
+        .month-selector input[type="month"]:focus { outline: none; border-color: var(--accent); }
+        .month-selector .month-info {
+            font-size: 0.78rem; color: var(--text-light); margin-left: auto;
+        }
+
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;
+            padding: 14px 18px; background: #fff; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 8px; font-size: 0.78rem;
+            font-weight: 500; color: var(--text-light); padding: 4px 10px;
+            border-radius: 20px; background: #f8fafc;
+        }
+        .legend-dot { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+
+        .palette {
+            display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+        }
+        .palette-title {
+            font-size: 0.8rem; font-weight: 700; color: var(--text); margin-right: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .swatch {
+            width: 28px; height: 28px; border-radius: 6px; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.15s;
+            position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .swatch:hover { transform: scale(1.12); }
+        .swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26,86,219,0.3); }
+        .swatch.auto {
+            background: #fff !important; border: 2px dashed #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.6rem; color: #64748b; font-weight: 700;
+        }
+        .palette-hint {
+            font-size: 0.72rem; color: var(--text-light); margin-left: auto;
+            max-width: 420px; line-height: 1.4;
+        }
+
+        .filters-panel {
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 14px 18px; margin-bottom: 20px; box-shadow: var(--shadow);
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;
+        }
+        .filters-panel .filter-field {
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .filters-panel .filter-field label {
+            font-size: 0.7rem; font-weight: 600; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .filters-panel .filter-field select,
+        .filters-panel .filter-field input {
+            padding: 7px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.82rem; min-width: 160px;
+            color: var(--text); background: #fff;
+        }
+        .filters-panel .filter-field select:focus,
+        .filters-panel .filter-field input:focus {
+            outline: none; border-color: var(--accent);
+        }
+        .filters-panel .filter-actions {
+            display: flex; gap: 8px; margin-left: auto; align-items: flex-end;
+        }
+        .filter-badge {
+            display: inline-block; font-size: 0.7rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 20px;
+            background: #dbeafe; color: #1e40af; margin-left: 6px;
+        }
+        .btn-clear-filter {
+            background: #fff; color: var(--text-light); border: 1.5px solid var(--border);
+            padding: 8px 14px; font-size: 0.78rem; border-radius: 50px;
+            cursor: pointer; font-weight: 600; font-family: var(--font);
+            transition: all 0.2s;
+        }
+        .btn-clear-filter:hover { border-color: var(--danger); color: var(--danger); }
+
+        .table-wrapper {
+            background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+            border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px;
+        }
+        .table-scroll {
+            overflow-x: auto; max-height: 70vh; overflow-y: auto; position: relative;
+        }
+        .gantt-table {
+            width: 100%; border-collapse: collapse; font-size: 0.75rem;
+            min-width: 1500px; table-layout: fixed;
+        }
+        .gantt-table thead th {
+            background: #0f172a; color: #fff; padding: 8px 2px; text-align: center;
+            font-weight: 600; font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.3px; border: 1px solid #1e293b;
+            position: sticky; top: 0; z-index: 5;
+        }
+        .gantt-table thead th:first-child {
+            width: 280px; min-width: 280px; text-align: left; padding-left: 10px;
+            z-index: 6; left: 0;
+        }
+        .gantt-table tbody td {
+            border: 1px solid #e2e8f0; text-align: center; vertical-align: middle;
+            padding: 2px; height: 34px; font-weight: 600; color: var(--text);
+            font-size: 0.75rem;
+        }
+        .gantt-table tbody td:first-child {
+            text-align: left; padding-left: 8px; font-weight: 600;
+            background: #f8fafc; border-right: 2px solid #cbd5e1;
+            white-space: normal; word-wrap: break-word;
+            position: sticky; left: 0; z-index: 3;
+            font-size: 0.7rem; line-height: 1.25;
+        }
+        .gantt-table tbody td.cell {
+            cursor: pointer; transition: all 0.15s;
+            position: relative;
+        }
+        .gantt-table tbody td.cell:hover {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+            filter: brightness(0.92);
+        }
+        .gantt-table tbody td.cell.filled { color: #1e293b; }
+        .gantt-table tbody td.cell.empty { background: #fff !important; }
+        .gantt-table tbody td.cell.empty:hover {
+            background: #f0f4ff !important;
+        }
+        .gantt-table tbody td.cell.empty::after {
+            content: '+'; color: #cbd5e1; font-weight: 400; font-size: 0.85rem;
+        }
+        .gantt-table tbody td.cell.planned-zero {
+            color: #94a3b8;
+            font-size: 0.65rem;
+        }
+        .gantt-table tbody td.cell.planned-zero::after {
+            content: '0'; color: #94a3b8; font-weight: 600;
+        }
+
+        /* Выделение диапазона */
+        .gantt-table tbody td.cell.range-selected {
+            outline: 3px solid #f59e0b !important;
+            outline-offset: -3px;
+            background-image: linear-gradient(rgba(245,158,11,0.15), rgba(245,158,11,0.15)) !important;
+        }
+        .gantt-table tbody td.cell.range-source {
+            outline: 3px solid #dc2626 !important;
+            outline-offset: -3px;
+            position: relative;
+        }
+        .gantt-table tbody td.cell.range-source::before {
+            content: '📋';
+            position: absolute;
+            top: 0; right: 0;
+            font-size: 0.65rem;
+            background: #dc2626;
+            color: #fff;
+            padding: 1px 3px;
+            border-radius: 0 0 0 4px;
+            z-index: 2;
+        }
+
+        .gantt-table tbody tr.total-row td {
+            background: #0f172a !important;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border-top: 3px solid var(--accent);
+            position: sticky;
+            bottom: 0;
+            z-index: 4;
+        }
+        .gantt-table tbody tr.total-row td:first-child {
+            background: #1e293b !important;
+            color: #fff;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-right: 2px solid var(--accent);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        .gantt-table tbody tr.total-row td .total-val {
+            color: #4ade80;
+            font-size: 0.85rem;
+        }
+        .gantt-table tbody tr.total-row td .total-val.zero {
+            color: #64748b;
+        }
+
+        .row-actions {
+            display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap;
+        }
+        .row-actions button {
+            font-size: 0.6rem; padding: 2px 5px; border-radius: 4px;
+            border: 1px solid var(--border); background: #fff; cursor: pointer;
+            font-weight: 600; color: var(--text-light);
+        }
+        .row-actions button:hover { border-color: var(--accent); color: var(--accent); }
+        .row-actions button.del:hover { border-color: var(--danger); color: var(--danger); }
+        .row-actions button.color-btn:hover { border-color: var(--purple); color: var(--purple); }
+        .row-actions button.up-btn:hover { border-color: var(--success); color: var(--success); }
+        .row-actions button.down-btn:hover { border-color: var(--info); color: var(--info); }
+        .row-actions button:disabled {
+            opacity: 0.35; cursor: not-allowed;
+        }
+        .row-actions button:disabled:hover {
+            border-color: var(--border); color: var(--text-light);
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #fff; border-radius: var(--radius); padding: 28px 26px;
+            width: 100%; max-width: 540px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalIn 0.2s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal h3 { font-size: 1.1rem; margin-bottom: 4px; color: var(--text); }
+        .modal .modal-sub {
+            font-size: 0.8rem; color: var(--text-light); margin-bottom: 18px;
+            padding-bottom: 14px; border-bottom: 1px solid var(--border);
+        }
+        .modal label {
+            display: block; font-size: 0.78rem; font-weight: 600;
+            margin-bottom: 5px; color: var(--text);
+        }
+        .modal input, .modal textarea, .modal select {
+            width: 100%; padding: 9px 12px; border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border); font-family: var(--font);
+            font-size: 0.85rem; margin-bottom: 14px; color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus {
+            outline: none; border-color: var(--accent);
+        }
+        .modal textarea { resize: vertical; min-height: 60px; }
+        .modal select.work-select { cursor: pointer; }
+        .modal .hint {
+            font-size: 0.7rem; color: var(--text-light); margin-top: -10px;
+            margin-bottom: 12px; line-height: 1.4;
+        }
+        .modal-palette {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+            padding: 10px; background: #f8fafc; border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .modal-palette .swatch { width: 26px; height: 26px; }
+        .modal-actions {
+            display: flex; gap: 10px; justify-content: flex-end; margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .modal-actions .btn { padding: 9px 20px; font-size: 0.82rem; }
+        .btn-cancel { background: #fff; color: var(--text-light); border: 1.5px solid var(--border); }
+        .btn-cancel:hover { border-color: var(--text-light); color: var(--text); }
+        .btn-save { background: var(--accent); color: #fff; }
+        .btn-save:hover { background: var(--accent-hover); }
+        .btn-delete {
+            background: #fff; color: var(--danger); border: 1.5px solid #fecaca;
+            margin-right: auto;
+        }
+        .btn-delete:hover { background: #fef2f2; }
+
+        .edit-panel {
+            background: #fff; border-radius: var(--radius-sm); padding: 16px 18px;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .edit-panel h3 {
+            font-size: 0.9rem; margin-bottom: 12px; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .edit-panel-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+        .edit-panel-row .field { display: flex; flex-direction: column; gap: 4px; }
+        .edit-panel-row .field label {
+            font-size: 0.7rem; font-weight: 600; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .edit-panel-row .field input, .edit-panel-row .field select {
+            padding: 7px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.82rem; min-width: 160px;
+        }
+        .edit-panel-row .field input:focus, .edit-panel-row .field select:focus {
+            outline: none; border-color: var(--accent);
+        }
+        .edit-panel-row .field input.element-input { min-width: 180px; }
+        .edit-panel-row .field input.stage-input { min-width: 140px; }
+        .edit-panel-row .field input.brigade-input { min-width: 140px; }
+
+        .catalog-list {
+            display: flex; flex-direction: column; gap: 8px;
+            max-height: 50vh; overflow-y: auto;
+            margin-bottom: 16px; padding-right: 4px;
+        }
+        .catalog-item {
+            display: flex; align-items: center; gap: 8px;
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 8px 12px;
+            transition: all 0.15s;
+        }
+        .catalog-item:hover { border-color: var(--accent); background: #f0f4ff; }
+        .catalog-item .catalog-text {
+            flex: 1; font-size: 0.82rem; color: var(--text);
+            word-break: break-word; line-height: 1.35;
+        }
+        .catalog-item .catalog-actions {
+            display: flex; gap: 4px; flex-shrink: 0;
+        }
+        .catalog-item .catalog-actions button {
+            font-size: 0.65rem; padding: 3px 8px; border-radius: 4px;
+            border: 1px solid var(--border); background: #fff; cursor: pointer;
+            font-weight: 600; color: var(--text-light); transition: all 0.15s;
+        }
+        .catalog-item .catalog-actions button.edit:hover {
+            border-color: var(--accent); color: var(--accent); background: #fff;
+        }
+        .catalog-item .catalog-actions button.del:hover {
+            border-color: var(--danger); color: var(--danger); background: #fef2f2;
+        }
+        .catalog-add-row {
+            display: flex; gap: 8px; margin-bottom: 16px;
+        }
+        .catalog-add-row input {
+            flex: 1; padding: 9px 12px; border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border); font-family: var(--font);
+            font-size: 0.85rem; color: var(--text); margin-bottom: 0;
+        }
+        .catalog-add-row input:focus { outline: none; border-color: var(--accent); }
+        .catalog-empty {
+            text-align: center; padding: 24px; color: var(--text-light);
+            font-size: 0.82rem; background: #f8fafc; border-radius: var(--radius-sm);
+            border: 1px dashed var(--border);
+        }
+        .catalog-stats {
+            font-size: 0.72rem; color: var(--text-light); margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .help-content {
+            font-size: 0.85rem; line-height: 1.6; color: var(--text);
+        }
+        .help-content h4 {
+            font-size: 0.9rem; margin: 16px 0 6px; color: var(--accent);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .help-content h4:first-child { margin-top: 0; }
+        .help-content ul { padding-left: 20px; margin-bottom: 8px; }
+        .help-content li { margin-bottom: 5px; }
+        .help-content code {
+            background: #f1f5f9; padding: 1px 6px; border-radius: 4px;
+            font-size: 0.8rem; color: #0f172a;
+        }
+        .help-content .tip {
+            background: #fef3c7; border-left: 3px solid #f59e0b;
+            padding: 8px 12px; border-radius: 6px; margin: 10px 0;
+            font-size: 0.8rem;
+        }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            opacity: 0; transition: all 0.3s ease; z-index: 2000; pointer-events: none;
+            max-width: 90vw; text-align: center;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .footer-note {
+            text-align: center; color: var(--text-light); font-size: 0.8rem;
+            padding: 14px; border-top: 1px solid var(--border); background: #fafbfc;
+        }
+
+        /* Панель режима карандаша */
+        .pencil-panel {
+            display: none;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: var(--radius-sm);
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .pencil-panel.active { display: flex; }
+        .pencil-panel .pencil-info {
+            font-size: 0.85rem; font-weight: 600; color: #92400e;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pencil-panel .pencil-source {
+            background: #fff; padding: 6px 12px; border-radius: 6px;
+            font-size: 0.8rem; color: #0f172a; font-weight: 600;
+            border: 1px solid #fbbf24;
+            max-width: 400px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pencil-panel .pencil-hint {
+            font-size: 0.75rem; color: #92400e; margin-left: auto;
+        }
+        .pencil-panel .btn-cancel-pencil {
+            background: #fff; color: #dc2626; border: 1.5px solid #fecaca;
+            padding: 8px 14px; font-size: 0.78rem; border-radius: 50px;
+            cursor: pointer; font-weight: 600; font-family: var(--font);
+            transition: all 0.2s;
+        }
+        .pencil-panel .btn-cancel-pencil:hover { background: #fef2f2; }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .header { padding: 16px 18px; }
+            .header h1 { font-size: 1.15rem; }
+            .table-scroll { max-height: 55vh; }
+            .stats-summary { margin-left: 0; width: 100%; justify-content: flex-start; }
+            .edit-panel-row .field input, .edit-panel-row .field select { min-width: 120px; }
+            .month-selector { flex-wrap: wrap; }
+            .month-selector .month-info { margin-left: 0; }
+            .palette-hint { margin-left: 0; max-width: 100%; }
+            .filters-panel { flex-wrap: wrap; }
+            .filters-panel .filter-actions { margin-left: 0; width: 100%; }
+            .pencil-panel .pencil-hint { margin-left: 0; width: 100%; }
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .toolbar, .legend, .edit-panel, .header-badge, .toast, .month-selector, .palette, .filters-panel, .pencil-panel { display: none !important; }
+            .header { border-radius: 0; box-shadow: none; }
+            .table-wrapper { box-shadow: none; border: 1px solid #ccc; border-radius: 0; }
+            .table-scroll { max-height: none; overflow: visible; }
+            .gantt-table thead th {
+                background: #333 !important; color: #fff !important;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .gantt-table tbody td {
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .row-actions { display: none; }
+        }
+		
+				        /* Footer */
+        footer {
+            background: #1a252f;
+            color: white;
+            padding: 30px 0 30px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 40px;
+        }
+
+
+
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            
+            color: #95a5a6;
+            font-size: 14px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>📊 Месячный график  работ</h1>
+                <div class="subtitle">Диаграмма Ганта · <span id="headerMonthLabel">Июнь 2025</span> ·by t.me/ProgrammYankov V.1</div>
+            </div>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span>Данные сохраняются локально</span>
+            </div>
+        </div>
+
+        <div class="month-selector">
+            <label for="monthPicker">📅 Месяц планирования:</label>
+            <input type="month" id="monthPicker" value="2025-06">
+            <span class="month-info" id="monthInfo"></span>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-excel" onclick="exportToExcel()">📥 Excel (.xls)</button>
+            <button class="btn btn-csv" onclick="exportToCSV()">📄 CSV</button>
+            <button class="btn btn-print" onclick="window.print()">🖨️ Печать</button>
+            
+            
+            <button class="btn btn-json-save" onclick="saveProjectJSON()">💾 Сохранить проект (JSON)</button>
+            <button class="btn btn-json-load" onclick="document.getElementById('jsonFileInput').click()">📂 Загрузить проект (JSON)</button>
+            <input type="file" id="jsonFileInput" accept=".json,application/json" style="display:none" onchange="loadProjectJSON(event)">
+            <button class="btn btn-reset" onclick="resetToDefaults()">🔄 Сбросить данные</button>
+            <button class="btn btn-help" onclick="openHelp()">❓ Инструкция</button>
+            <div class="stats-summary">
+                <div class="stat-chip">👷 Пик рабочих: <span class="num" id="maxWorkers">0</span></div>
+                <div class="stat-chip">📅 Дней: <span class="num" id="daysCount">30</span></div>
+                <div class="stat-chip">🧱 Строк: <span class="num" id="rowCount">0</span></div>
+            </div>
+        </div>
+
+        <!-- Панель режима карандаша -->
+        <div class="pencil-panel" id="pencilPanel">
+            <div class="pencil-info">
+                ✏️ <b>Режим «Карандаш»</b> — выберите ячейку-образец, затем выделите диапазон для заполнения.
+            </div>
+            <div class="pencil-source" id="pencilSourceInfo">Образец не выбран</div>
+            <div class="pencil-hint">
+                <span id="pencilStep">Шаг 1: кликните по ячейке-образцу</span>
+            </div>
+            <button class="btn-cancel-pencil" onclick="exitPencilMode()">✖ Выйти</button>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#e2e8f0;"></span> Подготовительные</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#fef3c7;"></span> Опалубочные</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#fee2e2;"></span> Арматурные</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#dbeafe;"></span> Бетонирование</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#d1fae5;"></span> Технологический перерыв</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ede9fe;"></span> Прочие</div>
+            <div class="legend-item"><span class="legend-dot" style="background:#f8fafc;border:1px solid #cbd5e1;"></span> Запланировано (0 рабочих)</div>
+        </div>
+
+        <div class="palette" id="globalPalette">
+            <span class="palette-title">🎨 Цвет для новых ячеек/строк:</span>
+            <span class="palette-hint">Выберите цвет, затем кликните по ячейке (или используйте кнопку «🎨 Цвет» у строки), чтобы применить. «Авто» — цвет по этапу.</span>
+        </div>
+
+        <div class="filters-panel">
+            <div class="filter-field">
+                <label>🏗️ Конструкция</label>
+                <select id="filterElement" onchange="applyFilters()">
+                    <option value="">Все конструкции</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label>⚙️ Этап работ</label>
+                <select id="filterStage" onchange="applyFilters()">
+                    <option value="">Все этапы</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label>👷 Бригада</label>
+                <select id="filterBrigade" onchange="applyFilters()">
+                    <option value="">Все бригады</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn-clear-filter" onclick="clearFilters()">✖ Сбросить фильтры</button>
+                <span id="filterInfo" class="filter-badge" style="display:none;"></span>
+            </div>
+        </div>
+
+        <div class="edit-panel">
+            <h3>⚙️ Управление конструкциями и этапами</h3>
+            <div class="edit-panel-row">
+                <div class="field">
+                    <label>Конструкция</label>
+                    <input type="text" id="newElement" class="element-input" placeholder="Например: Плита перекрытия" list="elementList">
+                    <datalist id="elementList"></datalist>
+                </div>
+                <div class="field">
+                    <label>Этап работ</label>
+                    <input type="text" id="newStage" class="stage-input" placeholder="Например: Арматурные" list="stageList">
+                    <datalist id="stageList"></datalist>
+                </div>
+                <div class="field">
+                    <label>Бригада</label>
+                    <input type="text" id="newBrigade" class="brigade-input" placeholder="Например: Бригада №1" list="brigadeList">
+                    <datalist id="brigadeList"></datalist>
+                </div>
+                <button class="btn btn-add" onclick="addNewRow()">➕ Добавить строку</button>
+            </div>
+            <p style="font-size:0.72rem;color:var(--text-light);margin-top:10px;">
+                💡 Кликните по ячейке для редактирования. Кнопки ⬆️⬇️ у строки перемещают её. Режим «✏️ Карандаш» позволяет скопировать образец ячейки в диапазон.
+            </p>
+			<button class="btn btn-pencil" id="pencilBtn" onclick="togglePencilMode()">✏️ Карандаш (копировать образец)</button>
+			<button class="btn btn-catalog" onclick="openCatalogEditor()">📚 Справочник работ</button>
+        </div>
+
+        <div class="table-wrapper">
+            <div class="table-scroll" id="tableScroll">
+                <table class="gantt-table" id="ganttTable"></table>
+            </div>
+            <div class="footer-note">
+                Каждая закрашенная ячейка — этап, выполняемый в этот день. Число внутри — количество рабочих. Строка «ИТОГО» внизу показывает суммарное количество рабочих по каждому дню. Клик по ячейке открывает редактор.
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно редактирования ячейки -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3 id="modalTitle">Редактирование дня</h3>
+            <div class="modal-sub" id="modalSubtitle"></div>
+            <label for="modalWorkSelect">Работа из справочника</label>
+            <select id="modalWorkSelect" class="work-select" onchange="onWorkSelectChange()">
+                <option value="">— Выберите из списка —</option>
+            </select>
+            <p class="hint">При выборе работа автоматически подставится в поле описания.</p>
+            <label for="modalPeople">Количество рабочих (0 = запланировано, без людей)</label>
+            <input type="number" id="modalPeople" min="0" max="999" value="0">
+            <label for="modalWork">Описание работ</label>
+            <textarea id="modalWork" placeholder="Например: Бетонирование колонн, объём 24 м³"></textarea>
+            <label for="modalNote">Примечание (необязательно)</label>
+            <input type="text" id="modalNote" placeholder="Например: Класс бетона B25">
+            <label>Цвет ячейки</label>
+            <div class="modal-palette" id="modalPalette"></div>
+            <div class="modal-actions">
+                <button class="btn btn-delete" onclick="deleteCell()">🗑 Очистить</button>
+                <button class="btn btn-cancel" onclick="closeModal()">Отмена</button>
+                <button class="btn btn-save" onclick="saveCell()">💾 Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора цвета строки -->
+    <div class="modal-overlay" id="rowColorModal">
+        <div class="modal" style="max-width:420px;">
+            <h3 id="rowColorTitle">🎨 Цвет строки</h3>
+            <div class="modal-sub" id="rowColorSub"></div>
+            <label>Выберите цвет для всей строки:</label>
+            <div class="modal-palette" id="rowColorPalette"></div>
+            <p class="hint">Цвет применится ко всем ячейкам строки, включая будущие. «Авто» — цвет по этапу.</p>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRowColorModal()">Отмена</button>
+                <button class="btn btn-save" onclick="saveRowColor()">💾 Применить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно справочника работ -->
+    <div class="modal-overlay" id="catalogModal">
+        <div class="modal" style="max-width:620px;">
+            <h3>📚 Справочник работ</h3>
+            <div class="modal-sub">Добавляйте, переименовывайте и удаляйте записи. Изменения сохраняются локально и попадают в JSON-проект.</div>
+            <div class="catalog-stats">
+                <span id="catalogStatsLabel">Всего записей: 0</span>
+                <button class="btn btn-reset" style="padding:5px 12px;font-size:0.72rem;" onclick="resetCatalog()">🔄 Сбросить справочник</button>
+            </div>
+            <div class="catalog-add-row">
+                <input type="text" id="catalogNewInput" placeholder="Новая работа (например: Установка анкеров)" maxlength="200">
+                <button class="btn btn-add" style="padding:9px 16px;font-size:0.8rem;" onclick="addCatalogItem()">➕ Добавить</button>
+            </div>
+            <div class="catalog-list" id="catalogList"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeCatalogEditor()">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно инструкции -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal" style="max-width:640px;">
+            <h3>❓ Краткая инструкция</h3>
+            <div class="modal-sub">Как пользоваться графиком монолитных ЖБ работ</div>
+            <div class="help-content">
+                <h4>📊 Назначение</h4>
+                <p>Интерактивная диаграмма Ганта для планирования монолитных работ на месяц. Каждая строка — конструкция + этап + бригада. Каждая ячейка — день месяца.</p>
+
+                <h4>🖱️ Работа с таблицей</h4>
+                <ul>
+                    <li><b>Клик по ячейке</b> — открывает редактор: количество рабочих, описание работ, примечание, цвет.</li>
+                    <li><b>0 рабочих</b> — ячейка остаётся закрашенной и означает «запланировано без людей».</li>
+                    <li><b>Число в ячейке</b> — количество рабочих на этот день.</li>
+                    <li><b>Строка «ИТОГО»</b> внизу — сумма рабочих по каждому дню (с учётом фильтров).</li>
+                </ul>
+
+                <h4>✏️ Режим «Карандаш»</h4>
+                <ul>
+                    <li>Нажмите кнопку <b>«✏️ Карандаш»</b> в панели инструментов.</li>
+                    <li><b>Шаг 1:</b> кликните по ячейке-образцу — с неё скопируются люди, описание, примечание и цвет.</li>
+                    <li><b>Шаг 2:</b> кликните по второй ячейке диапазона (в любой строке, любой день).</li>
+                    <li>Система заполнит прямоугольный диапазон между образцом и конечной ячейкой копиями образца.</li>
+                    <li>Если образец был <b>пустой ячейкой</b>, диапазон станет пустым — удобно очищать блоки.</li>
+                    <li>Для выхода нажмите <b>«✖ Выйти»</b> или клавишу <b>Esc</b>.</li>
+                </ul>
+
+                <h4>⚙️ Управление строками</h4>
+                <ul>
+                    <li><b>➕ Добавить строку</b> — укажите конструкцию, этап и бригаду.</li>
+                    <li><b>⬆️ / ⬇️</b> — переместить строку выше или ниже.</li>
+                    <li><b>✏️</b> — переименовать; <b>🎨</b> — цвет строки; <b>🗑</b> — удалить.</li>
+                </ul>
+
+                <h4>🔎 Фильтры</h4>
+                <p>Панель «Фильтры» позволяет отфильтровать строки по <b>конструкции</b>, <b>этапу</b> и <b>бригаде</b>. Итоги и экспорт учитывают фильтр.</p>
+
+                <h4>📚 Справочник работ</h4>
+                <ul>
+                    <li>Открывается кнопкой <b>«📚 Справочник работ»</b>.</li>
+                    <li>При переименовании работа <b>автоматически обновляется во всех ячейках графика</b>.</li>
+                    <li>Новая работа, введённая вручную в ячейке, автоматически попадает в справочник.</li>
+                </ul>
+
+                <h4>📤 Экспорт</h4>
+                <ul>
+                    <li><b>📥 Excel (.xls)</b> — два листа: «Гант» и «Детализация» с гиперссылками между ними.</li>
+                    <li><b>📄 CSV</b> — плоская таблица + блок детализации.</li>
+                    <li><b>💾 / 📂 JSON</b> — сохранение и загрузка полного проекта.</li>
+                </ul>
+
+                <h4>📅 Месяц и сохранение</h4>
+                <ul>
+                    <li>Выбор месяца пересчитывает количество дней (28–31).</li>
+                    <li>Все изменения <b>сохраняются автоматически</b> в браузере (localStorage).</li>
+                    <li><b>🔄 Сбросить данные</b> — вернуть исходный график.</li>
+                </ul>
+
+                <div class="tip">💡 <b>Совет:</b> если данные не отображаются, откройте консоль (F12) — там будет строка <code>✅ Init. Строк: N, Дней: M</code>.</div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-save" onclick="closeHelp()">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+   <!-- Footer -->
+           <!-- Футер -->
+        <div class="footer-links">
+            <p>
+                <a href="https://t.me/ProgrammYankov" target="_blank">🧮 ProgrammYankov</a> |
+                <a href="https://t.me/GeoLisp" target="_blank">📢  Канал GeoLisp</a> |
+                <a href="https://yankov.alex.gen@gmail.com" target="_blank">📐 Mail</a>
+				<a href="mailto:yankov.alex.gen@gmail.com" class="contact-item">
+        <span class="icon">
+          
+        ПОЧТА
+      </a>
+    </div>
+	<a href="https://yoomoney.ru/to/4100119651846362/100" target="_blank">Благодарность Автору по ссылке или QR CODE</a>
+            </p>
+			<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="200.000000pt" height="200.000000pt" viewBox="0 0 567.000000 558.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,558.000000) scale(0.100000,-0.100000)"
+fill="#000000" stroke="none">
+<path d="M0 2790 l0 -2790 2835 0 2835 0 0 2790 0 2790 -2835 0 -2835 0 0
+-2790z m5390 20 l0 -2500 -2500 0 -2500 0 0 2500 0 2500 2500 0 2500 0 0
+-2500z"/>
+<path d="M420 4685 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M760 4685 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M1950 5195 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 -85 0 -85 170 0 170 0 0 -255 0 -255 85 0 85 0 0 255 0 255 85
+0 85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -255 0 -255 170 0
+170 0 0 -85 0 -85 -255 0 -255 0 0 -85 0 -85 -85 0 -85 0 0 170 0 170 85 0 85
+0 0 85 0 85 -425 0 -425 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -425 0 -425 0 0
+-170 0 -170 255 0 255 0 0 -85 0 -85 -170 0 -170 0 0 -85 0 -85 85 0 85 0 0
+-85 0 -85 170 0 170 0 0 -85 0 -85 85 0 85 0 0 85 0 85 170 0 170 0 0 85 0 85
+-85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 85 0 85 0 0 -170 0 -170 85 0 85 0
+0 -85 0 -85 85 0 85 0 0 -170 0 -170 -85 0 -85 0 0 -170 0 -170 -170 0 -170 0
+0 85 0 85 85 0 85 0 0 170 0 170 -170 0 -170 0 0 -85 0 -85 -85 0 -85 0 0 -85
+0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -255 0 -255 0 0 -595 0
+-595 85 0 85 0 0 510 0 510 85 0 85 0 0 -170 0 -170 85 0 85 0 0 85 0 85 85 0
+85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 -85
+0 -85 -170 0 -170 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -170 0 -170 0 0 -170
+0 -170 85 0 85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 170
+0 170 0 0 85 0 85 170 0 170 0 0 -85 0 -85 -85 0 -85 0 0 -170 0 -170 85 0 85
+0 0 170 0 170 255 0 255 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0
+-85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85
+0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -170 0 -170 170 0 170
+0 0 -85 0 -85 85 0 85 0 0 -170 0 -170 85 0 85 0 0 -85 0 -85 255 0 255 0 0
+85 0 85 -255 0 -255 0 0 85 0 85 85 0 85 0 0 85 0 85 -170 0 -170 0 0 85 0 85
+340 0 340 0 0 85 0 85 85 0 85 0 0 -170 0 -170 -170 0 -170 0 0 -85 0 -85 170
+0 170 0 0 -85 0 -85 425 0 425 0 0 -85 0 -85 170 0 170 0 0 85 0 85 85 0 85 0
+0 170 0 170 85 0 85 0 0 255 0 255 -85 0 -85 0 0 -85 0 -85 -170 0 -170 0 0
+-85 0 -85 -85 0 -85 0 0 170 0 170 170 0 170 0 0 85 0 85 170 0 170 0 0 170 0
+170 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 255 0 255 85 0 85 0 0 85 0 85 -85 0
+-85 0 0 85 0 85 -170 0 -170 0 0 85 0 85 170 0 170 0 0 85 0 85 85 0 85 0 0
+85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0
+170 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0
+-85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 -85 0 -85 0
+0 -255 0 -255 -85 0 -85 0 0 255 0 255 -85 0 -85 0 0 -170 0 -170 -85 0 -85 0
+0 170 0 170 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 340 0 340 0 0 -85 0
+-85 170 0 170 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 170 0 170 -85 0
+-85 0 0 85 0 85 -255 0 -255 0 0 -170 0 -170 -85 0 -85 0 0 85 0 85 -85 0 -85
+0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -255 0 -255 0 0 -85 0 -85 -85 0 -85 0 0
+170 0 170 -85 0 -85 0 0 -85z m1020 -170 l0 -85 85 0 85 0 0 -85 0 -85 -85 0
+-85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0
+0 170 0 170 170 0 170 0 0 85 0 85 85 0 85 0 0 -85z m850 0 l0 -85 -85 0 -85
+0 0 -85 0 -85 -170 0 -170 0 0 85 0 85 85 0 85 0 0 85 0 85 170 0 170 0 0 -85z
+m-1530 -340 l0 -85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 -85z m510 -510 l0 -85
+85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -170 0 -170 340 0
+340 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -255 0 -255
+0 0 -85 0 -85 255 0 255 0 0 -85 0 -85 85 0 85 0 0 170 0 170 85 0 85 0 0 170
+0 170 85 0 85 0 0 -170 0 -170 170 0 170 0 0 85 0 85 85 0 85 0 0 -170 0 -170
+-340 0 -340 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0
+-85 0 0 -255 0 -255 -85 0 -85 0 0 -85 0 -85 340 0 340 0 0 -170 0 -170 -255
+0 -255 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 85 0
+85 0 0 -85 0 -85 -170 0 -170 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0
+0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 170 0
+170 85 0 85 0 0 85 0 85 -170 0 -170 0 0 -85 0 -85 -340 0 -340 0 0 -85 0 -85
+-170 0 -170 0 0 85 0 85 170 0 170 0 0 85 0 85 340 0 340 0 0 85 0 85 -85 0
+-85 0 0 170 0 170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 85 0 85 85 0 85 0 0
+-85 0 -85 85 0 85 0 0 170 0 170 170 0 170 0 0 85 0 85 85 0 85 0 0 85 0 85
+-85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 85 0 85 0 0 -85z m-1700 -510
+l0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 -85 0 -85 0
+0 85 0 85 85 0 85 0 0 -85z m510 0 l0 -85 -85 0 -85 0 0 85 0 85 85 0 85 0 0
+-85z m3060 -850 l0 -85 170 0 170 0 0 -85 0 -85 -170 0 -170 0 0 -85 0 -85 85
+0 85 0 0 -170 0 -170 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0
+-85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 85 0 85 0 0 85 0 85 -340 0 -340 0 0
+85 0 85 255 0 255 0 0 170 0 170 85 0 85 0 0 -85z m-3060 -170 l0 -85 -85 0
+-85 0 0 85 0 85 85 0 85 0 0 -85z m2890 -1190 l0 -255 -255 0 -255 0 0 255 0
+255 255 0 255 0 0 -255z m170 -510 l0 -85 -255 0 -255 0 0 -85 0 -85 -85 0
+-85 0 0 170 0 170 340 0 340 0 0 -85z m340 -340 l0 -85 -85 0 -85 0 0 85 0 85
+85 0 85 0 0 -85z"/>
+<path d="M2800 4855 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0
+85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M2970 3410 l0 -170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 -170z"/>
+<path d="M3480 3495 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M2630 3155 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 -170 0 -170 170 0 170 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85
+0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 340 0 340 0 0 85 0 85 85 0 85 0 0
+85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -170 0 -170 -85 0 -85 0 0 170 0
+170 -170 0 -170 0 0 85 0 85 340 0 340 0 0 255 0 255 -85 0 -85 0 0 -170 0
+-170 -170 0 -170 0 0 85 0 85 85 0 85 0 0 85 0 85 -255 0 -255 0 0 170 0 170
+-85 0 -85 0 0 -85z m170 -510 l0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 85
+0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 -85z"/>
+<path d="M4160 1455 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M4160 4685 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M4500 4685 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M1780 4260 l0 -170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 -170z"/>
+<path d="M5010 3835 l0 -85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 -85 0
+-85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M5180 2985 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M5180 2305 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M420 945 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M760 945 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M2120 1455 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M1780 775 l0 -425 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 255 0
+255 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 -340 0 -340 0 0
+85 0 85 170 0 170 0 0 85 0 85 -255 0 -255 0 0 -425z"/>
+</g>
+</svg>
+
+        </div>
+		  </div>
+            <div class="footer-bottom">
+			<p>&copy; 2026 ProgrammYankov.  Все права защищены.</p>
+                <p>По вопросам разработки,использования,а так же сотрудничества.</p>
+            </div>
+    </div>
+    <script>
+        // ================== КОНСТАНТЫ ==================
+        const STORAGE_KEY = 'gantt_schedule_v7';
+        const MONTH_STORAGE_KEY = 'gantt_month_v7';
+        const CATALOG_STORAGE_KEY = 'gantt_catalog_v7';
+        const PROJECT_VERSION = '4.1';
+
+        const stageColors = {
+            'Подготовительные': '#e2e8f0',
+            'Опалубочные': '#fef3c7',
+            'Арматурные': '#fee2e2',
+            'Бетонирование': '#dbeafe',
+            'Технологический': '#d1fae5',
+            'Прочие': '#ede9fe'
+        };
+
+        const PALETTE = [
+            { name: 'Авто', value: 'auto' },
+            { name: 'Серый', value: '#e2e8f0' },
+            { name: 'Жёлтый', value: '#fef3c7' },
+            { name: 'Красный', value: '#fee2e2' },
+            { name: 'Синий', value: '#dbeafe' },
+            { name: 'Зелёный', value: '#d1fae5' },
+            { name: 'Фиолетовый', value: '#ede9fe' },
+            { name: 'Оранжевый', value: '#ffedd5' },
+            { name: 'Розовый', value: '#fce7f3' },
+            { name: 'Бирюзовый', value: '#ccfbf1' },
+            { name: 'Лайм', value: '#ecfccb' },
+            { name: 'Индиго', value: '#e0e7ff' }
+        ];
+
+        const DEFAULT_WORKS = [
+            'Геодезическая разбивка осей', 'Подготовка площадки',
+            'Установка арматурных каркасов колонн', 'Армирование колонн (вязка хомутов)',
+            'Армирование пилонов (вертикальные стержни)', 'Монтаж опалубки колонн',
+            'Монтаж опалубки пилонов', 'Монтаж опалубки плиты перекрытия',
+            'Монтаж опалубки верхней плиты', 'Установка арматурных сеток (нижний слой)',
+            'Вязка нижней арматурной сетки плиты', 'Монтаж верхней арматурной сетки плиты',
+            'Вязка верхней арматурной сетки плиты', 'Установка закладных деталей, гильз',
+            'Бетонирование колонн', 'Бетонирование пилонов', 'Бетонирование плиты перекрытия',
+            'Бетонирование верхней плиты', 'Вибрирование и заглаживание поверхности',
+            'Уход за бетоном (полив, укрытие)', 'Распалубка колонн', 'Распалубка пилонов',
+            'Распалубка плиты перекрытия', 'Распалубка верхней плиты',
+            'Приёмка арматурного каркаса', 'Контроль прочности бетона',
+            'Гидроизоляция узлов примыкания', 'Заделка дефектов, шлифовка',
+            'Уборка, складирование опалубки', 'Геодезическая съёмка выполненных конструкций',
+            'Оформление исполнительной документации', 'Сдача-приёмка скрытых работ'
+        ];
+
+        const DEFAULT_DATA = [
+            { element: 'Колонны', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 1: { people: 10, work: 'Установка арматурных каркасов колонн (нижняя секция)', note: 'Оси А-Г/1-4' }, 2: { people: 10, work: 'Продолжение армирования колонн, вязка хомутов', note: 'Проверка шага хомутов' }, 3: { people: 10, work: 'Завершение армирования колонн, приёмка', note: 'Акт скрытых работ' } } },
+            { element: 'Колонны', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 3: { people: 12, work: 'Монтаж опалубки колонн (щитовая система)', note: 'Щиты 3×3 м' }, 4: { people: 12, work: 'Завершение опалубки колонн, выверка вертикальности', note: 'Допуск ±5 мм' }, 8: { people: 6, work: 'Распалубка колонн (частичная)', note: 'Прочность ≥ 50%' } } },
+            { element: 'Колонны', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 5: { people: 8, work: 'Бетонирование колонн (высота 3.3 м)', note: 'Класс бетона B25, объём 24 м³' } } },
+            { element: 'Пилоны', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 1: { people: 8, work: 'Монтаж опалубки пилонов (1-й ярус)', note: 'Щитовая опалубка' }, 2: { people: 8, work: 'Завершение опалубки пилонов 1-го яруса', note: 'Смазка щитов' }, 9: { people: 6, work: 'Распалубка пилонов', note: 'Прочность ≥ 60%' } } },
+            { element: 'Пилоны', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 2: { people: 9, work: 'Армирование пилонов (вертикальные стержни)', note: 'Стыковка арматуры внахлёст' }, 3: { people: 9, work: 'Продолжение армирования пилонов', note: 'Установка закладных' }, 4: { people: 9, work: 'Армирование пилонов (завершение), приёмка', note: 'Акт скрытых работ' } } },
+            { element: 'Пилоны', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 5: { people: 8, work: 'Бетонирование пилонов (1-й ярус)', note: 'Объём 18 м³, вибрирование' } } },
+            { element: 'Плита перекрытия', stage: 'Подготовительные', brigade: 'Бригада №4 (комплексная)', days: { 5: { people: 5, work: 'Подготовка площадки для плиты перекрытия', note: 'Установка лесов' }, 10: { people: 4, work: 'Подготовка к бетонированию плиты', note: 'Установка маяков' } } },
+            { element: 'Плита перекрытия', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 6: { people: 14, work: 'Монтаж опалубки плиты перекрытия (основная площадь)', note: 'Телескопические стойки, фанера' }, 7: { people: 14, work: 'Продолжение монтажа опалубки плиты, выверка горизонта', note: 'Контроль отметок' }, 8: { people: 14, work: 'Завершение опалубки плиты, установка бортов', note: 'Борта по периметру' }, 12: { people: 8, work: 'Распалубка опалубки плиты (частичная)', note: 'Стойки оставить' }, 15: { people: 10, work: 'Распалубка плиты перекрытия (полная)', note: 'Прочность ≥ 75%' } } },
+            { element: 'Плита перекрытия', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 6: { people: 10, work: 'Установка арматурных сеток (нижний слой)', note: 'Сетка Ø12 шаг 200' }, 7: { people: 12, work: 'Вязка нижней арматурной сетки плиты', note: 'Вязка проволокой' }, 8: { people: 12, work: 'Вязка нижней арматуры (продолжение)', note: '' }, 9: { people: 14, work: 'Монтаж верхней арматурной сетки плиты', note: 'Сетка Ø10 шаг 200' }, 10: { people: 14, work: 'Вязка верхней арматурной сетки плиты', note: 'Соединение с нижней сеткой' } } },
+            { element: 'Плита перекрытия', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 11: { people: 12, work: 'Бетонирование плиты перекрытия (толщина 200 мм)', note: 'Объём 45 м³, класс B25' } } },
+            { element: 'Колонны/пилоны', stage: 'Технологический', brigade: 'Бригада №4 (комплексная)', days: { 6: { people: 2, work: 'Уход за бетоном колонн и пилонов (полив)', note: 'Влажностный уход' }, 7: { people: 2, work: 'Уход за бетоном (полив, укрытие)', note: 'Набор прочности' }, 18: { people: 2, work: 'Уход за бетоном колонн и пилонов', note: 'Полив' }, 19: { people: 2, work: 'Уход за бетоном (полив)', note: '' }, 22: { people: 2, work: 'Уход за бетоном (полив)', note: '' } } },
+            { element: 'Плита перекрытия', stage: 'Технологический', brigade: 'Бригада №4 (комплексная)', days: { 11: { people: 2, work: 'Уход за бетоном (начало)', note: 'Полив водой' }, 12: { people: 3, work: 'Уход за бетоном плиты (полив, укрытие плёнкой)', note: 'Температурный контроль' }, 13: { people: 2, work: 'Уход за бетоном плиты', note: '' }, 14: { people: 2, work: 'Уход за бетоном (полив)', note: 'Прочность ≈ 70%' } } },
+            { element: 'Верхний ярус', stage: 'Подготовительные', brigade: 'ИТР / Геодезия', days: { 12: { people: 4, work: 'Геодезическая разбивка верхнего яруса', note: 'Перенос осей' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 13: { people: 10, work: 'Армирование колонн верхнего яруса', note: 'Вязка каркасов' }, 14: { people: 10, work: 'Продолжение армирования колонн', note: '' }, 15: { people: 10, work: 'Завершение армирования колонн, приёмка', note: 'Акт скрытых работ' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 16: { people: 12, work: 'Монтаж опалубки колонн 2-го яруса', note: '' }, 20: { people: 6, work: 'Распалубка колонн (частичная)', note: '' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 17: { people: 8, work: 'Бетонирование колонн 2-го яруса', note: 'Объём 22 м³' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 13: { people: 9, work: 'Монтаж опалубки пилонов верхнего яруса', note: '' }, 16: { people: 8, work: 'Монтаж опалубки пилонов (верх)', note: '' }, 21: { people: 6, work: 'Распалубка пилонов', note: '' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 14: { people: 9, work: 'Завершение опалубки пилонов, армирование', note: 'Совмещение работ' }, 15: { people: 9, work: 'Завершение армирования пилонов, приёмка', note: 'Акт скрытых работ' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 17: { people: 8, work: 'Бетонирование пилонов 2-го яруса', note: 'Объём 16 м³' } } },
+            { element: 'Верх плиты', stage: 'Подготовительные', brigade: 'Бригада №4 (комплексная)', days: { 17: { people: 5, work: 'Подготовка опалубки для верхней плиты', note: 'Стойки, балки' } } },
+            { element: 'Верх плиты', stage: 'Опалубочные', brigade: 'Бригада №3 (опалубщики)', days: { 18: { people: 14, work: 'Монтаж опалубки верхней плиты (покрытие)', note: 'Фанера, стойки' }, 19: { people: 14, work: 'Продолжение монтажа опалубки верхней плиты', note: '' }, 20: { people: 14, work: 'Завершение опалубки верхней плиты, борта', note: 'Борта по контуру' }, 24: { people: 8, work: 'Распалубка верхней плиты (частичная)', note: '' }, 25: { people: 10, work: 'Полная распалубка верхней плиты', note: 'Прочность ≥ 75%' } } },
+            { element: 'Верх плиты', stage: 'Арматурные', brigade: 'Бригада №1 (арматурщики)', days: { 18: { people: 10, work: 'Установка нижней арматурной сетки верхней плиты', note: '' }, 19: { people: 12, work: 'Вязка нижней арматуры верхней плиты', note: '' }, 20: { people: 13, work: 'Монтаж верхней арматурной сетки', note: '' }, 21: { people: 13, work: 'Вязка верхней арматуры, установка закладных', note: '' } } },
+            { element: 'Верх плиты', stage: 'Бетонирование', brigade: 'Бригада №2 (бетонщики)', days: { 22: { people: 12, work: 'Бетонирование верхней плиты (покрытие)', note: 'Объём 40 м³, класс B25' } } },
+            { element: 'Верх плиты', stage: 'Технологический', brigade: 'Бригада №4 (комплексная)', days: { 22: { people: 2, work: 'Уход за бетоном (полив)', note: '' }, 23: { people: 3, work: 'Уход за бетоном верхней плиты (полив)', note: 'Плёнка, вода' }, 24: { people: 2, work: 'Уход за бетоном верхней плиты', note: '' }, 25: { people: 2, work: 'Уход за бетоном', note: '' }, 28: { people: 2, work: 'Уход за бетоном (завершающий этап)', note: '' } } },
+            { element: 'Колонны/пилоны', stage: 'Прочие', brigade: 'Бригада №5 (отделочники)', days: { 27: { people: 5, work: 'Усиление узлов, монтаж анкерных болтов', note: '' } } },
+            { element: 'Все конструкции', stage: 'Прочие', brigade: 'ИТР / Геодезия', days: { 23: { people: 3, work: 'Контроль качества бетонных поверхностей', note: 'Визуальный осмотр' }, 24: { people: 5, work: 'Заделка дефектов, шлифовка', note: '' }, 26: { people: 3, work: 'Контроль прочности бетона (неразрушающий метод)', note: '' }, 27: { people: 4, work: 'Очистка бетонных поверхностей', note: '' }, 28: { people: 4, work: 'Геодезическая съёмка выполненных конструкций', note: 'Исполнительная схема' }, 29: { people: 5, work: 'Сдача-приёмка скрытых работ (комиссионно)', note: 'Подписание актов' }, 30: { people: 3, work: 'Оформление исполнительной документации', note: 'Акты, схемы' } } },
+            { element: 'Все конструкции', stage: 'Прочие', brigade: 'Бригада №5 (отделочники)', days: { 29: { people: 4, work: 'Устранение замечаний (при наличии)', note: '' }, 28: { people: 6, work: 'Заделка швов, финишная отделка поверхностей', note: '' } } },
+            { element: 'Всё здание', stage: 'Подготовительные', brigade: 'ИТР / Геодезия', days: { 1: { people: 6, work: 'Геодезическая разбивка осей, подготовка площадки', note: 'Разбивка осей 1-го этажа' }, 26: { people: 5, work: 'Подготовка площадки к следующему этапу', note: '' }, 27: { people: 6, work: 'Перемещение материалов на следующий этаж', note: '' }, 29: { people: 6, work: 'Подготовка к следующему циклу работ', note: '' } } },
+            { element: 'Всё здание', stage: 'Прочие', brigade: 'Бригада №4 (комплексная)', days: { 23: { people: 6, work: 'Уборка площадки, перемещение материалов', note: '' }, 25: { people: 6, work: 'Уборка, складирование опалубки', note: '' }, 30: { people: 6, work: 'Итоговая проверка, уборка территории', note: '' } } },
+            { element: 'Всё здание', stage: 'Прочие', brigade: 'ИТР / Геодезия', days: { 30: { people: 2, work: 'Планирование работ на следующий месяц', note: 'Совещание' } } },
+            { element: 'Плита/верх плиты', stage: 'Прочие', brigade: 'Бригада №5 (отделочники)', days: { 26: { people: 4, work: 'Гидроизоляция узлов примыкания', note: 'Обмазочная гидроизоляция' } } }
+        ];
+
+        // ================== УТИЛИТЫ ==================
+        function daysInMonth(year, month) { return new Date(year, month, 0).getDate(); }
+        function getMonthFromValue(value) {
+            if (!value || typeof value !== 'string') {
+                const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() + 1 };
+            }
+            const parts = value.split('-');
+            const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10);
+            if (isNaN(y) || isNaN(m) || m < 1 || m > 12) {
+                const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() + 1 };
+            }
+            return { year: y, month: m };
+        }
+        function getMonthLabel(year, month) {
+            const names = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            return `${names[month - 1]} ${year}`;
+        }
+        function getMonthValue(year, month) { return `${year}-${String(month).padStart(2, '0')}`; }
+        function safeInt(v, def) { const n = parseInt(v, 10); return isNaN(n) ? def : n; }
+
+        // ================== СОСТОЯНИЕ ==================
+        let ganttMatrix = [];
+        let editingRowIndex = -1;
+        let editingDayIndex = -1;
+        let editingCellColor = 'auto';
+        let currentYear = 2025;
+        let currentMonth = 6;
+        let daysCount = 30;
+        let worksCatalog = [];
+        let globalSelectedColor = 'auto';
+        let rowColorTargetIndex = -1;
+
+        let filterElement = '';
+        let filterStage = '';
+        let filterBrigade = '';
+
+        // Режим «Карандаш»
+        let pencilMode = false;
+        let pencilSource = null; // { rowIdx, dayIdx, data: {...}|null, rowColor }
+        let pencilHover = null; // { rowIdx, dayIdx } — превью диапазона при наведении
+
+        // ================== НОРМАЛИЗАЦИЯ ==================
+        function normalizeDaysCount() { daysCount = daysInMonth(currentYear, currentMonth); }
+
+        function normalizeDay(raw) {
+            if (!raw || typeof raw !== 'object') return null;
+            const people = Number(raw.people);
+            const hasWork = typeof raw.work === 'string' && raw.work.trim() !== '';
+            const hasNote = typeof raw.note === 'string' && raw.note.trim() !== '';
+            const planned = raw.planned === true;
+            if ((!isNaN(people) && people > 0) || planned || hasWork || hasNote) {
+                return {
+                    people: !isNaN(people) && people >= 0 ? people : 0,
+                    work: hasWork ? raw.work : '',
+                    note: hasNote ? raw.note : '',
+                    planned: true,
+                    color: typeof raw.color === 'string' && raw.color ? raw.color : null
+                };
+            }
+            return null;
+        }
+
+        function normalizeDaysArray(rawDays, targetLen) {
+            const days = new Array(targetLen).fill(null);
+            if (!rawDays) return days;
+            if (Array.isArray(rawDays)) {
+                for (let i = 0; i < Math.min(rawDays.length, targetLen); i++) {
+                    const d = normalizeDay(rawDays[i]); if (d) days[i] = d;
+                }
+            } else if (typeof rawDays === 'object') {
+                for (const key in rawDays) {
+                    const idx = Math.floor(parseFloat(key)) - 1;
+                    if (idx >= 0 && idx < targetLen) {
+                        const d = normalizeDay(rawDays[key]); if (d) days[idx] = d;
+                    }
+                }
+            }
+            return days;
+        }
+
+        function normalizeRow(item, targetLen) {
+            if (!item || typeof item !== 'object') return null;
+            const element = String(item.element || '').trim();
+            const stage = String(item.stage || '').trim();
+            if (!element || !stage) return null;
+            return {
+                element, stage,
+                brigade: typeof item.brigade === 'string' ? item.brigade : '',
+                days: normalizeDaysArray(item.days, targetLen),
+                rowColor: typeof item.rowColor === 'string' && item.rowColor ? item.rowColor : null
+            };
+        }
+
+        function normalizeMatrix(matrix, targetLen) {
+            if (!Array.isArray(matrix)) return [];
+            const result = [];
+            matrix.forEach(item => { const r = normalizeRow(item, targetLen); if (r) result.push(r); });
+            return result;
+        }
+
+        function normalizeDefaults() {
+            const targetDays = daysInMonth(currentYear, currentMonth);
+            return DEFAULT_DATA.map(item => {
+                const days = new Array(targetDays).fill(null);
+                for (const key in item.days) {
+                    const idx = Math.floor(parseFloat(key)) - 1;
+                    if (idx >= 0 && idx < targetDays && item.days[key]) {
+                        const d = normalizeDay(item.days[key]); if (d) days[idx] = d;
+                    }
+                }
+                return { element: item.element, stage: item.stage, brigade: item.brigade || '', days, rowColor: null };
+            });
+        }
+
+        // ================== ХРАНИЛИЩЕ ==================
+        function loadWorksCatalog() {
+            try {
+                const saved = localStorage.getItem(CATALOG_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        worksCatalog = parsed.filter(w => typeof w === 'string' && w.trim() !== '');
+                        if (worksCatalog.length > 0) return;
+                    }
+                }
+            } catch (e) { console.warn(e); }
+            worksCatalog = [...DEFAULT_WORKS];
+        }
+        function saveWorksCatalog() {
+            try { localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(worksCatalog)); } catch (e) { console.warn(e); }
+        }
+
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        const normalized = normalizeMatrix(parsed, daysCount);
+                        if (normalized.length > 0) { ganttMatrix = normalized; return; }
+                    }
+                }
+            } catch (e) { console.warn(e); }
+            ganttMatrix = normalizeDefaults();
+            saveToStorage();
+        }
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(ganttMatrix));
+                localStorage.setItem(MONTH_STORAGE_KEY, getMonthValue(currentYear, currentMonth));
+            } catch (e) { console.warn(e); }
+        }
+
+        // ================== ИНИЦИАЛИЗАЦИЯ ==================
+        function init() {
+            const savedMonth = localStorage.getItem(MONTH_STORAGE_KEY);
+            if (savedMonth) { const m = getMonthFromValue(savedMonth); currentYear = m.year; currentMonth = m.month; }
+            document.getElementById('monthPicker').value = getMonthValue(currentYear, currentMonth);
+            normalizeDaysCount();
+
+            loadWorksCatalog();
+            loadFromStorage();
+
+            renderTable();
+            updateDatalists();
+            updateMonthInfo();
+            renderGlobalPalette();
+            renderModalPalette();
+            renderFilterOptions();
+
+            document.getElementById('monthPicker').addEventListener('change', onMonthChange);
+            console.log('✅ Init. Строк:', ganttMatrix.length, 'Дней:', daysCount);
+        }
+
+        // ================== ФИЛЬТРЫ ==================
+        function renderFilterOptions() {
+            const elSel = document.getElementById('filterElement');
+            const stSel = document.getElementById('filterStage');
+            const brSel = document.getElementById('filterBrigade');
+
+            const elements = new Set(), stages = new Set(), brigades = new Set();
+            ganttMatrix.forEach(r => {
+                if (r.element) elements.add(r.element);
+                if (r.stage) stages.add(r.stage);
+                if (r.brigade) brigades.add(r.brigade);
+            });
+
+            const curEl = elSel.value, curSt = stSel.value, curBr = brSel.value;
+
+            elSel.innerHTML = '<option value="">Все конструкции</option>';
+            [...elements].sort((a,b)=>a.localeCompare(b,'ru')).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; elSel.appendChild(opt);
+            });
+
+            stSel.innerHTML = '<option value="">Все этапы</option>';
+            [...stages].sort((a,b)=>a.localeCompare(b,'ru')).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; stSel.appendChild(opt);
+            });
+
+            brSel.innerHTML = '<option value="">Все бригады</option>';
+            [...brigades].sort((a,b)=>a.localeCompare(b,'ru')).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; brSel.appendChild(opt);
+            });
+
+            if ([...elements].includes(curEl)) elSel.value = curEl;
+            if ([...stages].includes(curSt)) stSel.value = curSt;
+            if ([...brigades].includes(curBr)) brSel.value = curBr;
+        }
+
+        function applyFilters() {
+            filterElement = document.getElementById('filterElement').value;
+            filterStage = document.getElementById('filterStage').value;
+            filterBrigade = document.getElementById('filterBrigade').value;
+            renderTable();
+            updateFilterInfo();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterElement').value = '';
+            document.getElementById('filterStage').value = '';
+            document.getElementById('filterBrigade').value = '';
+            filterElement = ''; filterStage = ''; filterBrigade = '';
+            renderTable();
+            updateFilterInfo();
+            showToast('✖ Фильтры сброшены');
+        }
+
+        function updateFilterInfo() {
+            const info = document.getElementById('filterInfo');
+            const active = [];
+            if (filterElement) active.push(`Конструкция: ${filterElement}`);
+            if (filterStage) active.push(`Этап: ${filterStage}`);
+            if (filterBrigade) active.push(`Бригада: ${filterBrigade}`);
+            if (active.length > 0) {
+                info.style.display = 'inline-block';
+                info.textContent = `🔎 ${active.join(' · ')}`;
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        function getFilteredMatrix() {
+            return ganttMatrix.filter(row => {
+                if (filterElement && row.element !== filterElement) return false;
+                if (filterStage && row.stage !== filterStage) return false;
+                if (filterBrigade && row.brigade !== filterBrigade) return false;
+                return true;
+            });
+        }
+
+        // ================== РЕЖИМ «КАРАНДАШ» ==================
+        function togglePencilMode() {
+            if (pencilMode) exitPencilMode();
+            else enterPencilMode();
+        }
+
+        function enterPencilMode() {
+            pencilMode = true;
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilBtn').classList.add('active');
+            document.getElementById('pencilBtn').textContent = '✏️ Карандаш (вкл)';
+            document.getElementById('pencilPanel').classList.add('active');
+            document.getElementById('pencilSourceInfo').textContent = 'Образец не выбран';
+            document.getElementById('pencilSourceInfo').style.color = '#0f172a';
+            document.getElementById('pencilStep').textContent = 'Шаг 1: кликните по ячейке-образцу';
+            renderTable();
+            showToast('✏️ Режим «Карандаш». Выберите ячейку-образец.');
+        }
+
+        function exitPencilMode() {
+            pencilMode = false;
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilBtn').classList.remove('active');
+            document.getElementById('pencilBtn').textContent = '✏️ Карандаш (копировать образец)';
+            document.getElementById('pencilPanel').classList.remove('active');
+            document.getElementById('pencilSourceInfo').textContent = 'Образец не выбран';
+            document.getElementById('pencilSourceInfo').style.color = '#0f172a';
+            document.getElementById('pencilStep').textContent = 'Шаг 1: кликните по ячейке-образцу';
+            renderTable();
+            showToast('✏️ Режим «Карандаш» выключен');
+        }
+
+        function selectPencilSource(rowIdx, dayIdx) {
+            const combo = ganttMatrix[rowIdx];
+            const dayData = combo.days[dayIdx];
+            pencilSource = {
+                rowIdx, dayIdx,
+                data: dayData ? { ...dayData } : null,
+                rowColor: combo.rowColor
+            };
+            pencilHover = null;
+
+            const info = document.getElementById('pencilSourceInfo');
+            if (!dayData) {
+                info.textContent = '📋 Образец: ПУСТАЯ ячейка (очистит диапазон)';
+                info.style.color = '#dc2626';
+            } else {
+                const parts = [];
+                if (dayData.people > 0) parts.push(`👷 ${dayData.people} чел.`);
+                else parts.push('👷 0 (план)');
+                if (dayData.work) parts.push(`📝 ${dayData.work.substring(0, 40)}${dayData.work.length > 40 ? '…' : ''}`);
+                if (dayData.note) parts.push(`💬 ${dayData.note.substring(0, 30)}${dayData.note.length > 30 ? '…' : ''}`);
+                info.textContent = '📋 ' + parts.join(' · ');
+                info.style.color = '#0f172a';
+            }
+
+            document.getElementById('pencilStep').textContent = 'Шаг 2: кликните по конечной ячейке диапазона';
+            renderTable();
+            showToast('✅ Образец выбран. Теперь кликните по конечной ячейке диапазона.');
+        }
+
+        function applyPencilRange(targetRowIdx, targetDayIdx) {
+            if (!pencilSource) return;
+
+            const r1 = Math.min(pencilSource.rowIdx, targetRowIdx);
+            const r2 = Math.max(pencilSource.rowIdx, targetRowIdx);
+            const d1 = Math.min(pencilSource.dayIdx, targetDayIdx);
+            const d2 = Math.max(pencilSource.dayIdx, targetDayIdx);
+
+            const cellCount = (r2 - r1 + 1) * (d2 - d1 + 1);
+            const isEmpty = !pencilSource.data;
+
+            if (cellCount > 50) {
+                const msg = isEmpty
+                    ? `Очистить ${cellCount} ячеек?`
+                    : `Заполнить ${cellCount} ячеек образцом? Это перезапишет существующие данные.`;
+                if (!confirm(msg)) return;
+            }
+
+            for (let r = r1; r <= r2; r++) {
+                const combo = ganttMatrix[r];
+                if (!combo) continue;
+                for (let d = d1; d <= d2; d++) {
+                    if (d >= 0 && d < daysCount) {
+                        if (isEmpty) {
+                            combo.days[d] = null;
+                        } else {
+                            combo.days[d] = { ...pencilSource.data };
+                        }
+                    }
+                }
+            }
+
+            saveToStorage();
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilSourceInfo').textContent = 'Образец не выбран';
+            document.getElementById('pencilSourceInfo').style.color = '#0f172a';
+            document.getElementById('pencilStep').textContent = 'Шаг 1: кликните по ячейке-образцу';
+            renderTable();
+            showToast(isEmpty
+                ? `🗑 Очищено ячеек: ${cellCount}. Выберите следующий образец.`
+                : `✅ Заполнено ячеек: ${cellCount}. Выберите следующий образец.`);
+        }
+
+        // Обновление подсветки диапазона без полного ререндера
+        function updateRangeHighlight() {
+            const table = document.getElementById('ganttTable');
+            if (!table) return;
+            const cells = table.querySelectorAll('td.cell');
+            cells.forEach(cell => {
+                cell.classList.remove('range-selected', 'range-source');
+            });
+
+            if (!pencilMode) return;
+
+            // Подсветка образца
+            if (pencilSource) {
+                const srcCell = table.querySelector(`td.cell[data-row="${pencilSource.rowIdx}"][data-day="${pencilSource.dayIdx}"]`);
+                if (srcCell) srcCell.classList.add('range-source');
+            }
+
+            // Подсветка диапазона
+            if (pencilSource && pencilHover) {
+                const r1 = Math.min(pencilSource.rowIdx, pencilHover.rowIdx);
+                const r2 = Math.max(pencilSource.rowIdx, pencilHover.rowIdx);
+                const d1 = Math.min(pencilSource.dayIdx, pencilHover.dayIdx);
+                const d2 = Math.max(pencilSource.dayIdx, pencilHover.dayIdx);
+
+                for (let r = r1; r <= r2; r++) {
+                    for (let d = d1; d <= d2; d++) {
+                        const c = table.querySelector(`td.cell[data-row="${r}"][data-day="${d}"]`);
+                        if (c) c.classList.add('range-selected');
+                    }
+                }
+            }
+        }
+
+        // ================== СПРАВОЧНИК ==================
+        function openCatalogEditor() {
+            renderCatalogList();
+            document.getElementById('catalogModal').classList.add('active');
+            setTimeout(() => document.getElementById('catalogNewInput').focus(), 50);
+        }
+        function closeCatalogEditor() {
+            document.getElementById('catalogModal').classList.remove('active');
+            if (document.getElementById('modalOverlay').classList.contains('active')) fillWorkSelect();
+        }
+        function renderCatalogList() {
+            const list = document.getElementById('catalogList');
+            const statsLabel = document.getElementById('catalogStatsLabel');
+            statsLabel.textContent = `Всего записей: ${worksCatalog.length}`;
+            list.innerHTML = '';
+            if (worksCatalog.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'catalog-empty';
+                empty.textContent = 'Справочник пуст. Добавьте первую запись.';
+                list.appendChild(empty); return;
+            }
+            const sorted = worksCatalog.map((w, i) => ({ text: w, idx: i })).sort((a, b) => a.text.localeCompare(b.text, 'ru'));
+            sorted.forEach(({ text, idx }) => {
+                const item = document.createElement('div');
+                item.className = 'catalog-item';
+                const textDiv = document.createElement('div');
+                textDiv.className = 'catalog-text'; textDiv.textContent = text;
+                item.appendChild(textDiv);
+                const actions = document.createElement('div');
+                actions.className = 'catalog-actions';
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'edit'; btnEdit.textContent = '✏️ Изменить';
+                btnEdit.onclick = () => editCatalogItem(idx, text);
+                actions.appendChild(btnEdit);
+                const btnDel = document.createElement('button');
+                btnDel.className = 'del'; btnDel.textContent = '🗑 Удалить';
+                btnDel.onclick = () => deleteCatalogItem(idx, text);
+                actions.appendChild(btnDel);
+                item.appendChild(actions);
+                list.appendChild(item);
+            });
+        }
+        function addCatalogItem() {
+            const input = document.getElementById('catalogNewInput');
+            const value = input.value.trim();
+            if (!value) { showToast('⚠️ Введите название'); return; }
+            if (value.length > 200) { showToast('⚠️ Слишком длинное'); return; }
+            if (worksCatalog.some(w => w.toLowerCase() === value.toLowerCase())) { showToast('⚠️ Уже есть'); return; }
+            worksCatalog.push(value); saveWorksCatalog(); input.value = ''; renderCatalogList();
+            showToast('➕ Добавлено');
+        }
+        function editCatalogItem(idx, oldText) {
+            const newText = prompt(`Изменить:\n\n«${oldText}»\n\nНовое название:`, oldText);
+            if (newText === null) return;
+            const trimmed = newText.trim();
+            if (!trimmed) { showToast('⚠️ Пустое название'); return; }
+            if (worksCatalog.some((w, i) => i !== idx && w.toLowerCase() === trimmed.toLowerCase())) { showToast('⚠️ Уже есть'); return; }
+            if (trimmed === oldText) return;
+            worksCatalog[idx] = trimmed; saveWorksCatalog();
+            let updated = 0;
+            ganttMatrix.forEach(c => c.days.forEach(d => { if (d && d.work === oldText) { d.work = trimmed; updated++; } }));
+            if (updated > 0) { saveToStorage(); renderTable(); }
+            renderCatalogList();
+            showToast(`✏️ Обновлено в графике: ${updated}`);
+        }
+        function deleteCatalogItem(idx, text) {
+            let used = 0;
+            ganttMatrix.forEach(c => c.days.forEach(d => { if (d && d.work === text) used++; }));
+            let msg = `Удалить «${text}»?`;
+            if (used > 0) msg += `\n\n⚠️ Используется в графике ${used} раз(а).`;
+            if (!confirm(msg)) return;
+            worksCatalog.splice(idx, 1); saveWorksCatalog(); renderCatalogList();
+            showToast(`🗑 Удалено (исп. ${used})`);
+        }
+        function resetCatalog() {
+            if (!confirm('Сбросить справочник к исходным 32 записям?')) return;
+            worksCatalog = [...DEFAULT_WORKS]; saveWorksCatalog(); renderCatalogList();
+            showToast('🔄 Справочник сброшен');
+        }
+        function fillWorkSelect() {
+            const select = document.getElementById('modalWorkSelect');
+            select.innerHTML = '<option value="">— Выберите из списка —</option>';
+            worksCatalog.slice().sort((a, b) => a.localeCompare(b, 'ru')).forEach(w => {
+                const opt = document.createElement('option'); opt.value = w; opt.textContent = w; select.appendChild(opt);
+            });
+        }
+        function onWorkSelectChange() {
+            const select = document.getElementById('modalWorkSelect');
+            if (select.value) document.getElementById('modalWork').value = select.value;
+        }
+
+        // ================== СМЕНА МЕСЯЦА ==================
+        function onMonthChange() {
+            const value = document.getElementById('monthPicker').value;
+            if (!value) return;
+            const m = getMonthFromValue(value);
+            currentYear = m.year; currentMonth = m.month; normalizeDaysCount();
+            ganttMatrix = normalizeMatrix(ganttMatrix, daysCount);
+            pencilSource = null;
+            pencilHover = null;
+            saveToStorage(); renderTable(); updateMonthInfo(); renderFilterOptions();
+            showToast(`📅 ${getMonthLabel(currentYear, currentMonth)} (${daysCount} дней)`);
+        }
+        function updateMonthInfo() {
+            const label = getMonthLabel(currentYear, currentMonth);
+            document.getElementById('headerMonthLabel').textContent = label;
+            document.getElementById('monthInfo').textContent = `${label} · ${daysCount} дней`;
+            document.getElementById('daysCount').textContent = daysCount;
+        }
+
+        // ================== ЦВЕТА ==================
+        function getCellColor(combo, dayData) {
+            if (dayData && dayData.color) return dayData.color;
+            if (combo.rowColor) return combo.rowColor;
+            return stageColors[combo.stage] || '#f1f5f9';
+        }
+        function renderGlobalPalette() {
+            const container = document.getElementById('globalPalette');
+            container.querySelectorAll('.swatch').forEach(el => el.remove());
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === globalSelectedColor ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = 'авто'; else sw.style.backgroundColor = c.value;
+                sw.title = c.name;
+                sw.onclick = () => { globalSelectedColor = c.value; renderGlobalPalette(); showToast(`🎨 ${c.name}`); };
+                container.appendChild(sw);
+            });
+        }
+        function renderModalPalette() {
+            const container = document.getElementById('modalPalette');
+            container.innerHTML = '';
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === editingCellColor ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = 'авто'; else sw.style.backgroundColor = c.value;
+                sw.title = c.name;
+                sw.onclick = () => { editingCellColor = c.value; renderModalPalette(); };
+                container.appendChild(sw);
+            });
+        }
+        function renderRowColorPalette(currentColor) {
+            const container = document.getElementById('rowColorPalette');
+            container.innerHTML = '';
+            const active = currentColor || 'auto';
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === active ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = 'авто'; else sw.style.backgroundColor = c.value;
+                sw.title = c.name;
+                sw.dataset.chosen = c.value;
+                sw.onclick = () => {
+                    container.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+                    sw.classList.add('selected');
+                };
+                container.appendChild(sw);
+            });
+        }
+
+        // ================== РЕНДЕР ==================
+        function renderTable() {
+            const table = document.getElementById('ganttTable');
+            table.innerHTML = '';
+
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            const thFirst = document.createElement('th');
+            thFirst.textContent = 'Конструкция / Этап / Бригада';
+            headerRow.appendChild(thFirst);
+            for (let d = 1; d <= daysCount; d++) {
+                const th = document.createElement('th'); th.textContent = d; headerRow.appendChild(th);
+            }
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            const filtered = getFilteredMatrix();
+
+            if (filtered.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = daysCount + 1;
+                const msg = ganttMatrix.length === 0
+                    ? 'Нет данных. Добавьте строку через панель выше.'
+                    : 'По выбранным фильтрам ничего не найдено. Попробуйте сбросить фильтры.';
+                td.textContent = msg;
+                td.style.padding = '20px'; td.style.textAlign = 'center'; td.style.color = '#64748b';
+                tr.appendChild(td); tbody.appendChild(tr);
+            } else {
+                filtered.forEach((combo) => {
+                    const realIdx = ganttMatrix.indexOf(combo);
+                    const tr = document.createElement('tr');
+
+                    const tdName = document.createElement('td');
+                    const nameDiv = document.createElement('div');
+                    nameDiv.innerHTML = `<strong>${combo.element}</strong> — ${combo.stage}${combo.brigade ? `<br><span style="font-size:0.62rem;color:#64748b;">👷 ${combo.brigade}</span>` : ''}`;
+                    tdName.appendChild(nameDiv);
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'row-actions';
+
+                    const btnUp = document.createElement('button');
+                    btnUp.textContent = '⬆️'; btnUp.title = 'Переместить вверх';
+                    btnUp.className = 'up-btn';
+                    btnUp.disabled = realIdx <= 0;
+                    btnUp.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, -1); };
+                    actionsDiv.appendChild(btnUp);
+
+                    const btnDown = document.createElement('button');
+                    btnDown.textContent = '⬇️'; btnDown.title = 'Переместить вниз';
+                    btnDown.className = 'down-btn';
+                    btnDown.disabled = realIdx < 0 || realIdx >= ganttMatrix.length - 1;
+                    btnDown.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, 1); };
+                    actionsDiv.appendChild(btnDown);
+
+                    const btnRename = document.createElement('button');
+                    btnRename.textContent = '✏️'; btnRename.title = 'Изменить';
+                    btnRename.onclick = (e) => { e.stopPropagation(); renameRow(realIdx); };
+                    actionsDiv.appendChild(btnRename);
+
+                    const btnColor = document.createElement('button');
+                    btnColor.textContent = '🎨'; btnColor.title = 'Цвет строки';
+                    btnColor.className = 'color-btn';
+                    btnColor.onclick = (e) => { e.stopPropagation(); openRowColorModal(realIdx); };
+                    actionsDiv.appendChild(btnColor);
+
+                    const btnDel = document.createElement('button');
+                    btnDel.textContent = '🗑'; btnDel.title = 'Удалить';
+                    btnDel.className = 'del';
+                    btnDel.onclick = (e) => { e.stopPropagation(); deleteRow(realIdx); };
+                    actionsDiv.appendChild(btnDel);
+
+                    tdName.appendChild(actionsDiv);
+                    if (combo.rowColor) tdName.style.borderLeft = `5px solid ${combo.rowColor}`;
+                    tr.appendChild(tdName);
+
+                    for (let i = 0; i < daysCount; i++) {
+                        const td = document.createElement('td');
+                        td.className = 'cell';
+                        td.dataset.row = realIdx;
+                        td.dataset.day = i;
+                        const dayData = combo.days[i];
+
+                        if (dayData) {
+                            td.style.backgroundColor = getCellColor(combo, dayData);
+                            if (dayData.people > 0) {
+                                td.textContent = dayData.people; td.classList.add('filled');
+                            } else {
+                                td.classList.add('planned-zero');
+                            }
+                            td.title = `${combo.element} — ${combo.stage}, день ${i+1}: ${dayData.work || ''}${dayData.note ? ' | ' + dayData.note : ''}${combo.brigade ? ' | ' + combo.brigade : ''}${dayData.people === 0 ? ' (0 рабочих)' : ''}`;
+                        } else {
+                            td.textContent = ''; td.classList.add('empty');
+                            td.style.backgroundColor = '#ffffff';
+                            td.title = `Добавить работу на день ${i+1}`;
+                        }
+
+                        // Обработчики для карандаша
+                        td.onclick = (e) => {
+                            if (pencilMode) {
+                                e.stopPropagation();
+                                if (!pencilSource) {
+                                    selectPencilSource(realIdx, i);
+                                } else {
+                                    applyPencilRange(realIdx, i);
+                                }
+                            } else {
+                                openCellEditor(realIdx, i);
+                            }
+                        };
+                        td.onmouseenter = () => {
+                            if (pencilMode && pencilSource) {
+                                pencilHover = { rowIdx: realIdx, dayIdx: i };
+                                updateRangeHighlight();
+                            }
+                        };
+                        td.onmouseleave = () => {
+                            if (pencilMode && pencilSource && pencilHover) {
+                                pencilHover = null;
+                                updateRangeHighlight();
+                            }
+                        };
+                        tr.appendChild(td);
+                    }
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            const tdTotalLabel = document.createElement('td');
+            tdTotalLabel.textContent = filtered.length === ganttMatrix.length
+                ? 'ИТОГО рабочих за день'
+                : `ИТОГО (по фильтру: ${filtered.length} из ${ganttMatrix.length})`;
+            totalRow.appendChild(tdTotalLabel);
+
+            for (let i = 0; i < daysCount; i++) {
+                const td = document.createElement('td');
+                let total = 0;
+                filtered.forEach(combo => {
+                    const day = combo.days[i];
+                    if (day && day.people > 0) total += day.people;
+                });
+                const span = document.createElement('span');
+                span.className = 'total-val' + (total === 0 ? ' zero' : '');
+                span.textContent = total;
+                td.appendChild(span);
+                totalRow.appendChild(td);
+            }
+            tbody.appendChild(totalRow);
+            table.appendChild(tbody);
+            updateStats();
+
+            // После рендера сразу накладываем подсветку (если нужно)
+            updateRangeHighlight();
+        }
+
+        function updateStats() {
+            let maxPeople = 0;
+            ganttMatrix.forEach(combo => combo.days.forEach(day => {
+                if (day && day.people > 0) maxPeople = Math.max(maxPeople, day.people);
+            }));
+            document.getElementById('maxWorkers').textContent = maxPeople;
+            document.getElementById('rowCount').textContent = ganttMatrix.length;
+            document.getElementById('daysCount').textContent = daysCount;
+        }
+
+        function updateDatalists() {
+            const elements = new Set(), stages = new Set(), brigades = new Set();
+            ganttMatrix.forEach(c => {
+                if (c.element) elements.add(c.element);
+                if (c.stage) stages.add(c.stage);
+                if (c.brigade) brigades.add(c.brigade);
+            });
+            const dlEl = document.getElementById('elementList');
+            const dlSt = document.getElementById('stageList');
+            const dlBr = document.getElementById('brigadeList');
+            dlEl.innerHTML = ''; dlSt.innerHTML = ''; dlBr.innerHTML = '';
+            [...elements].sort().forEach(el => { const o = document.createElement('option'); o.value = el; dlEl.appendChild(o); });
+            [...stages].sort().forEach(st => { const o = document.createElement('option'); o.value = st; dlSt.appendChild(o); });
+            [...brigades].sort().forEach(br => { const o = document.createElement('option'); o.value = br; dlBr.appendChild(o); });
+        }
+
+        // ================== ПЕРЕМЕЩЕНИЕ СТРОК ==================
+        function moveRow(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= ganttMatrix.length) return;
+            const temp = ganttMatrix[index];
+            ganttMatrix[index] = ganttMatrix[newIndex];
+            ganttMatrix[newIndex] = temp;
+            pencilSource = null;
+            pencilHover = null;
+            saveToStorage();
+            renderTable();
+            renderFilterOptions();
+            showToast(direction < 0 ? '⬆️ Строка перемещена вверх' : '⬇️ Строка перемещена вниз');
+        }
+
+        // ================== РЕДАКТИРОВАНИЕ ЯЧЕЙКИ ==================
+        function openCellEditor(rowIndex, dayIndex) {
+            editingRowIndex = rowIndex; editingDayIndex = dayIndex;
+            const combo = ganttMatrix[rowIndex];
+            const dayData = combo.days[dayIndex];
+
+            document.getElementById('modalTitle').textContent = `📅 День ${dayIndex + 1} — ${combo.element}`;
+            document.getElementById('modalSubtitle').textContent = `Этап: ${combo.stage}${combo.brigade ? ' · ' + combo.brigade : ''}`;
+
+            fillWorkSelect();
+            const peopleInput = document.getElementById('modalPeople');
+            const workInput = document.getElementById('modalWork');
+            const noteInput = document.getElementById('modalNote');
+
+            if (dayData) {
+                peopleInput.value = dayData.people;
+                workInput.value = dayData.work || '';
+                noteInput.value = dayData.note || '';
+                document.getElementById('modalWorkSelect').value = worksCatalog.includes(dayData.work) ? dayData.work : '';
+                editingCellColor = dayData.color || 'auto';
+            } else {
+                peopleInput.value = 0; workInput.value = ''; noteInput.value = '';
+                document.getElementById('modalWorkSelect').value = '';
+                editingCellColor = globalSelectedColor;
+            }
+            renderModalPalette();
+            document.getElementById('modalOverlay').classList.add('active');
+            setTimeout(() => peopleInput.focus(), 50);
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            editingRowIndex = -1; editingDayIndex = -1;
+        }
+        function saveCell() {
+            if (editingRowIndex < 0 || editingDayIndex < 0) return;
+            const people = safeInt(document.getElementById('modalPeople').value, 0);
+            const work = document.getElementById('modalWork').value.trim();
+            const note = document.getElementById('modalNote').value.trim();
+            if (people < 0) { showToast('⚠️ Отрицательное значение'); return; }
+            const combo = ganttMatrix[editingRowIndex];
+            const isEmpty = (people === 0 && !work && !note && editingCellColor === 'auto');
+            if (isEmpty) combo.days[editingDayIndex] = null;
+            else combo.days[editingDayIndex] = { people, work, note, planned: true, color: editingCellColor === 'auto' ? null : editingCellColor };
+
+            if (work && !worksCatalog.some(w => w.toLowerCase() === work.toLowerCase())) {
+                worksCatalog.push(work); saveWorksCatalog();
+                if (document.getElementById('catalogModal').classList.contains('active')) renderCatalogList();
+            }
+            saveToStorage(); renderTable(); closeModal();
+            showToast(isEmpty ? '🗑 Очищено' : '✅ Сохранено');
+        }
+        function deleteCell() {
+            if (editingRowIndex < 0 || editingDayIndex < 0) return;
+            ganttMatrix[editingRowIndex].days[editingDayIndex] = null;
+            saveToStorage(); renderTable(); closeModal();
+            showToast('🗑 Удалено');
+        }
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        // ================== ЦВЕТ СТРОКИ ==================
+        function openRowColorModal(rowIndex) {
+            rowColorTargetIndex = rowIndex;
+            const combo = ganttMatrix[rowIndex];
+            document.getElementById('rowColorTitle').textContent = '🎨 Цвет строки';
+            document.getElementById('rowColorSub').textContent = `${combo.element} — ${combo.stage}${combo.brigade ? ' · ' + combo.brigade : ''}`;
+            renderRowColorPalette(combo.rowColor);
+            document.getElementById('rowColorModal').classList.add('active');
+        }
+        function closeRowColorModal() {
+            document.getElementById('rowColorModal').classList.remove('active');
+            rowColorTargetIndex = -1;
+        }
+        function saveRowColor() {
+            if (rowColorTargetIndex < 0) return;
+            const selected = document.querySelector('#rowColorPalette .swatch.selected');
+            if (!selected) { showToast('⚠️ Выберите цвет'); return; }
+            const chosen = selected.dataset.chosen;
+            const combo = ganttMatrix[rowColorTargetIndex];
+            combo.rowColor = (chosen === 'auto') ? null : chosen;
+            saveToStorage(); renderTable(); closeRowColorModal();
+            showToast('🎨 Цвет применён');
+        }
+        document.getElementById('rowColorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRowColorModal();
+        });
+
+        // ================== ИНСТРУКЦИЯ ==================
+        function openHelp() {
+            document.getElementById('helpModal').classList.add('active');
+        }
+        function closeHelp() {
+            document.getElementById('helpModal').classList.remove('active');
+        }
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) closeHelp();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeRowColorModal();
+                closeCatalogEditor();
+                closeHelp();
+                if (pencilMode) exitPencilMode();
+            }
+        });
+
+        // ================== СТРОКИ ==================
+        function addNewRow() {
+            const element = document.getElementById('newElement').value.trim();
+            const stage = document.getElementById('newStage').value.trim();
+            const brigade = document.getElementById('newBrigade').value.trim();
+            if (!element || !stage) { showToast('⚠️ Заполните конструкцию и этап'); return; }
+            if (ganttMatrix.some(c => c.element === element && c.stage === stage)) {
+                showToast('⚠️ Такая строка уже существует'); return;
+            }
+            ganttMatrix.push({
+                element, stage, brigade,
+                days: new Array(daysCount).fill(null),
+                rowColor: globalSelectedColor === 'auto' ? null : globalSelectedColor
+            });
+            document.getElementById('newElement').value = '';
+            document.getElementById('newStage').value = '';
+            document.getElementById('newBrigade').value = '';
+            pencilSource = null;
+            saveToStorage(); renderTable(); updateDatalists(); renderFilterOptions();
+            showToast('➕ Строка добавлена');
+        }
+        function deleteRow(rowIndex) {
+            if (rowIndex < 0 || rowIndex >= ganttMatrix.length) return;
+            const combo = ganttMatrix[rowIndex];
+            if (!confirm(`Удалить строку «${combo.element} — ${combo.stage}»?`)) return;
+            ganttMatrix.splice(rowIndex, 1);
+            pencilSource = null;
+            pencilHover = null;
+            saveToStorage(); renderTable(); updateDatalists(); renderFilterOptions();
+            showToast('🗑 Строка удалена');
+        }
+        function renameRow(rowIndex) {
+            const combo = ganttMatrix[rowIndex];
+            const newElement = prompt('Название конструкции:', combo.element);
+            if (newElement === null) return;
+            const newStage = prompt('Название этапа:', combo.stage);
+            if (newStage === null) return;
+            const newBrigade = prompt('Бригада:', combo.brigade || '');
+            if (newBrigade === null) return;
+            const el = newElement.trim(), st = newStage.trim(), br = newBrigade.trim();
+            if (!el || !st) { showToast('⚠️ Названия не могут быть пустыми'); return; }
+            if (ganttMatrix.some((c, i) => i !== rowIndex && c.element === el && c.stage === st)) {
+                showToast('⚠️ Такая строка уже существует'); return;
+            }
+            combo.element = el; combo.stage = st; combo.brigade = br;
+            saveToStorage(); renderTable(); updateDatalists(); renderFilterOptions();
+            showToast('✏️ Переименовано');
+        }
+
+        // ================== СБРОС ==================
+        function resetToDefaults() {
+            if (!confirm('Сбросить все данные к исходному графику?')) return;
+            ganttMatrix = normalizeDefaults();
+            pencilSource = null;
+            pencilHover = null;
+            saveToStorage(); renderTable(); updateDatalists(); renderFilterOptions();
+            showToast('🔄 Данные сброшены');
+        }
+
+        // ================== JSON ==================
+        function saveProjectJSON() {
+            const project = {
+                version: PROJECT_VERSION,
+                savedAt: new Date().toISOString(),
+                year: currentYear, month: currentMonth, daysCount,
+                title: `Месячный график монолитных ЖБ работ (${getMonthLabel(currentYear, currentMonth)})`,
+                worksCatalog, rows: ganttMatrix
+            };
+            const json = JSON.stringify(project, null, 2);
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Проект_графика_Ганта_${getMonthValue(currentYear, currentMonth)}.json`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('💾 Проект сохранён');
+        }
+        function loadProjectJSON(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let rows = null, projYear = currentYear, projMonth = currentMonth, catalog = null;
+                    if (Array.isArray(parsed)) rows = parsed;
+                    else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rows)) {
+                        rows = parsed.rows;
+                        if (parsed.year && parsed.month) {
+                            projYear = safeInt(parsed.year, currentYear);
+                            projMonth = safeInt(parsed.month, currentMonth);
+                            if (projMonth < 1 || projMonth > 12) projMonth = currentMonth;
+                        }
+                        if (Array.isArray(parsed.worksCatalog)) catalog = parsed.worksCatalog;
+                    }
+                    if (!rows) throw new Error('В файле нет массива rows');
+                    currentYear = projYear; currentMonth = projMonth;
+                    document.getElementById('monthPicker').value = getMonthValue(currentYear, currentMonth);
+                    normalizeDaysCount();
+                    const normalized = normalizeMatrix(rows, daysCount);
+                    if (normalized.length === 0) throw new Error('Не удалось прочитать строки (нужны element и stage)');
+                    if (!confirm(`Загрузить проект?\nСтрок: ${normalized.length}\nМесяц: ${getMonthLabel(currentYear, currentMonth)} (${daysCount} дней)\n\nТекущие данные будут заменены.`)) {
+                        event.target.value = ''; return;
+                    }
+                    if (catalog && catalog.length > 0) {
+                        const cleaned = catalog.filter(w => typeof w === 'string' && w.trim() !== '');
+                        if (cleaned.length > 0) { worksCatalog = cleaned; saveWorksCatalog(); }
+                    }
+                    ganttMatrix = normalized;
+                    pencilSource = null;
+                    pencilHover = null;
+                    saveToStorage(); renderTable(); updateDatalists(); updateMonthInfo(); renderFilterOptions();
+                    showToast(`📂 Загружено строк: ${normalized.length}`);
+                } catch (err) {
+                    console.error(err); showToast('❌ ' + err.message);
+                } finally { event.target.value = ''; }
+            };
+            reader.onerror = function() { showToast('❌ Не удалось прочитать файл'); event.target.value = ''; };
+            reader.readAsText(file, 'utf-8');
+        }
+
+        // ================== TOAST ==================
+        let toastTimer = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message; toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+        }
+
+        // ================== ВСПОМОГАТЕЛЬНОЕ ==================
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // ================== EXCEL С ГИПЕРССЫЛКАМИ ==================
+        function exportToExcel() {
+            const filtered = getFilteredMatrix();
+
+            const allDetailRows = [];
+            ganttMatrix.forEach((combo, rowIdx) => {
+                combo.days.forEach((day, dayIdx) => {
+                    if (day && (day.people > 0 || day.work || day.note || day.planned)) {
+                        allDetailRows.push({
+                            rowIdx, dayIdx,
+                            day: dayIdx + 1,
+                            date: `${String(dayIdx + 1).padStart(2, '0')}.${String(currentMonth).padStart(2, '0')}.${currentYear}`,
+                            element: combo.element,
+                            stage: combo.stage,
+                            brigade: combo.brigade || '',
+                            people: day.people || 0,
+                            work: day.work || '',
+                            note: day.note || '',
+                            planned: day.people === 0 ? 'Да (план)' : 'Нет',
+                            color: day.color || combo.rowColor || stageColors[combo.stage] || ''
+                        });
+                    }
+                });
+            });
+
+            allDetailRows.sort((a, b) => a.day - b.day || a.rowIdx - b.rowIdx);
+
+            const DETAIL_HEADER_ROWS = 4;
+            const detailLinkMap = new Map();
+            allDetailRows.forEach((r, index) => {
+                detailLinkMap.set(`${r.rowIdx}:${r.dayIdx}`, DETAIL_HEADER_ROWS + 1 + index);
+            });
+
+            const SHEET1_NAME = 'Гант';
+            const SHEET2_NAME = 'Детализация';
+
+            let ganttHtml = `
+                <h3>Месячный график монолитных ЖБ работ — ${getMonthLabel(currentYear, currentMonth)}</h3>
+                ${filterElement || filterStage || filterBrigade ? `<p><b>Фильтр:</b> ${[filterElement ? 'Конструкция: ' + escapeHtml(filterElement) : '', filterStage ? 'Этап: ' + escapeHtml(filterStage) : '', filterBrigade ? 'Бригада: ' + escapeHtml(filterBrigade) : ''].filter(Boolean).join(' · ')}</p>` : ''}
+                <p style="font-size:11px;color:#666;">💡 Клик по числу в ячейке открывает соответствующую строку на листе «${SHEET2_NAME}».</p>
+                <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:11px;text-align:center;">
+                    <thead>
+                        <tr style="background:#0f172a;color:#fff;">
+                            <th style="text-align:left;min-width:200px;">Конструкция / Этап / Бригада</th>`;
+
+            for (let d = 1; d <= daysCount; d++) {
+                ganttHtml += `<th>${d}</th>`;
+            }
+            ganttHtml += `</tr></thead><tbody>`;
+
+            filtered.forEach((combo) => {
+                const realRowIdx = ganttMatrix.indexOf(combo);
+                ganttHtml += `<tr>`;
+                ganttHtml += `<td style="text-align:left;background:#f8fafc;font-weight:bold;">
+                    ${escapeHtml(combo.element)} — ${escapeHtml(combo.stage)}
+                    ${combo.brigade ? `<br><span style="font-size:10px;color:#64748b;font-weight:normal;">👷 ${escapeHtml(combo.brigade)}</span>` : ''}
+                </td>`;
+
+                for (let i = 0; i < daysCount; i++) {
+                    const dayData = combo.days[i];
+                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note || dayData.planned)) {
+                        const bg = dayData.color || combo.rowColor || stageColors[combo.stage] || '#f1f5f9';
+                        const targetRowNum = detailLinkMap.get(`${realRowIdx}:${i}`);
+                        const displayText = dayData.people > 0 ? dayData.people : '0';
+                        if (targetRowNum) {
+                            ganttHtml += `<td style="background:${bg};">
+                                <a href="#'${SHEET2_NAME}'!A${targetRowNum}" style="color:#1a56db;text-decoration:none;font-weight:bold;display:block;">${displayText}</a>
+                            </td>`;
+                        } else {
+                            ganttHtml += `<td style="background:${bg};">${displayText}</td>`;
+                        }
+                    } else {
+                        ganttHtml += `<td style="background:#fff;"></td>`;
+                    }
+                }
+                ganttHtml += `</tr>`;
+            });
+
+            ganttHtml += `<tr style="background:#0f172a;color:#fff;font-weight:bold;">
+                <td style="text-align:left;background:#1e293b;">ИТОГО рабочих за день${filtered.length !== ganttMatrix.length ? ` (по фильтру: ${filtered.length} из ${ganttMatrix.length})` : ''}</td>`;
+            for (let i = 0; i < daysCount; i++) {
+                let total = 0;
+                filtered.forEach(combo => {
+                    const day = combo.days[i];
+                    if (day && day.people > 0) total += day.people;
+                });
+                ganttHtml += `<td style="background:#0f172a;color:${total === 0 ? '#64748b' : '#4ade80'};">${total}</td>`;
+            }
+            ganttHtml += `</tr></tbody></table>`;
+
+            let detailHtml = `
+                <h3>Детализация работ — ${getMonthLabel(currentYear, currentMonth)}</h3>
+                <p>Все записи с описаниями, примечаниями и бригадами. Всего: ${allDetailRows.length}.<br>
+                💡 Клик по номеру строки (столбец «№») возвращает к графику.</p>
+                <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:11px;">
+                    <thead>
+                        <tr style="background:#0f172a;color:#fff;">
+                            <th>№</th>
+                            <th>День</th>
+                            <th>Дата</th>
+                            <th>Конструкция</th>
+                            <th>Этап работ</th>
+                            <th>Бригада</th>
+                            <th>Рабочих</th>
+                            <th>Описание работ</th>
+                            <th>Примечание</th>
+                            <th>План (0 чел.)</th>
+                            <th>Цвет</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+            allDetailRows.forEach((r, index) => {
+                const rowNum = DETAIL_HEADER_ROWS + 1 + index;
+                detailHtml += `<tr>
+                    <td style="text-align:center;background:#f8fafc;">
+                        <a href="#'${SHEET1_NAME}'!A${r.rowIdx + 5}" style="color:#1a56db;text-decoration:none;font-weight:bold;">${rowNum}</a>
+                    </td>
+                    <td style="text-align:center;font-weight:bold;">${r.day}</td>
+                    <td style="text-align:center;">${r.date}</td>
+                    <td>${escapeHtml(r.element)}</td>
+                    <td>${escapeHtml(r.stage)}</td>
+                    <td>${escapeHtml(r.brigade)}</td>
+                    <td style="text-align:center;font-weight:bold;background:${r.color || '#fff'};">${r.people}</td>
+                    <td>${escapeHtml(r.work)}</td>
+                    <td>${escapeHtml(r.note)}</td>
+                    <td style="text-align:center;">${r.planned}</td>
+                    <td style="text-align:center;background:${r.color || '#fff'};">${r.color || '—'}</td>
+                </tr>`;
+            });
+            detailHtml += `</tbody></table>`;
+
+            const fullHtml = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                      xmlns:x="urn:schemas-microsoft-com:office:excel"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head>
+                    <meta charset="UTF-8">
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <x:ExcelWorkbook>
+                            <x:ExcelWorksheets>
+                                <x:ExcelWorksheet>
+                                    <x:Name>${SHEET1_NAME}</x:Name>
+                                    <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                                <x:ExcelWorksheet>
+                                    <x:Name>${SHEET2_NAME}</x:Name>
+                                    <x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+                                </x:ExcelWorksheet>
+                            </x:ExcelWorksheets>
+                        </x:ExcelWorkbook>
+                    </xml>
+                    <![endif]-->
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; }
+                        table { border-collapse: collapse; }
+                        th, td { border: 1px solid #999; padding: 3px 5px; vertical-align: top; }
+                        th { background: #0f172a; color: #fff; }
+                        a { color: #1a56db; text-decoration: none; font-weight: bold; }
+                        a:hover { text-decoration: underline; }
+                        .page-break { page-break-before: always; }
+                        h3 { color: #0f172a; }
+                    </style>
+                </head>
+                <body>
+                    <div>${ganttHtml}</div>
+                    <br style="page-break-before:always;">
+                    <div>${detailHtml}</div>
+                </body>
+                </html>
+            `;
+
+            const blob = new Blob(['\ufeff' + fullHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `График_монолитных_работ_${getMonthValue(currentYear, currentMonth)}.xls`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast(`📥 Excel с гиперссылками: ${allDetailRows.length} записей`);
+        }
+
+        // ================== CSV ==================
+        function exportToCSV() {
+            const filtered = getFilteredMatrix();
+            const headers = ['Конструкция / Этап / Бригада'];
+            for (let i = 1; i <= daysCount; i++) headers.push(`День ${i}`);
+
+            const rows = filtered.map(combo => {
+                const name = `${combo.element} — ${combo.stage}${combo.brigade ? ' / ' + combo.brigade : ''}`;
+                const row = [name];
+                for (let i = 0; i < daysCount; i++) {
+                    const d = combo.days[i];
+                    if (d && d.people > 0) row.push(d.people);
+                    else if (d && d.planned) row.push('0 (план)');
+                    else row.push('');
+                }
+                return row;
+            });
+
+            const totalRow = ['ИТОГО рабочих за день'];
+            for (let i = 0; i < daysCount; i++) {
+                let total = 0;
+                filtered.forEach(combo => {
+                    const day = combo.days[i];
+                    if (day && day.people > 0) total += day.people;
+                });
+                totalRow.push(total);
+            }
+            rows.push(totalRow);
+
+            rows.push([]);
+            rows.push(['=== ДЕТАЛИЗАЦИЯ ===']);
+            rows.push(['День', 'Дата', 'Конструкция', 'Этап', 'Бригада', 'Рабочих', 'Описание', 'Примечание', 'План']);
+
+            ganttMatrix.forEach(combo => {
+                combo.days.forEach((day, idx) => {
+                    if (day && (day.people > 0 || day.work || day.note)) {
+                        rows.push([
+                            idx + 1,
+                            `${String(idx+1).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}.${currentYear}`,
+                            combo.element,
+                            combo.stage,
+                            combo.brigade || '',
+                            day.people || 0,
+                            day.work || '',
+                            day.note || '',
+                            day.people === 0 ? 'Да' : 'Нет'
+                        ]);
+                    }
+                });
+            });
+
+            let csv = '\uFEFF' + headers.join(';') + '\n';
+            rows.forEach(r => {
+                csv += r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';') + '\n';
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `График_монолитных_работ_${getMonthValue(currentYear, currentMonth)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast('📄 CSV сформирован');
+        }
+
+        // ================== СТАРТ ==================
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
