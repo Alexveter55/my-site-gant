@@ -1,0 +1,3373 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="theme-color" content="#1a56db">
+    <title>График  работ / RC Schedule</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --card: #ffffff;
+            --border: #dce3ed;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --accent: #1a56db;
+            --accent-hover: #1745a8;
+            --success: #0f973d;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --info: #0891b2;
+            --purple: #7c3aed;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            --radius: 14px;
+            --radius-sm: 8px;
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        html, body { overflow-x: hidden; }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        .container { width: 100%; max-width: 1700px; }
+
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 50%, #1a56db 100%);
+            color: #fff;
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(26, 86, 219, 0.25);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.5px; line-height: 1.3; }
+        .header .subtitle { font-size: 0.9rem; opacity: 0.85; margin-top: 6px; font-weight: 400; }
+        .header-badge {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            padding: 8px 18px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+        .header-badge .dot {
+            width: 10px; height: 10px; border-radius: 50%; background: #4ade80;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.4); }
+        }
+
+        .switches-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+        .switch-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            padding: 4px;
+            box-shadow: var(--shadow);
+        }
+        .switch-group .switch-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 0 8px 0 12px;
+            white-space: nowrap;
+        }
+        .switch-btn {
+            padding: 7px 14px;
+            border-radius: 50px;
+            border: none;
+            background: transparent;
+            font-family: var(--font);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .switch-btn:hover { color: var(--accent); }
+        .switch-btn.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(26,86,219,0.3);
+        }
+
+        .toolbar {
+            display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; align-items: center;
+        }
+        .btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 9px 16px; border-radius: 50px;
+            font-weight: 600; font-size: 0.8rem; border: none; cursor: pointer;
+            transition: all 0.25s ease; font-family: var(--font);
+            letter-spacing: 0.3px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            white-space: nowrap;
+        }
+        .btn-excel { background: #0f973d; color: #fff; }
+        .btn-excel:hover { background: #0b7a31; transform: translateY(-1px); }
+        .btn-csv { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+        .btn-csv:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-print { background: #fff; color: var(--text); border: 1.5px solid var(--border); }
+        .btn-print:hover { border-color: var(--purple); color: var(--purple); }
+        .btn-add { background: var(--accent); color: #fff; }
+        .btn-add:hover { background: var(--accent-hover); }
+        .btn-reset { background: #fff; color: var(--danger); border: 1.5px solid #fecaca; }
+        .btn-reset:hover { background: #fef2f2; border-color: var(--danger); }
+        .btn-json-save { background: #7c3aed; color: #fff; }
+        .btn-json-save:hover { background: #6d28d9; transform: translateY(-1px); }
+        .btn-json-load { background: #fff; color: #7c3aed; border: 1.5px solid #ddd6fe; }
+        .btn-json-load:hover { background: #f5f3ff; border-color: #7c3aed; }
+        .btn-catalog { background: #0891b2; color: #fff; }
+        .btn-catalog:hover { background: #0e7490; transform: translateY(-1px); }
+        .btn-help { background: #0891b2; color: #fff; }
+        .btn-help:hover { background: #0e7490; transform: translateY(-1px); }
+        .btn-pencil { background: #f59e0b; color: #fff; }
+        .btn-pencil:hover { background: #d97706; transform: translateY(-1px); }
+        .btn-pencil.active { background: #dc2626; }
+        .btn-pencil.active:hover { background: #b91c1c; }
+
+        .stats-summary { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+        .stat-chip {
+            background: #fff; border: 1px solid var(--border); border-radius: 50px;
+            padding: 7px 14px; font-size: 0.78rem; font-weight: 600;
+            display: flex; align-items: center; gap: 6px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+        }
+        .stat-chip .num { color: var(--accent); font-size: 1rem; }
+
+        .month-selector {
+            display: flex; align-items: center; gap: 10px;
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 10px 16px; margin-bottom: 16px; box-shadow: var(--shadow);
+            flex-wrap: wrap;
+        }
+        .month-selector label {
+            font-size: 0.8rem; font-weight: 600; color: var(--text);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .month-selector input[type="month"] {
+            padding: 7px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.82rem; color: var(--text);
+            cursor: pointer; max-width: 100%;
+        }
+        .month-selector input[type="month"]:focus { outline: none; border-color: var(--accent); }
+        .month-selector .month-info {
+            font-size: 0.75rem; color: var(--text-light); margin-left: auto;
+        }
+
+        .legend {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px;
+            padding: 12px 16px; background: #fff; border-radius: var(--radius-sm);
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+        }
+        .legend-item {
+            display: flex; align-items: center; gap: 6px; font-size: 0.75rem;
+            font-weight: 500; color: var(--text-light); padding: 4px 10px;
+            border-radius: 20px; background: #f8fafc;
+        }
+        .legend-dot { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+
+        .palette {
+            display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow);
+        }
+        .palette-title {
+            font-size: 0.78rem; font-weight: 700; color: var(--text); margin-right: 6px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .swatch {
+            width: 26px; height: 26px; border-radius: 6px; cursor: pointer;
+            border: 2px solid transparent; transition: all 0.15s;
+            position: relative; box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .swatch:hover { transform: scale(1.12); }
+        .swatch.selected { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(26,86,219,0.3); }
+        .swatch.auto {
+            background: #fff !important; border: 2px dashed #94a3b8;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.55rem; color: #64748b; font-weight: 700;
+        }
+        .palette-hint {
+            font-size: 0.7rem; color: var(--text-light); margin-left: auto;
+            max-width: 420px; line-height: 1.4;
+        }
+
+        .filters-panel {
+            background: #fff; border: 1px solid var(--border); border-radius: var(--radius-sm);
+            padding: 12px 16px; margin-bottom: 16px; box-shadow: var(--shadow);
+            display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-end;
+        }
+        .filters-panel .filter-field { display: flex; flex-direction: column; gap: 4px; }
+        .filters-panel .filter-field label {
+            font-size: 0.68rem; font-weight: 600; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .filters-panel .filter-field select,
+        .filters-panel .filter-field input {
+            padding: 6px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.8rem; min-width: 150px;
+            color: var(--text); background: #fff;
+        }
+        .filters-panel .filter-field select:focus,
+        .filters-panel .filter-field input:focus {
+            outline: none; border-color: var(--accent);
+        }
+        .filters-panel .filter-actions {
+            display: flex; gap: 8px; margin-left: auto; align-items: flex-end;
+        }
+        .filter-badge {
+            display: inline-block; font-size: 0.68rem; font-weight: 700;
+            padding: 2px 8px; border-radius: 20px;
+            background: #dbeafe; color: #1e40af; margin-left: 6px;
+        }
+        .btn-clear-filter {
+            background: #fff; color: var(--text-light); border: 1.5px solid var(--border);
+            padding: 7px 14px; font-size: 0.75rem; border-radius: 50px;
+            cursor: pointer; font-weight: 600; font-family: var(--font);
+            transition: all 0.2s;
+        }
+        .btn-clear-filter:hover { border-color: var(--danger); color: var(--danger); }
+
+        .table-wrapper {
+            background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+            border: 1px solid var(--border); overflow: hidden; margin-bottom: 24px;
+        }
+        .table-scroll {
+            overflow-x: auto; max-height: 70vh; overflow-y: auto; position: relative;
+            -webkit-overflow-scrolling: touch;
+        }
+        .gantt-table {
+            width: 100%; border-collapse: collapse; font-size: 0.75rem;
+            min-width: 1500px; table-layout: fixed;
+        }
+        .gantt-table thead th {
+            background: #0f172a; color: #fff; padding: 8px 2px; text-align: center;
+            font-weight: 600; font-size: 0.68rem; text-transform: uppercase;
+            letter-spacing: 0.3px; border: 1px solid #1e293b;
+            position: sticky; top: 0; z-index: 5;
+        }
+        .gantt-table thead th:first-child {
+            width: 280px; min-width: 280px; text-align: left; padding-left: 10px;
+            z-index: 6; left: 0;
+        }
+        .gantt-table tbody td {
+            border: 1px solid #e2e8f0; text-align: center; vertical-align: middle;
+            padding: 2px; height: 34px; font-weight: 600; color: var(--text);
+            font-size: 0.75rem;
+        }
+        .gantt-table tbody td:first-child {
+            text-align: left; padding-left: 8px; font-weight: 600;
+            background: #f8fafc; border-right: 2px solid #cbd5e1;
+            white-space: normal; word-wrap: break-word;
+            position: sticky; left: 0; z-index: 3;
+            font-size: 0.7rem; line-height: 1.25;
+        }
+        .gantt-table tbody td.cell {
+            cursor: pointer; transition: all 0.15s;
+            position: relative;
+        }
+        .gantt-table tbody td.cell:hover {
+            outline: 2px solid var(--accent);
+            outline-offset: -2px;
+            filter: brightness(0.92);
+        }
+        .gantt-table tbody td.cell.filled { color: #1e293b; }
+        .gantt-table tbody td.cell.empty { background: #fff !important; }
+        .gantt-table tbody td.cell.empty:hover {
+            background: #f0f4ff !important;
+        }
+        .gantt-table tbody td.cell.empty::after {
+            content: '+'; color: #cbd5e1; font-weight: 400; font-size: 0.85rem;
+        }
+        .gantt-table tbody td.cell.planned-zero {
+            color: #94a3b8;
+            font-size: 0.65rem;
+        }
+        .gantt-table tbody td.cell.planned-zero::after {
+            content: '0'; color: #94a3b8; font-weight: 600;
+        }
+
+        /* Значок «примечание» в ячейке */
+        .gantt-table tbody td.cell.has-note {
+            position: relative;
+        }
+        .gantt-table tbody td.cell.has-note::before {
+            content: '💬';
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.55rem;
+            line-height: 1;
+            padding: 1px 2px;
+            opacity: 0.9;
+            z-index: 2;
+        }
+
+        .gantt-table tbody td.cell.range-selected {
+            outline: 3px solid #f59e0b !important;
+            outline-offset: -3px;
+            background-image: linear-gradient(rgba(245,158,11,0.15), rgba(245,158,11,0.15)) !important;
+        }
+        .gantt-table tbody td.cell.range-source {
+            outline: 3px solid #dc2626 !important;
+            outline-offset: -3px;
+            position: relative;
+        }
+        .gantt-table tbody td.cell.range-source::after {
+            content: '📋';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            font-size: 0.6rem;
+            background: #dc2626;
+            color: #fff;
+            padding: 1px 3px;
+            border-radius: 4px 0 0 0;
+            z-index: 2;
+        }
+
+        .gantt-table tbody tr.total-row td {
+            background: #0f172a !important;
+            color: #fff;
+            font-weight: 700;
+            font-size: 0.75rem;
+            border-top: 3px solid var(--accent);
+            position: sticky;
+            bottom: 0;
+            z-index: 4;
+        }
+        .gantt-table tbody tr.total-row td:first-child {
+            background: #1e293b !important;
+            color: #fff;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            border-right: 2px solid var(--accent);
+            position: sticky;
+            left: 0;
+            z-index: 5;
+        }
+        .gantt-table tbody tr.total-row td .total-val {
+            color: #4ade80;
+            font-size: 0.85rem;
+        }
+        .gantt-table tbody tr.total-row td .total-val.zero {
+            color: #64748b;
+        }
+
+        .row-actions {
+            display: flex; gap: 3px; margin-top: 4px; flex-wrap: wrap;
+        }
+        .row-actions button {
+            font-size: 0.6rem; padding: 2px 5px; border-radius: 4px;
+            border: 1px solid var(--border); background: #fff; cursor: pointer;
+            font-weight: 600; color: var(--text-light);
+        }
+        .row-actions button:hover { border-color: var(--accent); color: var(--accent); }
+        .row-actions button.del:hover { border-color: var(--danger); color: var(--danger); }
+        .row-actions button.color-btn:hover { border-color: var(--purple); color: var(--purple); }
+        .row-actions button.up-btn:hover { border-color: var(--success); color: var(--success); }
+        .row-actions button.down-btn:hover { border-color: var(--info); color: var(--info); }
+        .row-actions button:disabled {
+            opacity: 0.35; cursor: not-allowed;
+        }
+        .row-actions button:disabled:hover {
+            border-color: var(--border); color: var(--text-light);
+        }
+
+        .card-view { display: none; }
+
+        .card-day {
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .card-day-header {
+            background: linear-gradient(135deg, #0f172a, #1e3a5f);
+            color: #fff; padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer;
+        }
+        .card-day-header .day-title {
+            font-weight: 700; font-size: 0.92rem;
+        }
+        .card-day-header .day-total {
+            background: rgba(255,255,255,0.15);
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 700;
+        }
+        .card-day-header .chevron {
+            transition: transform 0.2s; font-size: 0.8rem; margin-left: 8px;
+            display: inline-block;
+        }
+        .card-day-header.collapsed .chevron { transform: rotate(-90deg); }
+
+        .card-day-body { display: block; }
+        .card-day-body.collapsed { display: none; }
+
+        .card-row {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .card-row:last-child { border-bottom: none; }
+        .card-row:active { background: #f0f4ff; }
+
+        .card-row .row-title {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 8px; margin-bottom: 6px;
+        }
+        .card-row .row-name {
+            font-weight: 700; font-size: 0.85rem; color: var(--text);
+            line-height: 1.3;
+        }
+        .card-row .row-badge {
+            display: inline-block;
+            padding: 3px 8px; border-radius: 20px;
+            font-size: 0.65rem; font-weight: 700;
+            background: #f1f5f9; color: var(--text-light);
+            white-space: nowrap;
+        }
+        .card-row .row-people {
+            font-weight: 800; font-size: 1.1rem; color: var(--accent);
+            white-space: nowrap;
+        }
+        .card-row .row-people.zero { color: #94a3b8; font-size: 0.9rem; }
+
+        .card-row .row-meta {
+            display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+            margin-top: 4px;
+        }
+        .card-row .row-brigade {
+            font-size: 0.7rem; color: var(--text-light);
+        }
+        .card-row .row-work {
+            font-size: 0.75rem; color: var(--text);
+            line-height: 1.4; margin-top: 4px;
+        }
+        .card-row .row-note {
+            font-size: 0.72rem; color: var(--text-light);
+            font-style: italic; margin-top: 4px;
+        }
+
+        .card-row-stack {
+            background: #fff; border-radius: var(--radius);
+            box-shadow: var(--shadow); border: 1px solid var(--border);
+            margin-bottom: 12px; overflow: hidden;
+        }
+        .card-row-stack-header {
+            background: #f8fafc; padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: flex-start;
+            gap: 8px;
+        }
+        .card-row-stack-header .title {
+            font-weight: 700; font-size: 0.85rem; line-height: 1.3;
+        }
+        .card-row-stack-header .brigade {
+            font-size: 0.7rem; color: var(--text-light); margin-top: 4px;
+        }
+        .card-row-stack-header .row-actions {
+            margin-top: 0; flex-shrink: 0;
+        }
+        .card-row-stack-header .row-actions button {
+            font-size: 0.75rem; padding: 4px 8px;
+        }
+
+        .card-day-chips {
+            display: flex; flex-wrap: wrap; gap: 6px; padding: 10px 12px;
+        }
+        .card-day-chip {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; min-width: 44px; min-height: 44px;
+            border-radius: 8px; cursor: pointer;
+            border: 1.5px solid #e2e8f0; background: #fff;
+            transition: all 0.15s; padding: 4px;
+            position: relative;
+        }
+        .card-day-chip:active { transform: scale(0.95); }
+        .card-day-chip .chip-day {
+            font-size: 0.6rem; color: var(--text-light); font-weight: 600;
+        }
+        .card-day-chip .chip-val {
+            font-size: 0.9rem; font-weight: 800; color: var(--text);
+        }
+        .card-day-chip.has-data { border-color: #60a5fa; }
+        .card-day-chip.has-data .chip-val { color: #1e40af; }
+        .card-day-chip.planned-zero { background: #f8fafc; border-color: #cbd5e1; }
+        .card-day-chip.planned-zero .chip-val { color: #94a3b8; font-size: 0.75rem; }
+
+        /* Значок примечания на чипсе */
+        .card-day-chip.has-note::before {
+            content: '💬';
+            position: absolute;
+            top: 0;
+            right: 0;
+            font-size: 0.5rem;
+            line-height: 1;
+            padding: 1px;
+            opacity: 0.9;
+        }
+
+        .card-day-chip.range-source {
+            background: #fee2e2 !important; border-color: #dc2626 !important;
+            box-shadow: 0 0 0 2px rgba(220,38,38,0.3);
+        }
+        .card-day-chip.range-selected {
+            background: #fef3c7 !important; border-color: #f59e0b !important;
+        }
+
+        /* Панель управления карточками (свернуть/развернуть) */
+        .card-controls {
+            display: none;
+            gap: 8px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .card-controls.visible { display: flex; }
+        .btn-collapse {
+            background: #fff;
+            color: var(--text);
+            border: 1.5px solid var(--border);
+            padding: 8px 14px;
+            font-size: 0.78rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: var(--font);
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-collapse:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .btn-collapse.active {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .card-mode-toggle {
+            display: none;
+            background: #fff; border: 1px solid var(--border); border-radius: 50px;
+            padding: 4px; margin-bottom: 12px; box-shadow: var(--shadow);
+        }
+        .card-mode-toggle button {
+            flex: 1; padding: 8px 14px; border: none; border-radius: 50px;
+            background: transparent; font-family: var(--font); font-size: 0.8rem;
+            font-weight: 600; color: var(--text-light); cursor: pointer;
+            transition: all 0.2s;
+        }
+        .card-mode-toggle button.active {
+            background: var(--accent); color: #fff;
+            box-shadow: 0 2px 8px rgba(26,86,219,0.3);
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.55); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center;
+            z-index: 1000; padding: 20px;
+        }
+        .modal-overlay.active { display: flex; }
+        .modal {
+            background: #fff; border-radius: var(--radius); padding: 26px 24px;
+            width: 100%; max-width: 540px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: modalIn 0.2s ease;
+            max-height: 90vh; overflow-y: auto;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .modal h3 { font-size: 1.05rem; margin-bottom: 4px; color: var(--text); }
+        .modal .modal-sub {
+            font-size: 0.78rem; color: var(--text-light); margin-bottom: 16px;
+            padding-bottom: 12px; border-bottom: 1px solid var(--border);
+        }
+        .modal label {
+            display: block; font-size: 0.75rem; font-weight: 600;
+            margin-bottom: 5px; color: var(--text);
+        }
+        .modal input, .modal textarea, .modal select {
+            width: 100%; padding: 9px 12px; border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border); font-family: var(--font);
+            font-size: 0.85rem; margin-bottom: 12px; color: var(--text);
+            transition: border-color 0.2s;
+        }
+        .modal input:focus, .modal textarea:focus, .modal select:focus {
+            outline: none; border-color: var(--accent);
+        }
+        .modal textarea { resize: vertical; min-height: 60px; }
+        .modal-palette {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;
+            padding: 10px; background: #f8fafc; border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+        .modal-palette .swatch { width: 26px; height: 26px; }
+        .modal-actions {
+            display: flex; gap: 8px; justify-content: flex-end; margin-top: 6px;
+            flex-wrap: wrap;
+        }
+        .modal-actions .btn { padding: 9px 18px; font-size: 0.8rem; }
+        .btn-cancel { background: #fff; color: var(--text-light); border: 1.5px solid var(--border); }
+        .btn-cancel:hover { border-color: var(--text-light); color: var(--text); }
+        .btn-save { background: var(--accent); color: #fff; }
+        .btn-save:hover { background: var(--accent-hover); }
+        .btn-delete {
+            background: #fff; color: var(--danger); border: 1.5px solid #fecaca;
+            margin-right: auto;
+        }
+        .btn-delete:hover { background: #fef2f2; }
+
+        .edit-panel {
+            background: #fff; border-radius: var(--radius-sm); padding: 14px 16px;
+            border: 1px solid var(--border); box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+        .edit-panel h3 {
+            font-size: 0.85rem; margin-bottom: 10px; color: var(--text);
+            display: flex; align-items: center; gap: 8px;
+        }
+        .edit-panel-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+        .edit-panel-row .field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 140px; }
+        .edit-panel-row .field label {
+            font-size: 0.68rem; font-weight: 600; color: var(--text-light);
+            text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .edit-panel-row .field input, .edit-panel-row .field select {
+            padding: 7px 10px; border-radius: 6px; border: 1.5px solid var(--border);
+            font-family: var(--font); font-size: 0.8rem; min-width: 0; width: 100%;
+        }
+        .edit-panel-row .field input:focus, .edit-panel-row .field select:focus {
+            outline: none; border-color: var(--accent);
+        }
+
+        .catalog-tabs {
+            display: flex; gap: 4px; background: #f1f5f9;
+            border-radius: 50px; padding: 4px; margin-bottom: 16px;
+        }
+        .catalog-tab-btn {
+            flex: 1; padding: 9px 14px; border: none; border-radius: 50px;
+            background: transparent; font-family: var(--font); font-size: 0.78rem;
+            font-weight: 600; color: var(--text-light); cursor: pointer;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .catalog-tab-btn:hover { color: var(--accent); }
+        .catalog-tab-btn.active {
+            background: #fff; color: var(--accent);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .catalog-tab-panel { display: none; }
+        .catalog-tab-panel.active { display: block; }
+
+        .catalog-list {
+            display: flex; flex-direction: column; gap: 8px;
+            max-height: 45vh; overflow-y: auto;
+            margin-bottom: 14px; padding-right: 4px;
+        }
+        .catalog-item {
+            display: flex; align-items: center; gap: 8px;
+            background: #f8fafc; border: 1px solid var(--border);
+            border-radius: var(--radius-sm); padding: 8px 12px;
+            transition: all 0.15s;
+        }
+        .catalog-item:hover { border-color: var(--accent); background: #f0f4ff; }
+        .catalog-item .catalog-text {
+            flex: 1; font-size: 0.8rem; color: var(--text);
+            word-break: break-word; line-height: 1.35;
+        }
+        .catalog-item .catalog-count {
+            font-size: 0.65rem; color: var(--text-light);
+            background: #fff; padding: 2px 8px; border-radius: 20px;
+            border: 1px solid var(--border); white-space: nowrap;
+        }
+        .catalog-item .catalog-actions {
+            display: flex; gap: 4px; flex-shrink: 0;
+        }
+        .catalog-item .catalog-actions button {
+            font-size: 0.65rem; padding: 3px 8px; border-radius: 4px;
+            border: 1px solid var(--border); background: #fff; cursor: pointer;
+            font-weight: 600; color: var(--text-light); transition: all 0.15s;
+        }
+        .catalog-item .catalog-actions button.edit:hover {
+            border-color: var(--accent); color: var(--accent); background: #fff;
+        }
+        .catalog-item .catalog-actions button.del:hover {
+            border-color: var(--danger); color: var(--danger); background: #fef2f2;
+        }
+        .catalog-add-row {
+            display: flex; gap: 8px; margin-bottom: 14px;
+        }
+        .catalog-add-row input {
+            flex: 1; padding: 9px 12px; border-radius: var(--radius-sm);
+            border: 1.5px solid var(--border); font-family: var(--font);
+            font-size: 0.85rem; color: var(--text); margin-bottom: 0; min-width: 0;
+        }
+        .catalog-add-row input:focus { outline: none; border-color: var(--accent); }
+        .catalog-empty {
+            text-align: center; padding: 24px; color: var(--text-light);
+            font-size: 0.82rem; background: #f8fafc; border-radius: var(--radius-sm);
+            border: 1px dashed var(--border);
+        }
+        .catalog-stats {
+            font-size: 0.7rem; color: var(--text-light); margin-bottom: 12px;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; gap: 8px;
+        }
+
+        .help-content { font-size: 0.82rem; line-height: 1.6; color: var(--text); }
+        .help-content h4 {
+            font-size: 0.88rem; margin: 14px 0 6px; color: var(--accent);
+            display: flex; align-items: center; gap: 6px;
+        }
+        .help-content h4:first-child { margin-top: 0; }
+        .help-content ul { padding-left: 20px; margin-bottom: 8px; }
+        .help-content li { margin-bottom: 5px; }
+        .help-content code {
+            background: #f1f5f9; padding: 1px 6px; border-radius: 4px;
+            font-size: 0.78rem; color: #0f172a;
+        }
+        .help-content .tip {
+            background: #fef3c7; border-left: 3px solid #f59e0b;
+            padding: 8px 12px; border-radius: 6px; margin: 10px 0;
+            font-size: 0.78rem;
+        }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+            background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 50px;
+            font-size: 0.85rem; font-weight: 500; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            opacity: 0; transition: all 0.3s ease; z-index: 2000; pointer-events: none;
+            max-width: 90vw; text-align: center;
+        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .footer-note {
+            text-align: center; color: var(--text-light); font-size: 0.78rem;
+            padding: 12px; border-top: 1px solid var(--border); background: #fafbfc;
+        }
+
+        .pencil-panel {
+            display: none;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #f59e0b;
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.25);
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .pencil-panel.active { display: flex; }
+        .pencil-panel .pencil-info {
+            font-size: 0.82rem; font-weight: 600; color: #92400e;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .pencil-panel .pencil-source {
+            background: #fff; padding: 6px 12px; border-radius: 6px;
+            font-size: 0.78rem; color: #0f172a; font-weight: 600;
+            border: 1px solid #fbbf24;
+            max-width: 100%;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .pencil-panel .pencil-hint {
+            font-size: 0.72rem; color: #92400e;
+        }
+        .pencil-panel .btn-cancel-pencil {
+            background: #fff; color: #dc2626; border: 1.5px solid #fecaca;
+            padding: 7px 14px; font-size: 0.75rem; border-radius: 50px;
+            cursor: pointer; font-weight: 600; font-family: var(--font);
+            transition: all 0.2s;
+        }
+        .pencil-panel .btn-cancel-pencil:hover { background: #fef2f2; }
+
+        @media (max-width: 1100px) {
+            .toolbar .btn span.btn-text { display: none; }
+            .toolbar .btn { padding: 9px 12px; }
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 12px; }
+            .header { padding: 18px 18px; margin-bottom: 14px; }
+            .header h1 { font-size: 1.15rem; }
+            .header .subtitle { font-size: 0.78rem; }
+            .header-badge { font-size: 0.75rem; padding: 6px 14px; }
+
+            .switches-row { gap: 8px; }
+            .switch-group { padding: 3px; }
+            .switch-group .switch-label { display: none; }
+            .switch-btn { padding: 7px 12px; font-size: 0.72rem; }
+
+            .toolbar { gap: 6px; margin-bottom: 12px; }
+            .btn { padding: 8px 12px; font-size: 0.72rem; flex: 1 1 auto; justify-content: center; }
+
+            .stats-summary {
+                margin-left: 0; width: 100%; justify-content: space-between;
+                gap: 6px;
+            }
+            .stat-chip {
+                padding: 6px 10px; font-size: 0.7rem; flex: 1;
+                justify-content: center;
+            }
+            .stat-chip .num { font-size: 0.9rem; }
+
+            .month-selector { padding: 10px 12px; margin-bottom: 12px; gap: 8px; }
+            .month-selector label { font-size: 0.75rem; }
+            .month-selector input[type="month"] { padding: 6px 8px; font-size: 0.8rem; }
+            .month-selector .month-info { font-size: 0.7rem; margin-left: 0; width: 100%; }
+
+            .legend { padding: 10px 12px; margin-bottom: 12px; gap: 6px; }
+            .legend-item { font-size: 0.68rem; padding: 3px 8px; }
+            .legend-dot { width: 10px; height: 10px; }
+
+            .palette { padding: 10px 12px; margin-bottom: 12px; gap: 6px; }
+            .palette-title { font-size: 0.72rem; }
+            .palette-hint { font-size: 0.65rem; margin-left: 0; width: 100%; max-width: 100%; }
+            .swatch { width: 24px; height: 24px; }
+
+            .filters-panel { padding: 10px 12px; margin-bottom: 12px; gap: 8px; }
+            .filters-panel .filter-field { flex: 1 1 100%; }
+            .filters-panel .filter-field select,
+            .filters-panel .filter-field input {
+                min-width: 0; width: 100%; padding: 8px 10px; font-size: 0.8rem;
+            }
+            .filters-panel .filter-actions { margin-left: 0; width: 100%; gap: 6px; }
+            .btn-clear-filter { padding: 8px 12px; font-size: 0.75rem; flex: 1; }
+
+            .edit-panel { padding: 12px 14px; margin-bottom: 12px; }
+            .edit-panel h3 { font-size: 0.82rem; margin-bottom: 8px; }
+            .edit-panel-row { gap: 8px; }
+            .edit-panel-row .field { flex: 1 1 100%; }
+            .edit-panel-row .field input,
+            .edit-panel-row .field select { padding: 9px 10px; font-size: 0.85rem; }
+            .edit-panel-row .btn-add { width: 100%; justify-content: center; padding: 10px; }
+            .edit-panel p { font-size: 0.68rem !important; }
+
+            .pencil-panel {
+                padding: 10px 12px; margin-bottom: 12px; gap: 8px;
+                flex-direction: column; align-items: stretch;
+            }
+            .pencil-panel .pencil-info { font-size: 0.75rem; }
+            .pencil-panel .pencil-source { font-size: 0.75rem; padding: 5px 10px; max-width: 100%; }
+            .pencil-panel .pencil-hint { font-size: 0.7rem; }
+            .pencil-panel .btn-cancel-pencil { padding: 8px 14px; font-size: 0.75rem; }
+
+            .modal-overlay { padding: 8px; align-items: flex-end; }
+            .modal {
+                padding: 20px 18px; max-height: 92vh;
+                border-radius: var(--radius) var(--radius) 0 0;
+                width: 100%; max-width: 100%;
+            }
+            .modal h3 { font-size: 1rem; }
+            .modal .modal-sub { font-size: 0.75rem; margin-bottom: 14px; padding-bottom: 10px; }
+            .modal input, .modal textarea, .modal select {
+                padding: 10px 12px; font-size: 0.9rem; margin-bottom: 12px;
+            }
+            .modal label { font-size: 0.75rem; }
+            .modal-actions { flex-direction: column-reverse; gap: 8px; }
+            .modal-actions .btn {
+                width: 100%; justify-content: center; padding: 11px;
+                font-size: 0.85rem;
+            }
+            .modal-actions .btn-delete { margin-right: 0; }
+            .modal-palette { padding: 8px; }
+            .modal-palette .swatch { width: 30px; height: 30px; }
+
+            .catalog-add-row { flex-wrap: wrap; }
+            .catalog-add-row input { min-width: 0; width: 100%; }
+            .catalog-add-row .btn-add { width: 100%; justify-content: center; }
+
+            .catalog-stats { flex-direction: column; align-items: flex-start; }
+            .catalog-tabs { gap: 3px; padding: 3px; }
+            .catalog-tab-btn { padding: 8px 10px; font-size: 0.72rem; }
+
+            .toast { font-size: 0.8rem; padding: 10px 18px; bottom: 16px; }
+            .footer-note { font-size: 0.72rem; padding: 10px; }
+
+            .help-content { font-size: 0.8rem; }
+            .help-content h4 { font-size: 0.85rem; }
+
+            .card-mode-toggle { display: flex; }
+            .card-controls.visible { display: flex; }
+        }
+
+        @media (max-width: 400px) {
+            .header h1 { font-size: 1rem; }
+            .btn { font-size: 0.68rem; padding: 7px 10px; }
+            .stat-chip { font-size: 0.65rem; padding: 5px 8px; }
+            .stat-chip .num { font-size: 0.85rem; }
+            .catalog-tab-btn { font-size: 0.68rem; padding: 7px 8px; }
+        }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .toolbar, .legend, .edit-panel, .header-badge, .toast,
+            .month-selector, .palette, .filters-panel, .pencil-panel,
+            .switches-row, .card-mode-toggle, .card-view, .card-controls { display: none !important; }
+            .header { border-radius: 0; box-shadow: none; }
+            .table-wrapper { box-shadow: none; border: 1px solid #ccc; border-radius: 0; display: block !important; }
+            .table-scroll { max-height: none; overflow: visible; }
+            .gantt-table thead th {
+                background: #333 !important; color: #fff !important;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .gantt-table tbody td {
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .row-actions { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1 data-i18n="app_title">📊 Месячный график работ</h1>
+                <div class="subtitle"><span data-i18n="app_subtitle">Диаграмма Ганта by ProgrammYankov V.1</span> · <span id="headerMonthLabel">Июнь 2025</span></div>
+            </div>
+            <div class="header-badge">
+                <span class="dot"></span>
+                <span data-i18n="autosave">Автосохранение</span>
+            </div>
+        </div>
+
+        <div class="switches-row">
+            <div class="switch-group">
+                <span class="switch-label" data-i18n="version">Версия</span>
+                <button class="switch-btn active" id="versionClassic" onclick="setVersion('classic')" data-i18n="version_classic">📋 Классика</button>
+                <button class="switch-btn" id="versionCards" onclick="setVersion('cards')" data-i18n="version_cards">🎴 Карточки</button>
+            </div>
+            <div class="switch-group">
+                <span class="switch-label" data-i18n="language">Язык</span>
+                <button class="switch-btn active" id="langRu" onclick="setLanguage('ru')">🇷🇺 RU</button>
+                <button class="switch-btn" id="langEn" onclick="setLanguage('en')">en EN</button>
+            </div>
+        </div>
+
+        <div class="month-selector">
+            <label for="monthPicker">📅 <span data-i18n="month">Месяц:</span></label>
+            <input type="month" id="monthPicker" value="2025-06">
+            <span class="month-info" id="monthInfo"></span>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn btn-excel" onclick="exportToExcel()" title="Excel">📥<span class="btn-text" data-i18n="excel"> Excel</span></button>
+            <button class="btn btn-csv" onclick="exportToCSV()" title="CSV">📄<span class="btn-text" data-i18n="csv"> CSV</span></button>
+            <button class="btn btn-print" onclick="window.print()" title="Print">🖨️<span class="btn-text" data-i18n="print"> Печать</span></button>
+            <button class="btn btn-json-save" onclick="saveProjectJSON()" title="Save">💾<span class="btn-text" data-i18n="save"> Сохранить</span></button>
+            <button class="btn btn-json-load" onclick="document.getElementById('jsonFileInput').click()" title="Load">📂<span class="btn-text" data-i18n="load"> Загрузить</span></button>
+            <input type="file" id="jsonFileInput" accept=".json,application/json" style="display:none" onchange="loadProjectJSON(event)">
+            <button class="btn btn-reset" onclick="resetToDefaults()" title="Reset">🔄<span class="btn-text" data-i18n="reset"> Сброс</span></button>
+            <button class="btn btn-help" onclick="openHelp()" title="Help">❓<span class="btn-text" data-i18n="help"> Инструкция</span></button>
+            <div class="stats-summary">
+                <div class="stat-chip">👷 <span class="num" id="maxWorkers">0</span></div>
+                <div class="stat-chip">📅 <span class="num" id="daysCount">30</span></div>
+                <div class="stat-chip">🧱 <span class="num" id="rowCount">0</span></div>
+            </div>
+        </div>
+
+        
+
+        <div class="card-mode-toggle" id="cardModeToggle">
+            <button id="cardModeDays" class="active" onclick="setCardMode('days')">📅 <span data-i18n="by_days">По дням</span></button>
+            <button id="cardModeRows" onclick="setCardMode('rows')">📋 <span data-i18n="by_rows">По строкам</span></button>
+        </div>
+
+     
+
+        <div class="legend">
+            <div class="legend-item"><span class="legend-dot" style="background:#e2e8f0;"></span> <span data-i18n="stage_prep">Подготовительные</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#fef3c7;"></span> <span data-i18n="stage_opal">Опалубочные</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#fee2e2;"></span> <span data-i18n="stage_arm">Арматурные</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#dbeafe;"></span> <span data-i18n="stage_beton">Бетонирование</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#d1fae5;"></span> <span data-i18n="stage_tech">Технологический</span></div>
+            <div class="legend-item"><span class="legend-dot" style="background:#ede9fe;"></span> <span data-i18n="stage_other">Прочие</span></div>
+        </div>
+
+        <div class="palette" id="globalPalette">
+            <span class="palette-title" data-i18n="color_title">🎨 Цвет:</span>
+            <span class="palette-hint" data-i18n="color_hint">Выберите цвет для новых ячеек/строк. «Авто» — цвет по этапу.</span>
+        </div>
+
+        <div class="filters-panel">
+            <div class="filter-field">
+                <label data-i18n="filter_element">🏗️ Конструкция</label>
+                <select id="filterElement" onchange="applyFilters()">
+                    <option value="" data-i18n="all">Все</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label data-i18n="filter_stage">⚙️ Этап</label>
+                <select id="filterStage" onchange="applyFilters()">
+                    <option value="" data-i18n="all">Все</option>
+                </select>
+            </div>
+            <div class="filter-field">
+                <label data-i18n="filter_brigade">👷 Бригада</label>
+                <select id="filterBrigade" onchange="applyFilters()">
+                    <option value="" data-i18n="all">Все</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn-clear-filter" onclick="clearFilters()">✖ <span data-i18n="reset_filters">Сбросить</span></button>
+                <span id="filterInfo" class="filter-badge" style="display:none;"></span>
+            </div>
+        </div>
+
+        <div class="edit-panel">
+            <h3>⚙️ <span data-i18n="manage_rows">Управление строками</span></h3>
+            <div class="edit-panel-row">
+                <div class="field">
+                    <label data-i18n="element">Конструкция</label>
+                    <input type="text" id="newElement" placeholder="Плита перекрытия" list="elementList">
+                    <datalist id="elementList"></datalist>
+                </div>
+                <div class="field">
+                    <label data-i18n="stage">Этап</label>
+                    <input type="text" id="newStage" placeholder="Арматурные" list="stageList">
+                    <datalist id="stageList"></datalist>
+                </div>
+                <div class="field">
+                    <label data-i18n="brigade">Бригада</label>
+                    <input type="text" id="newBrigade" placeholder="Бригада №1" list="brigadeList">
+                    <datalist id="brigadeList"></datalist>
+                </div>
+                <button class="btn btn-add" onclick="addNewRow()">➕ <span data-i18n="add">Добавить</span></button>
+            </div>
+	</div>		
+            <p style="font-size:0.72rem;color:var(--text-light);margin-top:10px;" data-i18n="edit_hint">
+                💡 Клик по ячейке — редактирование. ⬆️⬇️ — перемещение. «✏️ Карандаш» — копирование образца.
+            </p>
+			            <button class="btn btn-pencil" id="pencilBtn" onclick="togglePencilMode()" title="Pencil">✏️<span class="btn-text" data-i18n="pencil"> Карандаш</span></button>
+            <button class="btn btn-catalog" onclick="openCatalogEditor()" title="Catalog">📚<span class="btn-text" data-i18n="catalog"> Справочник</span></button>
+			<div class="pencil-panel" id="pencilPanel">
+            <div class="pencil-info">✏️ <b data-i18n="pencil_mode">Карандаш</b></div>
+            <div class="pencil-source" id="pencilSourceInfo" data-i18n="sample_not_selected">Образец не выбран</div>
+            <div class="pencil-hint"><span id="pencilStep" data-i18n="step1">Шаг 1: выберите ячейку-образец</span></div>
+            <button class="btn-cancel-pencil" onclick="exitPencilMode()">✖ <span data-i18n="exit">Выйти</span></button>
+        </div>
+		   <!-- Панель управления карточками: свернуть/развернуть всё -->
+        <div class="card-controls" id="cardControls">
+            <button class="btn-collapse" id="btnCollapseAll" onclick="toggleCollapseAll()">
+                <span id="collapseIcon">🔽</span> <span id="collapseText" data-i18n="collapse_all">Свернуть всё</span>
+            </button>
+            <span style="font-size:0.72rem;color:var(--text-light);" data-i18n="collapse_hint">
+                💡 Клик по заголовку карточки — свернуть/развернуть отдельно
+            </span>
+			
+        </div
+        </div>
+
+        <div class="table-wrapper" id="classicView">
+            <div class="table-scroll" id="tableScroll">
+                <table class="gantt-table" id="ganttTable"></table>
+            </div>
+            <div class="footer-note" data-i18n="table_footer">
+                Каждая закрашенная ячейка — этап в этот день. Число — количество рабочих. 💬 — есть примечание.
+            </div>
+        </div>
+
+        <div class="card-view" id="cardView"></div>
+    </div>
+
+    <!-- Модальное окно редактирования ячейки -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <h3 id="modalTitle" data-i18n="edit_day">Редактирование</h3>
+            <div class="modal-sub" id="modalSubtitle"></div>
+            <label for="modalWorkSelect" data-i18n="work_from_catalog">Работа из справочника</label>
+            <select id="modalWorkSelect" onchange="onWorkSelectChange()">
+                <option value="" data-i18n="select">— Выберите —</option>
+            </select>
+            <label for="modalPeople" data-i18n="people_count">Количество рабочих (0 = план)</label>
+            <input type="number" id="modalPeople" min="0" max="999" value="0">
+            <label for="modalWork" data-i18n="work_desc">Описание работ</label>
+            <textarea id="modalWork" placeholder="Например: Бетонирование колонн, 24 м³"></textarea>
+            <label for="modalNote" data-i18n="note">Примечание</label>
+            <input type="text" id="modalNote" placeholder="Класс бетона B25">
+            <label data-i18n="cell_color">Цвет ячейки</label>
+            <div class="modal-palette" id="modalPalette"></div>
+            <div class="modal-actions">
+                <button class="btn btn-delete" onclick="deleteCell()">🗑 <span data-i18n="clear">Очистить</span></button>
+                <button class="btn btn-cancel" onclick="closeModal()" data-i18n="cancel">Отмена</button>
+                <button class="btn btn-save" onclick="saveCell()">💾 <span data-i18n="save_btn">Сохранить</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно выбора цвета строки -->
+    <div class="modal-overlay" id="rowColorModal">
+        <div class="modal" style="max-width:420px;">
+            <h3 id="rowColorTitle" data-i18n="row_color">🎨 Цвет строки</h3>
+            <div class="modal-sub" id="rowColorSub"></div>
+            <label data-i18n="choose_color">Выберите цвет:</label>
+            <div class="modal-palette" id="rowColorPalette"></div>
+            <div class="modal-actions">
+                <button class="btn btn-cancel" onclick="closeRowColorModal()" data-i18n="cancel">Отмена</button>
+                <button class="btn btn-save" onclick="saveRowColor()">💾 <span data-i18n="apply">Применить</span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно справочника -->
+    <div class="modal-overlay" id="catalogModal">
+        <div class="modal" style="max-width:680px;">
+            <h3 data-i18n="catalog_title">📚 Справочник</h3>
+            <div class="modal-sub" data-i18n="catalog_sub">Управление работами, конструкциями, этапами и бригадами.</div>
+
+            <div class="catalog-tabs" role="tablist">
+                <button class="catalog-tab-btn active" id="tabWorksBtn" onclick="switchCatalogTab('works')">🔧 <span data-i18n="tab_works">Работы</span></button>
+                <button class="catalog-tab-btn" id="tabDictBtn" onclick="switchCatalogTab('dict')">🏗️ <span data-i18n="tab_dict">Конструкции / Этапы / Бригады</span></button>
+            </div>
+
+            <div class="catalog-tab-panel active" id="tabWorksPanel">
+                <div class="catalog-stats">
+                    <span id="catalogStatsLabel">Всего: 0</span>
+                    <button class="btn btn-reset" style="padding:5px 12px;font-size:0.72rem;" onclick="resetCatalog()">🔄 <span data-i18n="reset_btn">Сбросить</span></button>
+                </div>
+                <div class="catalog-add-row">
+                    <input type="text" id="catalogNewInput" placeholder="Новая работа" maxlength="200">
+                    <button class="btn btn-add" style="padding:9px 16px;font-size:0.8rem;" onclick="addCatalogItem()">➕ <span data-i18n="add">Добавить</span></button>
+                </div>
+                <div class="catalog-list" id="catalogList"></div>
+            </div>
+
+            <div class="catalog-tab-panel" id="tabDictPanel">
+                <div class="catalog-tabs" style="background:#e0e7ff;">
+                    <button class="catalog-tab-btn active" id="dictSubElementBtn" onclick="switchDictSubTab('element')">🏗️ <span data-i18n="dict_element">Конструкции</span></button>
+                    <button class="catalog-tab-btn" id="dictSubStageBtn" onclick="switchDictSubTab('stage')">⚙️ <span data-i18n="dict_stage">Этапы</span></button>
+                    <button class="catalog-tab-btn" id="dictSubBrigadeBtn" onclick="switchDictSubTab('brigade')">👷 <span data-i18n="dict_brigade">Бригады</span></button>
+                </div>
+
+                <div class="catalog-tab-panel active" id="dictSubElementPanel">
+                    <div class="catalog-stats"><span id="dictElementStats">Всего: 0</span></div>
+                    <div class="catalog-add-row">
+                        <input type="text" id="dictNewElement" placeholder="Новая конструкция" maxlength="200">
+                        <button class="btn btn-add" style="padding:9px 16px;font-size:0.8rem;" onclick="addDictItem('element')">➕ <span data-i18n="add">Добавить</span></button>
+                    </div>
+                    <div class="catalog-list" id="dictElementList"></div>
+                </div>
+
+                <div class="catalog-tab-panel" id="dictSubStagePanel">
+                    <div class="catalog-stats"><span id="dictStageStats">Всего: 0</span></div>
+                    <div class="catalog-add-row">
+                        <input type="text" id="dictNewStage" placeholder="Новый этап" maxlength="200">
+                        <button class="btn btn-add" style="padding:9px 16px;font-size:0.8rem;" onclick="addDictItem('stage')">➕ <span data-i18n="add">Добавить</span></button>
+                    </div>
+                    <div class="catalog-list" id="dictStageList"></div>
+                </div>
+
+                <div class="catalog-tab-panel" id="dictSubBrigadePanel">
+                    <div class="catalog-stats"><span id="dictBrigadeStats">Всего: 0</span></div>
+                    <div class="catalog-add-row">
+                        <input type="text" id="dictNewBrigade" placeholder="Новая бригада" maxlength="200">
+                        <button class="btn btn-add" style="padding:9px 16px;font-size:0.8rem;" onclick="addDictItem('brigade')">➕ <span data-i18n="add">Добавить</span></button>
+                    </div>
+                    <div class="catalog-list" id="dictBrigadeList"></div>
+                </div>
+            </div>
+
+            <div class="modal-actions" style="margin-top:16px;">
+                <button class="btn btn-cancel" onclick="closeCatalogEditor()" data-i18n="close">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно инструкции -->
+    <div class="modal-overlay" id="helpModal">
+        <div class="modal" style="max-width:640px;">
+            <h3 data-i18n="help_title">❓ Краткая инструкция</h3>
+            <div class="modal-sub" data-i18n="help_sub">Как пользоваться графиком</div>
+            <div class="help-content" id="helpContent"></div>
+            <div class="modal-actions">
+                <button class="btn btn-save" onclick="closeHelp()" data-i18n="ok">Понятно</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+	</div>
+    <!-- Footer -->
+           <!-- Футер -->
+        <div class="footer-links">
+            <p>
+                <a href="https://t.me/ProgrammYankov" target="_blank">🧮 ProgrammYankov</a> |
+                <a href="https://t.me/GeoLisp" target="_blank">📢  Канал GeoLisp</a> |
+                <a href="https://yankov.alex.gen@gmail.com" target="_blank">📐 Mail</a>
+				<a href="mailto:yankov.alex.gen@gmail.com" class="contact-item">
+        <span class="icon">
+          
+        ПОЧТА
+      </a>
+    </div>
+	<a href="https://yoomoney.ru/to/4100119651846362/100" target="_blank">Благодарность Автору по ссылке или QR CODE</a>
+            </p>
+			<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
+ "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" xmlns="http://www.w3.org/2000/svg"
+ width="200.000000pt" height="200.000000pt" viewBox="0 0 567.000000 558.000000"
+ preserveAspectRatio="xMidYMid meet">
+
+<g transform="translate(0.000000,558.000000) scale(0.100000,-0.100000)"
+fill="#000000" stroke="none">
+<path d="M0 2790 l0 -2790 2835 0 2835 0 0 2790 0 2790 -2835 0 -2835 0 0
+-2790z m5390 20 l0 -2500 -2500 0 -2500 0 0 2500 0 2500 2500 0 2500 0 0
+-2500z"/>
+<path d="M420 4685 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M760 4685 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M1950 5195 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 -85 0 -85 170 0 170 0 0 -255 0 -255 85 0 85 0 0 255 0 255 85
+0 85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -255 0 -255 170 0
+170 0 0 -85 0 -85 -255 0 -255 0 0 -85 0 -85 -85 0 -85 0 0 170 0 170 85 0 85
+0 0 85 0 85 -425 0 -425 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -425 0 -425 0 0
+-170 0 -170 255 0 255 0 0 -85 0 -85 -170 0 -170 0 0 -85 0 -85 85 0 85 0 0
+-85 0 -85 170 0 170 0 0 -85 0 -85 85 0 85 0 0 85 0 85 170 0 170 0 0 85 0 85
+-85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 85 0 85 0 0 -170 0 -170 85 0 85 0
+0 -85 0 -85 85 0 85 0 0 -170 0 -170 -85 0 -85 0 0 -170 0 -170 -170 0 -170 0
+0 85 0 85 85 0 85 0 0 170 0 170 -170 0 -170 0 0 -85 0 -85 -85 0 -85 0 0 -85
+0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -255 0 -255 0 0 -595 0
+-595 85 0 85 0 0 510 0 510 85 0 85 0 0 -170 0 -170 85 0 85 0 0 85 0 85 85 0
+85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 -85
+0 -85 -170 0 -170 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -170 0 -170 0 0 -170
+0 -170 85 0 85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 170
+0 170 0 0 85 0 85 170 0 170 0 0 -85 0 -85 -85 0 -85 0 0 -170 0 -170 85 0 85
+0 0 170 0 170 255 0 255 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0
+-85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85
+0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -170 0 -170 170 0 170
+0 0 -85 0 -85 85 0 85 0 0 -170 0 -170 85 0 85 0 0 -85 0 -85 255 0 255 0 0
+85 0 85 -255 0 -255 0 0 85 0 85 85 0 85 0 0 85 0 85 -170 0 -170 0 0 85 0 85
+340 0 340 0 0 85 0 85 85 0 85 0 0 -170 0 -170 -170 0 -170 0 0 -85 0 -85 170
+0 170 0 0 -85 0 -85 425 0 425 0 0 -85 0 -85 170 0 170 0 0 85 0 85 85 0 85 0
+0 170 0 170 85 0 85 0 0 255 0 255 -85 0 -85 0 0 -85 0 -85 -170 0 -170 0 0
+-85 0 -85 -85 0 -85 0 0 170 0 170 170 0 170 0 0 85 0 85 170 0 170 0 0 170 0
+170 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 255 0 255 85 0 85 0 0 85 0 85 -85 0
+-85 0 0 85 0 85 -170 0 -170 0 0 85 0 85 170 0 170 0 0 85 0 85 85 0 85 0 0
+85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0
+170 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0
+-85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 -85 0 -85 0
+0 -255 0 -255 -85 0 -85 0 0 255 0 255 -85 0 -85 0 0 -170 0 -170 -85 0 -85 0
+0 170 0 170 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 340 0 340 0 0 -85 0
+-85 170 0 170 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 170 0 170 -85 0
+-85 0 0 85 0 85 -255 0 -255 0 0 -170 0 -170 -85 0 -85 0 0 85 0 85 -85 0 -85
+0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -255 0 -255 0 0 -85 0 -85 -85 0 -85 0 0
+170 0 170 -85 0 -85 0 0 -85z m1020 -170 l0 -85 85 0 85 0 0 -85 0 -85 -85 0
+-85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0 -85 0
+0 170 0 170 170 0 170 0 0 85 0 85 85 0 85 0 0 -85z m850 0 l0 -85 -85 0 -85
+0 0 -85 0 -85 -170 0 -170 0 0 85 0 85 85 0 85 0 0 85 0 85 170 0 170 0 0 -85z
+m-1530 -340 l0 -85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 -85z m510 -510 l0 -85
+85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -170 0 -170 340 0
+340 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -255 0 -255
+0 0 -85 0 -85 255 0 255 0 0 -85 0 -85 85 0 85 0 0 170 0 170 85 0 85 0 0 170
+0 170 85 0 85 0 0 -170 0 -170 170 0 170 0 0 85 0 85 85 0 85 0 0 -170 0 -170
+-340 0 -340 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 85 0 85 -85 0
+-85 0 0 -255 0 -255 -85 0 -85 0 0 -85 0 -85 340 0 340 0 0 -170 0 -170 -255
+0 -255 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 85 0
+85 0 0 -85 0 -85 -170 0 -170 0 0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0
+0 85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -85 0 -85 -85 0 -85 0 0 170 0
+170 85 0 85 0 0 85 0 85 -170 0 -170 0 0 -85 0 -85 -340 0 -340 0 0 -85 0 -85
+-170 0 -170 0 0 85 0 85 170 0 170 0 0 85 0 85 340 0 340 0 0 85 0 85 -85 0
+-85 0 0 170 0 170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 85 0 85 85 0 85 0 0
+-85 0 -85 85 0 85 0 0 170 0 170 170 0 170 0 0 85 0 85 85 0 85 0 0 85 0 85
+-85 0 -85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 85 0 85 0 0 -85z m-1700 -510
+l0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 -85 0 -85 0
+0 85 0 85 85 0 85 0 0 -85z m510 0 l0 -85 -85 0 -85 0 0 85 0 85 85 0 85 0 0
+-85z m3060 -850 l0 -85 170 0 170 0 0 -85 0 -85 -170 0 -170 0 0 -85 0 -85 85
+0 85 0 0 -170 0 -170 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 -85 0 -85 -85 0
+-85 0 0 85 0 85 -85 0 -85 0 0 170 0 170 85 0 85 0 0 85 0 85 -340 0 -340 0 0
+85 0 85 255 0 255 0 0 170 0 170 85 0 85 0 0 -85z m-3060 -170 l0 -85 -85 0
+-85 0 0 85 0 85 85 0 85 0 0 -85z m2890 -1190 l0 -255 -255 0 -255 0 0 255 0
+255 255 0 255 0 0 -255z m170 -510 l0 -85 -255 0 -255 0 0 -85 0 -85 -85 0
+-85 0 0 170 0 170 340 0 340 0 0 -85z m340 -340 l0 -85 -85 0 -85 0 0 85 0 85
+85 0 85 0 0 -85z"/>
+<path d="M2800 4855 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 85 0
+85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M2970 3410 l0 -170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 -170z"/>
+<path d="M3480 3495 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M2630 3155 l0 -85 -85 0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85
+-85 0 -85 0 0 -170 0 -170 170 0 170 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 -85
+0 -85 0 0 -85 0 -85 85 0 85 0 0 -85 0 -85 340 0 340 0 0 85 0 85 85 0 85 0 0
+85 0 85 -85 0 -85 0 0 85 0 85 -85 0 -85 0 0 -170 0 -170 -85 0 -85 0 0 170 0
+170 -170 0 -170 0 0 85 0 85 340 0 340 0 0 255 0 255 -85 0 -85 0 0 -170 0
+-170 -170 0 -170 0 0 85 0 85 85 0 85 0 0 85 0 85 -255 0 -255 0 0 170 0 170
+-85 0 -85 0 0 -85z m170 -510 l0 -85 85 0 85 0 0 -85 0 -85 -85 0 -85 0 0 85
+0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 -85z"/>
+<path d="M4160 1455 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M4160 4685 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M4500 4685 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M1780 4260 l0 -170 85 0 85 0 0 170 0 170 -85 0 -85 0 0 -170z"/>
+<path d="M5010 3835 l0 -85 85 0 85 0 0 -85 0 -85 85 0 85 0 0 85 0 85 -85 0
+-85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M5180 2985 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M5180 2305 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M420 945 l0 -595 595 0 595 0 0 595 0 595 -595 0 -595 0 0 -595z
+m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
+<path d="M760 945 l0 -255 255 0 255 0 0 255 0 255 -255 0 -255 0 0 -255z"/>
+<path d="M2120 1455 l0 -85 85 0 85 0 0 85 0 85 -85 0 -85 0 0 -85z"/>
+<path d="M1780 775 l0 -425 85 0 85 0 0 85 0 85 85 0 85 0 0 -85 0 -85 255 0
+255 0 0 85 0 85 -85 0 -85 0 0 85 0 85 85 0 85 0 0 85 0 85 -340 0 -340 0 0
+85 0 85 170 0 170 0 0 85 0 85 -255 0 -255 0 0 -425z"/>
+</g>
+</svg>
+
+        </div>
+		  </div>
+            <div class="footer-bottom">
+			<p>&copy; 2026 ProgrammYankov.  Все права защищены.</p>
+                <p>По вопросам разработки,использования,а так же сотрудничества.</p>
+            </div>
+    </div>
+    <script>
+        // ================== КОНСТАНТЫ ==================
+        const STORAGE_KEY = 'gantt_schedule_v11';
+        const MONTH_STORAGE_KEY = 'gantt_month_v11';
+        const CATALOG_STORAGE_KEY = 'gantt_catalog_v11';
+        const DICT_STORAGE_KEY = 'gantt_dict_v11';
+        const VERSION_KEY = 'gantt_version_v3';
+        const LANGUAGE_KEY = 'gantt_language_v3';
+        const CARD_MODE_KEY = 'gantt_card_mode_v3';
+        const COLLAPSE_KEY = 'gantt_collapse_all_v1';
+        const PROJECT_VERSION = '8.0';
+
+        const stageColors = {
+            'Подготовительные': '#e2e8f0', 'Опалубочные': '#fef3c7',
+            'Арматурные': '#fee2e2', 'Бетонирование': '#dbeafe',
+            'Технологический': '#d1fae5', 'Прочие': '#ede9fe',
+            'Preparatory': '#e2e8f0', 'Formwork': '#fef3c7',
+            'Rebar': '#fee2e2', 'Concreting': '#dbeafe',
+            'Technological': '#d1fae5', 'Other': '#ede9fe'
+        };
+
+        const PALETTE = [
+            { name: 'Авто', nameEn: 'Auto', value: 'auto' },
+            { name: 'Серый', nameEn: 'Gray', value: '#e2e8f0' },
+            { name: 'Жёлтый', nameEn: 'Yellow', value: '#fef3c7' },
+            { name: 'Красный', nameEn: 'Red', value: '#fee2e2' },
+            { name: 'Синий', nameEn: 'Blue', value: '#dbeafe' },
+            { name: 'Зелёный', nameEn: 'Green', value: '#d1fae5' },
+            { name: 'Фиолетовый', nameEn: 'Purple', value: '#ede9fe' },
+            { name: 'Оранжевый', nameEn: 'Orange', value: '#ffedd5' },
+            { name: 'Розовый', nameEn: 'Pink', value: '#fce7f3' },
+            { name: 'Бирюзовый', nameEn: 'Turquoise', value: '#ccfbf1' },
+            { name: 'Лайм', nameEn: 'Lime', value: '#ecfccb' },
+            { name: 'Индиго', nameEn: 'Indigo', value: '#e0e7ff' }
+        ];
+
+        const DEFAULT_WORKS = [
+            'Геодезическая разбивка осей', 'Подготовка площадки',
+            'Установка арматурных каркасов колонн', 'Армирование колонн (вязка хомутов)',
+            'Армирование пилонов (вертикальные стержни)', 'Монтаж опалубки колонн',
+            'Монтаж опалубки пилонов', 'Монтаж опалубки плиты перекрытия',
+            'Монтаж опалубки верхней плиты', 'Установка арматурных сеток (нижний слой)',
+            'Вязка нижней арматурной сетки плиты', 'Монтаж верхней арматурной сетки плиты',
+            'Вязка верхней арматурной сетки плиты', 'Установка закладных деталей, гильз',
+            'Бетонирование колонн', 'Бетонирование пилонов', 'Бетонирование плиты перекрытия',
+            'Бетонирование верхней плиты', 'Вибрирование и заглаживание поверхности',
+            'Уход за бетоном (полив, укрытие)', 'Распалубка колонн', 'Распалубка пилонов',
+            'Распалубка плиты перекрытия', 'Распалубка верхней плиты',
+            'Приёмка арматурного каркаса', 'Контроль прочности бетона',
+            'Гидроизоляция узлов примыкания', 'Заделка дефектов, шлифовка',
+            'Уборка, складирование опалубки', 'Геодезическая съёмка выполненных конструкций',
+            'Оформление исполнительной документации', 'Сдача-приёмка скрытых работ'
+        ];
+
+        const DEFAULT_DATA = [
+            { element: 'Колонны', stage: 'Арматурные', brigade: 'Бригада №1', days: { 1: { people: 10, work: 'Установка арматурных каркасов колонн', note: 'Оси А-Г/1-4' }, 2: { people: 10, work: 'Продолжение армирования колонн', note: 'Проверка шага' }, 3: { people: 10, work: 'Завершение армирования колонн', note: 'Акт скрытых работ' } } },
+            { element: 'Колонны', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 3: { people: 12, work: 'Монтаж опалубки колонн', note: 'Щиты 3×3' }, 4: { people: 12, work: 'Завершение опалубки колонн', note: 'Допуск ±5 мм' }, 8: { people: 6, work: 'Распалубка колонн', note: 'Прочность ≥ 50%' } } },
+            { element: 'Колонны', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 5: { people: 8, work: 'Бетонирование колонн', note: 'B25, 24 м³' } } },
+            { element: 'Пилоны', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 1: { people: 8, work: 'Монтаж опалубки пилонов', note: 'Щитовая' }, 2: { people: 8, work: 'Завершение опалубки пилонов', note: 'Смазка' }, 9: { people: 6, work: 'Распалубка пилонов', note: '≥ 60%' } } },
+            { element: 'Пилоны', stage: 'Арматурные', brigade: 'Бригада №1', days: { 2: { people: 9, work: 'Армирование пилонов', note: 'Стыковка' }, 3: { people: 9, work: 'Продолжение армирования', note: '' }, 4: { people: 9, work: 'Завершение армирования', note: 'Акт' } } },
+            { element: 'Пилоны', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 5: { people: 8, work: 'Бетонирование пилонов', note: '18 м³' } } },
+            { element: 'Плита перекрытия', stage: 'Подготовительные', brigade: 'Бригада №4', days: { 5: { people: 5, work: 'Подготовка площадки', note: 'Леса' }, 10: { people: 4, work: 'Подготовка к бетонированию', note: 'Маяки' } } },
+            { element: 'Плита перекрытия', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 6: { people: 14, work: 'Монтаж опалубки плиты', note: 'Стойки, фанера' }, 7: { people: 14, work: 'Продолжение монтажа', note: 'Контроль' }, 8: { people: 14, work: 'Завершение опалубки', note: 'Борта' }, 12: { people: 8, work: 'Частичная распалубка', note: '' }, 15: { people: 10, work: 'Полная распалубка', note: '≥ 75%' } } },
+            { element: 'Плита перекрытия', stage: 'Арматурные', brigade: 'Бригада №1', days: { 6: { people: 10, work: 'Нижняя арматурная сетка', note: 'Ø12 шаг 200' }, 7: { people: 12, work: 'Вязка нижней сетки', note: '' }, 8: { people: 12, work: 'Вязка нижней арматуры', note: '' }, 9: { people: 14, work: 'Верхняя арматурная сетка', note: 'Ø10 шаг 200' }, 10: { people: 14, work: 'Вязка верхней сетки', note: 'Соединение' } } },
+            { element: 'Плита перекрытия', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 11: { people: 12, work: 'Бетонирование плиты', note: '45 м³, B25' } } },
+            { element: 'Колонны/пилоны', stage: 'Технологический', brigade: 'Бригада №4', days: { 6: { people: 2, work: 'Уход за бетоном', note: 'Полив' }, 7: { people: 2, work: 'Уход за бетоном', note: 'Прочность' }, 18: { people: 2, work: 'Уход за бетоном', note: 'Полив' }, 19: { people: 2, work: 'Уход за бетоном', note: '' }, 22: { people: 2, work: 'Уход за бетоном', note: '' } } },
+            { element: 'Плита перекрытия', stage: 'Технологический', brigade: 'Бригада №4', days: { 11: { people: 2, work: 'Уход за бетоном', note: 'Полив' }, 12: { people: 3, work: 'Уход за бетоном', note: 'Контроль' }, 13: { people: 2, work: 'Уход за бетоном', note: '' }, 14: { people: 2, work: 'Уход за бетоном', note: '≈70%' } } },
+            { element: 'Верхний ярус', stage: 'Подготовительные', brigade: 'ИТР', days: { 12: { people: 4, work: 'Геодезическая разбивка', note: 'Перенос осей' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Арматурные', brigade: 'Бригада №1', days: { 13: { people: 10, work: 'Армирование колонн', note: 'Каркасы' }, 14: { people: 10, work: 'Продолжение армирования', note: '' }, 15: { people: 10, work: 'Завершение армирования', note: 'Акт' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 16: { people: 12, work: 'Монтаж опалубки колонн', note: '' }, 20: { people: 6, work: 'Частичная распалубка', note: '' } } },
+            { element: 'Колонны (2-й ярус)', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 17: { people: 8, work: 'Бетонирование колонн', note: '22 м³' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 13: { people: 9, work: 'Монтаж опалубки пилонов', note: '' }, 16: { people: 8, work: 'Монтаж опалубки', note: '' }, 21: { people: 6, work: 'Распалубка пилонов', note: '' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Арматурные', brigade: 'Бригада №1', days: { 14: { people: 9, work: 'Завершение опалубки, армирование', note: 'Совмещение' }, 15: { people: 9, work: 'Завершение армирования', note: 'Акт' } } },
+            { element: 'Пилоны (2-й ярус)', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 17: { people: 8, work: 'Бетонирование пилонов', note: '16 м³' } } },
+            { element: 'Верх плиты', stage: 'Подготовительные', brigade: 'Бригада №4', days: { 17: { people: 5, work: 'Подготовка опалубки', note: 'Стойки, балки' } } },
+            { element: 'Верх плиты', stage: 'Опалубочные', brigade: 'Бригада №3', days: { 18: { people: 14, work: 'Монтаж опалубки', note: 'Фанера' }, 19: { people: 14, work: 'Продолжение монтажа', note: '' }, 20: { people: 14, work: 'Завершение опалубки', note: 'Борта' }, 24: { people: 8, work: 'Частичная распалубка', note: '' }, 25: { people: 10, work: 'Полная распалубка', note: '≥ 75%' } } },
+            { element: 'Верх плиты', stage: 'Арматурные', brigade: 'Бригада №1', days: { 18: { people: 10, work: 'Нижняя сетка', note: '' }, 19: { people: 12, work: 'Вязка нижней арматуры', note: '' }, 20: { people: 13, work: 'Верхняя сетка', note: '' }, 21: { people: 13, work: 'Вязка верхней арматуры', note: '' } } },
+            { element: 'Верх плиты', stage: 'Бетонирование', brigade: 'Бригада №2', days: { 22: { people: 12, work: 'Бетонирование верхней плиты', note: '40 м³' } } },
+            { element: 'Верх плиты', stage: 'Технологический', brigade: 'Бригада №4', days: { 22: { people: 2, work: 'Уход за бетоном', note: '' }, 23: { people: 3, work: 'Уход за бетоном', note: 'Плёнка' }, 24: { people: 2, work: 'Уход за бетоном', note: '' }, 25: { people: 2, work: 'Уход за бетоном', note: '' }, 28: { people: 2, work: 'Уход за бетоном', note: '' } } },
+            { element: 'Колонны/пилоны', stage: 'Прочие', brigade: 'Бригада №5', days: { 27: { people: 5, work: 'Усиление узлов', note: '' } } },
+            { element: 'Все конструкции', stage: 'Прочие', brigade: 'ИТР', days: { 23: { people: 3, work: 'Контроль качества', note: '' }, 24: { people: 5, work: 'Заделка дефектов', note: '' }, 26: { people: 3, work: 'Контроль прочности', note: '' }, 27: { people: 4, work: 'Очистка поверхностей', note: '' }, 28: { people: 4, work: 'Геодезическая съёмка', note: 'Схема' }, 29: { people: 5, work: 'Приёмка скрытых работ', note: 'Акты' }, 30: { people: 3, work: 'Исполнительная документация', note: 'Акты' } } },
+            { element: 'Все конструкции', stage: 'Прочие', brigade: 'Бригада №5', days: { 29: { people: 4, work: 'Устранение замечаний', note: '' }, 28: { people: 6, work: 'Заделка швов', note: '' } } },
+            { element: 'Всё здание', stage: 'Подготовительные', brigade: 'ИТР', days: { 1: { people: 6, work: 'Геодезическая разбивка', note: '1-й этаж' }, 26: { people: 5, work: 'Подготовка площадки', note: '' }, 27: { people: 6, work: 'Перемещение материалов', note: '' }, 29: { people: 6, work: 'Подготовка к циклу', note: '' } } },
+            { element: 'Всё здание', stage: 'Прочие', brigade: 'Бригада №4', days: { 23: { people: 6, work: 'Уборка площадки', note: '' }, 25: { people: 6, work: 'Складирование опалубки', note: '' }, 30: { people: 6, work: 'Итоговая проверка', note: '' } } },
+            { element: 'Всё здание', stage: 'Прочие', brigade: 'ИТР', days: { 30: { people: 2, work: 'Планирование', note: 'Совещание' } } },
+            { element: 'Плита/верх плиты', stage: 'Прочие', brigade: 'Бригада №5', days: { 26: { people: 4, work: 'Гидроизоляция узлов', note: 'Обмазочная' } } }
+        ];
+
+        // ================== ПЕРЕВОДЫ ==================
+        const I18N = {
+            ru: {
+                app_title: '📊 Месячный график монолитных ЖБ работ',
+                app_subtitle: 'Диаграмма Ганта by ProgrammYankov V.1', autosave: 'Автосохранение',
+                version: 'Версия', version_classic: '📋 Классика', version_cards: '🎴 Карточки',
+                language: 'Язык', month: 'Месяц:',
+                excel: 'Excel', csv: 'CSV', print: 'Печать',
+                pencil: 'Карандаш', catalog: 'Справочник',
+                save: 'Сохранить', load: 'Загрузить', reset: 'Сброс', help: 'Инструкция',
+                pencil_mode: 'Карандаш', sample_not_selected: 'Образец не выбран',
+                step1: 'Шаг 1: выберите ячейку-образец', step2: 'Шаг 2: конечная ячейка',
+                exit: 'Выйти',
+                by_days: 'По дням', by_rows: 'По строкам',
+                collapse_all: 'Свернуть всё', expand_all: 'Развернуть всё',
+                collapse_hint: '💡 Клик по заголовку карточки — свернуть/развернуть отдельно',
+                stage_prep: 'Подготовительные', stage_opal: 'Опалубочные',
+                stage_arm: 'Арматурные', stage_beton: 'Бетонирование',
+                stage_tech: 'Технологический', stage_other: 'Прочие',
+                color_title: '🎨 Цвет:', color_hint: 'Выберите цвет для новых ячеек/строк. «Авто» — цвет по этапу.',
+                filter_element: '🏗️ Конструкция', filter_stage: '⚙️ Этап', filter_brigade: '👷 Бригада',
+                all: 'Все', reset_filters: 'Сбросить',
+                manage_rows: 'Управление строками',
+                element: 'Конструкция', stage: 'Этап', brigade: 'Бригада', add: 'Добавить',
+                edit_hint: '💡 Клик по ячейке — редактирование. ⬆️⬇️ — перемещение. «✏️ Карандаш» — копирование образца.',
+                table_footer: 'Каждая закрашенная ячейка — этап в этот день. Число — количество рабочих. 💬 — есть примечание.',
+                edit_day: 'Редактирование', work_from_catalog: 'Работа из справочника',
+                select: '— Выберите —', people_count: 'Количество рабочих (0 = план)',
+                work_desc: 'Описание работ', note: 'Примечание',
+                cell_color: 'Цвет ячейки', clear: 'Очистить', cancel: 'Отмена', save_btn: 'Сохранить',
+                row_color: '🎨 Цвет строки', choose_color: 'Выберите цвет:', apply: 'Применить',
+                catalog_title: '📚 Справочник',
+                catalog_sub: 'Управление работами, конструкциями, этапами и бригадами.',
+                tab_works: 'Работы', tab_dict: 'Конструкции / Этапы / Бригады',
+                dict_element: 'Конструкции', dict_stage: 'Этапы', dict_brigade: 'Бригады',
+                reset_btn: 'Сбросить', close: 'Закрыть', ok: 'Понятно',
+                help_title: '❓ Краткая инструкция', help_sub: 'Как пользоваться графиком',
+                total: 'ИТОГО', no_data: 'Нет данных. Добавьте строку.',
+                nothing_found: 'По фильтрам ничего не найдено.',
+                day_prefix: '📅 День',
+                saved: 'Сохранено', cleared: 'Очищено', deleted: 'Удалено', added: 'Добавлено', renamed: 'Переименовано',
+                filters_reset: 'Фильтры сброшены',
+                sample_selected: 'Образец. Выберите конечную ячейку',
+                empty_sample: '📋 ПУСТАЯ (очистит)',
+                filled_count: 'Заполнено', cleared_count: 'Очищено',
+                move_up: 'Вверх', move_down: 'Вниз',
+                confirm_reset: 'Сбросить к исходному графику?',
+                confirm_delete_row: 'Удалить строку?',
+                choose_color_warn: 'Выберите цвет', negative_warn: 'Отрицательное значение',
+                empty_warn: 'Заполните поля', exists_warn: 'Уже существует',
+                load_confirm: 'Загрузить проект?', loaded: 'Загружено',
+                export_excel: 'Excel: записей', csv_ready: 'CSV сформирован',
+                month_changed: 'Месяц изменён',
+                mode_days: 'Режим: по дням', mode_rows: 'Режим: по строкам',
+                version_classic_toast: 'Классический вид', version_cards_toast: 'Вид карточками',
+                language_changed: 'Язык изменён',
+                pencil_on: 'Режим «Карандаш». Выберите образец.',
+                pencil_off: 'Режим «Карандаш» выключен',
+                catalog_reset: 'Справочник сброшен',
+                updated_in_schedule: 'Обновлено в графике',
+                used_in_schedule: 'Используется раз',
+                dict_conflict: 'Уже существует', dict_updated: 'Обновлено в графике',
+                dict_confirm_delete: 'Удалить? Используется в графике: ',
+                dict_all_deleted: 'Удалено', dict_added: 'Добавлено в справочник',
+                dict_empty: 'Пусто. Добавьте запись.', dict_total: 'Всего',
+                all_collapsed: 'Все карточки свёрнуты', all_expanded: 'Все карточки развёрнуты'
+            },
+            en: {
+                app_title: '📊 Monthly RC Works Schedule',
+                app_subtitle: 'Gantt Chart by ProgrammYankov V.1', autosave: 'Autosave',
+                version: 'Version', version_classic: '📋 Classic', version_cards: '🎴 Cards',
+                language: 'Language', month: 'Month:',
+                excel: 'Excel', csv: 'CSV', print: 'Print',
+                pencil: 'Pencil', catalog: 'Catalog',
+                save: 'Save', load: 'Load', reset: 'Reset', help: 'Help',
+                pencil_mode: 'Pencil', sample_not_selected: 'No sample selected',
+                step1: 'Step 1: click sample cell', step2: 'Step 2: click target cell',
+                exit: 'Exit',
+                by_days: 'By days', by_rows: 'By rows',
+                collapse_all: 'Collapse all', expand_all: 'Expand all',
+                collapse_hint: '💡 Click card header to collapse/expand individually',
+                stage_prep: 'Preparatory', stage_opal: 'Formwork',
+                stage_arm: 'Rebar', stage_beton: 'Concreting',
+                stage_tech: 'Technological', stage_other: 'Other',
+                color_title: '🎨 Color:', color_hint: 'Choose color for new cells/rows. "Auto" — stage color.',
+                filter_element: '🏗️ Element', filter_stage: '⚙️ Stage', filter_brigade: '👷 Crew',
+                all: 'All', reset_filters: 'Reset',
+                manage_rows: 'Manage rows',
+                element: 'Element', stage: 'Stage', brigade: 'Crew', add: 'Add',
+                edit_hint: '💡 Click cell to edit. ⬆️⬇️ — move. "✏️ Pencil" — copy sample.',
+                table_footer: 'Each colored cell is a stage for that day. Number = workers count. 💬 — has note.',
+                edit_day: 'Editing', work_from_catalog: 'Work from catalog',
+                select: '— Select —', people_count: 'Workers count (0 = plan)',
+                work_desc: 'Work description', note: 'Note',
+                cell_color: 'Cell color', clear: 'Clear', cancel: 'Cancel', save_btn: 'Save',
+                row_color: '🎨 Row color', choose_color: 'Choose color:', apply: 'Apply',
+                catalog_title: '📚 Catalog',
+                catalog_sub: 'Manage works, elements, stages and crews.',
+                tab_works: 'Works', tab_dict: 'Elements / Stages / Crews',
+                dict_element: 'Elements', dict_stage: 'Stages', dict_brigade: 'Crews',
+                reset_btn: 'Reset', close: 'Close', ok: 'Got it',
+                help_title: '❓ Quick guide', help_sub: 'How to use the schedule',
+                total: 'TOTAL', no_data: 'No data. Add a row.',
+                nothing_found: 'Nothing found by filters.',
+                day_prefix: '📅 Day',
+                saved: 'Saved', cleared: 'Cleared', deleted: 'Deleted', added: 'Added', renamed: 'Renamed',
+                filters_reset: 'Filters reset',
+                sample_selected: 'Sample. Select target cell',
+                empty_sample: '📋 EMPTY (will clear)',
+                filled_count: 'Filled', cleared_count: 'Cleared',
+                move_up: 'Up', move_down: 'Down',
+                confirm_reset: 'Reset to default schedule?',
+                confirm_delete_row: 'Delete row?',
+                choose_color_warn: 'Choose a color', negative_warn: 'Negative value',
+                empty_warn: 'Fill in fields', exists_warn: 'Already exists',
+                load_confirm: 'Load project?', loaded: 'Loaded',
+                export_excel: 'Excel: records', csv_ready: 'CSV created',
+                month_changed: 'Month changed',
+                mode_days: 'Mode: by days', mode_rows: 'Mode: by rows',
+                version_classic_toast: 'Classic view', version_cards_toast: 'Cards view',
+                language_changed: 'Language changed',
+                pencil_on: 'Pencil mode. Select sample.',
+                pencil_off: 'Pencil mode off',
+                catalog_reset: 'Catalog reset',
+                updated_in_schedule: 'Updated in schedule',
+                used_in_schedule: 'Used times',
+                dict_conflict: 'Already exists', dict_updated: 'Updated in schedule',
+                dict_confirm_delete: 'Delete? Used in schedule: ',
+                dict_all_deleted: 'Deleted', dict_added: 'Added to catalog',
+                dict_empty: 'Empty. Add a record.', dict_total: 'Total',
+                all_collapsed: 'All cards collapsed', all_expanded: 'All cards expanded'
+            }
+        };
+
+        // ================== СОСТОЯНИЕ ==================
+        let ganttMatrix = [];
+        let editingRowIndex = -1;
+        let editingDayIndex = -1;
+        let editingCellColor = 'auto';
+        let currentYear = 2025;
+        let currentMonth = 6;
+        let daysCount = 30;
+        let worksCatalog = [];
+        let globalSelectedColor = 'auto';
+        let rowColorTargetIndex = -1;
+
+        let filterElement = '';
+        let filterStage = '';
+        let filterBrigade = '';
+
+        let pencilMode = false;
+        let pencilSource = null;
+        let pencilHover = null;
+
+        let currentVersion = 'classic';
+        let currentLang = 'ru';
+        let cardMode = 'days';
+        let collapsedDays = new Set();
+        let collapseAll = false;  // глобальное состояние «свернуть всё»
+
+        let dictElements = [];
+        let dictStages = [];
+        let dictBrigades = [];
+
+        let activeCatalogTab = 'works';
+        let activeDictSubTab = 'element';
+
+        function t(key) {
+            return (I18N[currentLang] && I18N[currentLang][key]) || key;
+        }
+
+        // ================== УТИЛИТЫ ==================
+        function daysInMonth(year, month) { return new Date(year, month, 0).getDate(); }
+        function getMonthFromValue(value) {
+            if (!value || typeof value !== 'string') {
+                const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() + 1 };
+            }
+            const parts = value.split('-');
+            const y = parseInt(parts[0], 10), m = parseInt(parts[1], 10);
+            if (isNaN(y) || isNaN(m) || m < 1 || m > 12) {
+                const now = new Date(); return { year: now.getFullYear(), month: now.getMonth() + 1 };
+            }
+            return { year: y, month: m };
+        }
+        function getMonthLabel(year, month) {
+            const ru = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+            const en = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const names = currentLang === 'en' ? en : ru;
+            return `${names[month - 1]} ${year}`;
+        }
+        function getMonthValue(year, month) { return `${year}-${String(month).padStart(2, '0')}`; }
+        function safeInt(v, def) { const n = parseInt(v, 10); return isNaN(n) ? def : n; }
+        function escapeHtml(s) {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
+
+        // Тултип с примечанием
+        function buildCellTooltip(combo, dayData, dayIdx) {
+            const lines = [];
+            lines.push(`${combo.element} — ${combo.stage}`);
+            if (combo.brigade) lines.push(`👷 ${combo.brigade}`);
+            lines.push(`${t('day_prefix')} ${dayIdx + 1}: ${dayData.people > 0 ? dayData.people : 0} 👷`);
+            if (dayData.work) lines.push(`📝 ${dayData.work}`);
+            if (dayData.note) lines.push(`💬 ${dayData.note}`);
+            return lines.join('\n');
+        }
+
+        // ================== НОРМАЛИЗАЦИЯ ==================
+        function normalizeDaysCount() { daysCount = daysInMonth(currentYear, currentMonth); }
+
+        function normalizeDay(raw) {
+            if (!raw || typeof raw !== 'object') return null;
+            const people = Number(raw.people);
+            const hasWork = typeof raw.work === 'string' && raw.work.trim() !== '';
+            const hasNote = typeof raw.note === 'string' && raw.note.trim() !== '';
+            const planned = raw.planned === true;
+            if ((!isNaN(people) && people > 0) || planned || hasWork || hasNote) {
+                return {
+                    people: !isNaN(people) && people >= 0 ? people : 0,
+                    work: hasWork ? raw.work : '',
+                    note: hasNote ? raw.note : '',
+                    planned: true,
+                    color: typeof raw.color === 'string' && raw.color ? raw.color : null
+                };
+            }
+            return null;
+        }
+
+        function normalizeDaysArray(rawDays, targetLen) {
+            const days = new Array(targetLen).fill(null);
+            if (!rawDays) return days;
+            if (Array.isArray(rawDays)) {
+                for (let i = 0; i < Math.min(rawDays.length, targetLen); i++) {
+                    const d = normalizeDay(rawDays[i]); if (d) days[i] = d;
+                }
+            } else if (typeof rawDays === 'object') {
+                for (const key in rawDays) {
+                    const idx = Math.floor(parseFloat(key)) - 1;
+                    if (idx >= 0 && idx < targetLen) {
+                        const d = normalizeDay(rawDays[key]); if (d) days[idx] = d;
+                    }
+                }
+            }
+            return days;
+        }
+
+        function normalizeRow(item, targetLen) {
+            if (!item || typeof item !== 'object') return null;
+            const element = String(item.element || '').trim();
+            const stage = String(item.stage || '').trim();
+            if (!element || !stage) return null;
+            return {
+                element, stage,
+                brigade: typeof item.brigade === 'string' ? item.brigade : '',
+                days: normalizeDaysArray(item.days, targetLen),
+                rowColor: typeof item.rowColor === 'string' && item.rowColor ? item.rowColor : null
+            };
+        }
+
+        function normalizeMatrix(matrix, targetLen) {
+            if (!Array.isArray(matrix)) return [];
+            const result = [];
+            matrix.forEach(item => { const r = normalizeRow(item, targetLen); if (r) result.push(r); });
+            return result;
+        }
+
+        function normalizeDefaults() {
+            const targetDays = daysInMonth(currentYear, currentMonth);
+            return DEFAULT_DATA.map(item => {
+                const days = new Array(targetDays).fill(null);
+                for (const key in item.days) {
+                    const idx = Math.floor(parseFloat(key)) - 1;
+                    if (idx >= 0 && idx < targetDays && item.days[key]) {
+                        const d = normalizeDay(item.days[key]); if (d) days[idx] = d;
+                    }
+                }
+                return { element: item.element, stage: item.stage, brigade: item.brigade || '', days, rowColor: null };
+            });
+        }
+
+        // ================== ХРАНИЛИЩЕ ==================
+        function loadWorksCatalog() {
+            try {
+                const saved = localStorage.getItem(CATALOG_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed)) {
+                        worksCatalog = parsed.filter(w => typeof w === 'string' && w.trim() !== '');
+                        if (worksCatalog.length > 0) return;
+                    }
+                }
+            } catch (e) { console.warn(e); }
+            worksCatalog = [...DEFAULT_WORKS];
+        }
+        function saveWorksCatalog() {
+            try { localStorage.setItem(CATALOG_STORAGE_KEY, JSON.stringify(worksCatalog)); } catch (e) { console.warn(e); }
+        }
+
+        function getUniqueFromMatrix(field) {
+            const set = new Set();
+            ganttMatrix.forEach(r => { if (r[field]) set.add(r[field]); });
+            return [...set].sort((a,b) => a.localeCompare(b, currentLang));
+        }
+
+        function loadDictionary() {
+            try {
+                const saved = localStorage.getItem(DICT_STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed.elements)) dictElements = parsed.elements.filter(x => typeof x === 'string' && x.trim());
+                    if (Array.isArray(parsed.stages)) dictStages = parsed.stages.filter(x => typeof x === 'string' && x.trim());
+                    if (Array.isArray(parsed.brigades)) dictBrigades = parsed.brigades.filter(x => typeof x === 'string' && x.trim());
+                }
+            } catch (e) { console.warn(e); }
+            if (dictElements.length === 0) dictElements = getUniqueFromMatrix('element');
+            if (dictStages.length === 0) dictStages = getUniqueFromMatrix('stage');
+            if (dictBrigades.length === 0) dictBrigades = getUniqueFromMatrix('brigade');
+        }
+        function saveDictionary() {
+            try { localStorage.setItem(DICT_STORAGE_KEY, JSON.stringify({ elements: dictElements, stages: dictStages, brigades: dictBrigades })); } catch (e) { console.warn(e); }
+        }
+
+        function loadFromStorage() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        const normalized = normalizeMatrix(parsed, daysCount);
+                        if (normalized.length > 0) { ganttMatrix = normalized; return; }
+                    }
+                }
+            } catch (e) { console.warn(e); }
+            ganttMatrix = normalizeDefaults();
+            saveToStorage();
+        }
+        function saveToStorage() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(ganttMatrix));
+                localStorage.setItem(MONTH_STORAGE_KEY, getMonthValue(currentYear, currentMonth));
+            } catch (e) { console.warn(e); }
+        }
+
+        // ================== ИНИЦИАЛИЗАЦИЯ ==================
+        function init() {
+            const savedMonth = localStorage.getItem(MONTH_STORAGE_KEY);
+            if (savedMonth) { const m = getMonthFromValue(savedMonth); currentYear = m.year; currentMonth = m.month; }
+            document.getElementById('monthPicker').value = getMonthValue(currentYear, currentMonth);
+            normalizeDaysCount();
+
+            const savedVersion = localStorage.getItem(VERSION_KEY);
+            if (savedVersion === 'cards' || savedVersion === 'classic') currentVersion = savedVersion;
+
+            const savedLang = localStorage.getItem(LANGUAGE_KEY);
+            if (savedLang === 'ru' || savedLang === 'en') currentLang = savedLang;
+
+            const savedCardMode = localStorage.getItem(CARD_MODE_KEY);
+            if (savedCardMode === 'days' || savedCardMode === 'rows') cardMode = savedCardMode;
+
+            const savedCollapse = localStorage.getItem(COLLAPSE_KEY);
+            if (savedCollapse === '1') collapseAll = true;
+
+            loadWorksCatalog();
+            loadFromStorage();
+            loadDictionary();
+
+            applyLanguage();
+            applyVersion();
+            updateSwitches();
+
+            renderAll();
+            updateDatalists();
+            updateMonthInfo();
+            renderGlobalPalette();
+            renderModalPalette();
+            renderFilterOptions();
+            renderCatalogList();
+            renderDictList('element');
+            renderDictList('stage');
+            renderDictList('brigade');
+            updateCollapseButton();
+
+            document.getElementById('monthPicker').addEventListener('change', onMonthChange);
+            window.addEventListener('resize', debounce(renderAll, 250));
+
+            console.log('✅ Init. Строк:', ganttMatrix.length, 'Дней:', daysCount, 'Язык:', currentLang, 'Версия:', currentVersion);
+        }
+
+        function debounce(fn, delay) {
+            let timer = null;
+            return function() {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn.apply(this, arguments), delay);
+            };
+        }
+
+        // ================== ПЕРЕКЛЮЧАТЕЛИ ==================
+        function setVersion(version) {
+            currentVersion = version;
+            try { localStorage.setItem(VERSION_KEY, version); } catch (e) { }
+            applyVersion();
+            updateSwitches();
+            updateCollapseButton();
+            renderAll();
+            showToast(t(version === 'cards' ? 'version_cards_toast' : 'version_classic_toast'));
+        }
+        function applyVersion() {
+            const classic = document.getElementById('classicView');
+            const cards = document.getElementById('cardView');
+            if (!classic || !cards) return;
+            if (currentVersion === 'cards') {
+                classic.style.display = 'none';
+                cards.style.display = 'block';
+            } else {
+                classic.style.display = 'block';
+                cards.style.display = 'none';
+            }
+        }
+
+        function setLanguage(lang) {
+            currentLang = lang;
+            try { localStorage.setItem(LANGUAGE_KEY, lang); } catch (e) { }
+            applyLanguage();
+            updateSwitches();
+            updateCollapseButton();
+            renderAll();
+            updateMonthInfo();
+            renderFilterOptions();
+            renderGlobalPalette();
+            renderModalPalette();
+            renderCatalogList();
+            renderDictList('element');
+            renderDictList('stage');
+            renderDictList('brigade');
+            showToast(t('language_changed'));
+        }
+
+        function applyLanguage() {
+            document.documentElement.lang = currentLang;
+            document.title = currentLang === 'en' ? 'RC Works Schedule' : 'График ЖБ работ';
+
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (I18N[currentLang] && I18N[currentLang][key]) el.textContent = I18N[currentLang][key];
+            });
+
+            renderHelpContent();
+            document.getElementById('modalTitle').textContent = t('edit_day');
+            document.getElementById('rowColorTitle').textContent = t('row_color');
+        }
+
+        function updateSwitches() {
+            document.getElementById('versionClassic').classList.toggle('active', currentVersion === 'classic');
+            document.getElementById('versionCards').classList.toggle('active', currentVersion === 'cards');
+            document.getElementById('langRu').classList.toggle('active', currentLang === 'ru');
+            document.getElementById('langEn').classList.toggle('active', currentLang === 'en');
+            const cardModeToggle = document.getElementById('cardModeToggle');
+            if (cardModeToggle) {
+                document.getElementById('cardModeDays').classList.toggle('active', cardMode === 'days');
+                document.getElementById('cardModeRows').classList.toggle('active', cardMode === 'rows');
+            }
+        }
+
+        function setCardMode(mode) {
+            cardMode = mode;
+            try { localStorage.setItem(CARD_MODE_KEY, mode); } catch (e) { }
+            updateSwitches();
+            renderAll();
+            showToast(t(mode === 'days' ? 'mode_days' : 'mode_rows'));
+        }
+
+        // ================== СВЕРНУТЬ/РАЗВЕРНУТЬ ВСЁ ==================
+        function toggleCollapseAll() {
+            collapseAll = !collapseAll;
+            try { localStorage.setItem(COLLAPSE_KEY, collapseAll ? '1' : '0'); } catch (e) { }
+            // Применяем ко всем дням
+            collapsedDays.clear();
+            if (collapseAll) {
+                for (let d = 0; d < daysCount; d++) collapsedDays.add(d);
+            }
+            updateCollapseButton();
+            renderCardView();
+            showToast(collapseAll ? '🔽 ' + t('all_collapsed') : '🔼 ' + t('all_expanded'));
+        }
+
+        function updateCollapseButton() {
+            const icon = document.getElementById('collapseIcon');
+            const text = document.getElementById('collapseText');
+            if (!icon || !text) return;
+            if (collapseAll) {
+                icon.textContent = '🔼';
+                text.textContent = t('expand_all');
+                document.getElementById('btnCollapseAll').classList.add('active');
+            } else {
+                icon.textContent = '🔽';
+                text.textContent = t('collapse_all');
+                document.getElementById('btnCollapseAll').classList.remove('active');
+            }
+            // Панель управления показываем только в режиме карточек и по дням
+            const controls = document.getElementById('cardControls');
+            if (controls) {
+                if (currentVersion === 'cards' && cardMode === 'days') {
+                    controls.classList.add('visible');
+                } else {
+                    controls.classList.remove('visible');
+                }
+            }
+        }
+
+        // ================== ФИЛЬТРЫ ==================
+        function renderFilterOptions() {
+            const elSel = document.getElementById('filterElement');
+            const stSel = document.getElementById('filterStage');
+            const brSel = document.getElementById('filterBrigade');
+
+            const elements = new Set(), stages = new Set(), brigades = new Set();
+            ganttMatrix.forEach(r => {
+                if (r.element) elements.add(r.element);
+                if (r.stage) stages.add(r.stage);
+                if (r.brigade) brigades.add(r.brigade);
+            });
+
+            const curEl = elSel.value, curSt = stSel.value, curBr = brSel.value;
+            const allLabel = t('all');
+
+            elSel.innerHTML = `<option value="">${allLabel}</option>`;
+            [...elements].sort((a,b)=>a.localeCompare(b, currentLang)).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; elSel.appendChild(opt);
+            });
+            stSel.innerHTML = `<option value="">${allLabel}</option>`;
+            [...stages].sort((a,b)=>a.localeCompare(b, currentLang)).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; stSel.appendChild(opt);
+            });
+            brSel.innerHTML = `<option value="">${allLabel}</option>`;
+            [...brigades].sort((a,b)=>a.localeCompare(b, currentLang)).forEach(v => {
+                const opt = document.createElement('option'); opt.value = v; opt.textContent = v; brSel.appendChild(opt);
+            });
+
+            if ([...elements].includes(curEl)) elSel.value = curEl;
+            if ([...stages].includes(curSt)) stSel.value = curSt;
+            if ([...brigades].includes(curBr)) brSel.value = curBr;
+        }
+
+        function applyFilters() {
+            filterElement = document.getElementById('filterElement').value;
+            filterStage = document.getElementById('filterStage').value;
+            filterBrigade = document.getElementById('filterBrigade').value;
+            renderAll();
+            updateFilterInfo();
+        }
+
+        function clearFilters() {
+            document.getElementById('filterElement').value = '';
+            document.getElementById('filterStage').value = '';
+            document.getElementById('filterBrigade').value = '';
+            filterElement = ''; filterStage = ''; filterBrigade = '';
+            renderAll();
+            updateFilterInfo();
+            showToast('✖ ' + t('filters_reset'));
+        }
+
+        function updateFilterInfo() {
+            const info = document.getElementById('filterInfo');
+            const active = [];
+            if (filterElement) active.push(`${t('filter_element')}: ${filterElement}`);
+            if (filterStage) active.push(`${t('filter_stage')}: ${filterStage}`);
+            if (filterBrigade) active.push(`${t('filter_brigade')}: ${filterBrigade}`);
+            if (active.length > 0) {
+                info.style.display = 'inline-block';
+                info.textContent = `🔎 ${active.join(' · ')}`;
+            } else {
+                info.style.display = 'none';
+            }
+        }
+
+        function getFilteredMatrix() {
+            return ganttMatrix.filter(row => {
+                if (filterElement && row.element !== filterElement) return false;
+                if (filterStage && row.stage !== filterStage) return false;
+                if (filterBrigade && row.brigade !== filterBrigade) return false;
+                return true;
+            });
+        }
+
+        // ================== КАРАНДАШ ==================
+        function togglePencilMode() {
+            if (pencilMode) exitPencilMode();
+            else enterPencilMode();
+        }
+        function enterPencilMode() {
+            pencilMode = true;
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilBtn').classList.add('active');
+            document.getElementById('pencilPanel').classList.add('active');
+            document.getElementById('pencilSourceInfo').textContent = t('sample_not_selected');
+            document.getElementById('pencilStep').textContent = t('step1');
+            renderAll();
+            showToast('✏️ ' + t('pencil_on'));
+        }
+        function exitPencilMode() {
+            pencilMode = false;
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilBtn').classList.remove('active');
+            document.getElementById('pencilPanel').classList.remove('active');
+            renderAll();
+            showToast('✏️ ' + t('pencil_off'));
+        }
+        function selectPencilSource(rowIdx, dayIdx) {
+            const combo = ganttMatrix[rowIdx];
+            const dayData = combo.days[dayIdx];
+            pencilSource = { rowIdx, dayIdx, data: dayData ? { ...dayData } : null, rowColor: combo.rowColor };
+            pencilHover = null;
+            const info = document.getElementById('pencilSourceInfo');
+            if (!dayData) {
+                info.textContent = t('empty_sample');
+                info.style.color = '#dc2626';
+            } else {
+                const parts = [];
+                if (dayData.people > 0) parts.push(`👷 ${dayData.people}`);
+                else parts.push('👷 0');
+                if (dayData.work) parts.push(`📝 ${dayData.work.substring(0, 30)}${dayData.work.length > 30 ? '…' : ''}`);
+                if (dayData.note) parts.push(`💬 ${dayData.note.substring(0, 20)}${dayData.note.length > 20 ? '…' : ''}`);
+                info.textContent = '📋 ' + parts.join(' · ');
+                info.style.color = '#0f172a';
+            }
+            document.getElementById('pencilStep').textContent = t('step2');
+            renderAll();
+            showToast('✅ ' + t('sample_selected'));
+        }
+        function applyPencilRange(targetRowIdx, targetDayIdx) {
+            if (!pencilSource) return;
+            const r1 = Math.min(pencilSource.rowIdx, targetRowIdx);
+            const r2 = Math.max(pencilSource.rowIdx, targetRowIdx);
+            const d1 = Math.min(pencilSource.dayIdx, targetDayIdx);
+            const d2 = Math.max(pencilSource.dayIdx, targetDayIdx);
+            const cellCount = (r2 - r1 + 1) * (d2 - d1 + 1);
+            const isEmpty = !pencilSource.data;
+
+            if (cellCount > 50) {
+                const msg = isEmpty
+                    ? (currentLang === 'en' ? `Clear ${cellCount} cells?` : `Очистить ${cellCount} ячеек?`)
+                    : (currentLang === 'en' ? `Fill ${cellCount} cells?` : `Заполнить ${cellCount} ячеек?`);
+                if (!confirm(msg)) return;
+            }
+
+            for (let r = r1; r <= r2; r++) {
+                const combo = ganttMatrix[r];
+                if (!combo) continue;
+                for (let d = d1; d <= d2; d++) {
+                    if (d >= 0 && d < daysCount) {
+                        if (isEmpty) combo.days[d] = null;
+                        else combo.days[d] = { ...pencilSource.data };
+                    }
+                }
+            }
+            saveToStorage();
+            pencilSource = null;
+            pencilHover = null;
+            document.getElementById('pencilSourceInfo').textContent = t('sample_not_selected');
+            document.getElementById('pencilSourceInfo').style.color = '#0f172a';
+            document.getElementById('pencilStep').textContent = t('step1');
+            renderAll();
+            showToast(isEmpty
+                ? `🗑 ${t('cleared_count')}: ${cellCount}`
+                : `✅ ${t('filled_count')}: ${cellCount}`);
+        }
+
+        // ================== СПРАВОЧНИК ==================
+        function openCatalogEditor() {
+            renderCatalogList();
+            renderDictList('element');
+            renderDictList('stage');
+            renderDictList('brigade');
+            switchCatalogTab(activeCatalogTab || 'works');
+            document.getElementById('catalogModal').classList.add('active');
+            setTimeout(() => {
+                if (activeCatalogTab === 'works') document.getElementById('catalogNewInput').focus();
+            }, 50);
+        }
+        function closeCatalogEditor() {
+            document.getElementById('catalogModal').classList.remove('active');
+            if (document.getElementById('modalOverlay').classList.contains('active')) fillWorkSelect();
+        }
+
+        function switchCatalogTab(tab) {
+            activeCatalogTab = tab;
+            document.getElementById('tabWorksBtn').classList.toggle('active', tab === 'works');
+            document.getElementById('tabDictBtn').classList.toggle('active', tab === 'dict');
+            document.getElementById('tabWorksPanel').classList.toggle('active', tab === 'works');
+            document.getElementById('tabDictPanel').classList.toggle('active', tab === 'dict');
+            if (tab === 'dict') switchDictSubTab(activeDictSubTab || 'element');
+        }
+
+        function switchDictSubTab(sub) {
+            activeDictSubTab = sub;
+            document.getElementById('dictSubElementBtn').classList.toggle('active', sub === 'element');
+            document.getElementById('dictSubStageBtn').classList.toggle('active', sub === 'stage');
+            document.getElementById('dictSubBrigadeBtn').classList.toggle('active', sub === 'brigade');
+            document.getElementById('dictSubElementPanel').classList.toggle('active', sub === 'element');
+            document.getElementById('dictSubStagePanel').classList.toggle('active', sub === 'stage');
+            document.getElementById('dictSubBrigadePanel').classList.toggle('active', sub === 'brigade');
+            renderDictList(sub);
+        }
+
+        function renderCatalogList() {
+            const list = document.getElementById('catalogList');
+            const statsLabel = document.getElementById('catalogStatsLabel');
+            statsLabel.textContent = t('dict_total') + ': ' + worksCatalog.length;
+            list.innerHTML = '';
+            if (worksCatalog.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'catalog-empty';
+                empty.textContent = t('dict_empty');
+                list.appendChild(empty); return;
+            }
+            const sorted = worksCatalog.map((w, i) => ({ text: w, idx: i })).sort((a, b) => a.text.localeCompare(b.text, currentLang));
+            sorted.forEach(({ text, idx }) => {
+                const item = document.createElement('div');
+                item.className = 'catalog-item';
+                const textDiv = document.createElement('div');
+                textDiv.className = 'catalog-text'; textDiv.textContent = text;
+                item.appendChild(textDiv);
+                const actions = document.createElement('div');
+                actions.className = 'catalog-actions';
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'edit'; btnEdit.textContent = '✏️';
+                btnEdit.onclick = () => editCatalogItem(idx, text);
+                actions.appendChild(btnEdit);
+                const btnDel = document.createElement('button');
+                btnDel.className = 'del'; btnDel.textContent = '🗑';
+                btnDel.onclick = () => deleteCatalogItem(idx, text);
+                actions.appendChild(btnDel);
+                item.appendChild(actions);
+                list.appendChild(item);
+            });
+        }
+        function addCatalogItem() {
+            const input = document.getElementById('catalogNewInput');
+            const value = input.value.trim();
+            if (!value) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (value.length > 200) { showToast('⚠️ ' + (currentLang === 'en' ? 'Too long' : 'Слишком длинное')); return; }
+            if (worksCatalog.some(w => w.toLowerCase() === value.toLowerCase())) { showToast('⚠️ ' + t('exists_warn')); return; }
+            worksCatalog.push(value); saveWorksCatalog(); input.value = ''; renderCatalogList();
+            showToast('➕ ' + t('added'));
+        }
+        function editCatalogItem(idx, oldText) {
+            const newText = prompt((currentLang === 'en' ? 'Edit: ' : 'Изменить: ') + `\n\n«${oldText}»`, oldText);
+            if (newText === null) return;
+            const trimmed = newText.trim();
+            if (!trimmed) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (worksCatalog.some((w, i) => i !== idx && w.toLowerCase() === trimmed.toLowerCase())) { showToast('⚠️ ' + t('exists_warn')); return; }
+            if (trimmed === oldText) return;
+            worksCatalog[idx] = trimmed; saveWorksCatalog();
+            let updated = 0;
+            ganttMatrix.forEach(c => c.days.forEach(d => { if (d && d.work === oldText) { d.work = trimmed; updated++; } }));
+            if (updated > 0) { saveToStorage(); renderAll(); }
+            renderCatalogList();
+            showToast(`✏️ ${t('updated_in_schedule')}: ${updated}`);
+        }
+        function deleteCatalogItem(idx, text) {
+            let used = 0;
+            ganttMatrix.forEach(c => c.days.forEach(d => { if (d && d.work === text) used++; }));
+            let msg = (currentLang === 'en' ? 'Delete ' : 'Удалить ') + `«${text}»?`;
+            if (used > 0) msg += `\n\n⚠️ ${t('used_in_schedule')}: ${used}`;
+            if (!confirm(msg)) return;
+            worksCatalog.splice(idx, 1); saveWorksCatalog(); renderCatalogList();
+            showToast('🗑 ' + t('deleted'));
+        }
+        function resetCatalog() {
+            if (!confirm(t('confirm_reset'))) return;
+            worksCatalog = [...DEFAULT_WORKS]; saveWorksCatalog(); renderCatalogList();
+            showToast('🔄 ' + t('catalog_reset'));
+        }
+        function fillWorkSelect() {
+            const select = document.getElementById('modalWorkSelect');
+            select.innerHTML = `<option value="">${t('select')}</option>`;
+            worksCatalog.slice().sort((a, b) => a.localeCompare(b, currentLang)).forEach(w => {
+                const opt = document.createElement('option'); opt.value = w; opt.textContent = w; select.appendChild(opt);
+            });
+        }
+        function onWorkSelectChange() {
+            const select = document.getElementById('modalWorkSelect');
+            if (select.value) document.getElementById('modalWork').value = select.value;
+        }
+
+        // ================== СЛОВАРЬ ==================
+        function getDictArray(kind) {
+            if (kind === 'element') return dictElements;
+            if (kind === 'stage') return dictStages;
+            if (kind === 'brigade') return dictBrigades;
+            return null;
+        }
+        function getFieldName(kind) {
+            if (kind === 'element') return 'element';
+            if (kind === 'stage') return 'stage';
+            if (kind === 'brigade') return 'brigade';
+            return null;
+        }
+        function countUsage(kind, value) {
+            const field = getFieldName(kind);
+            let count = 0;
+            ganttMatrix.forEach(r => { if (r[field] === value) count++; });
+            return count;
+        }
+        function renderDictList(kind) {
+            const arr = getDictArray(kind);
+            if (!arr) return;
+            let listEl, statsEl;
+            if (kind === 'element') { listEl = document.getElementById('dictElementList'); statsEl = document.getElementById('dictElementStats'); }
+            else if (kind === 'stage') { listEl = document.getElementById('dictStageList'); statsEl = document.getElementById('dictStageStats'); }
+            else { listEl = document.getElementById('dictBrigadeList'); statsEl = document.getElementById('dictBrigadeStats'); }
+            if (!listEl) return;
+
+            statsEl.textContent = t('dict_total') + ': ' + arr.length;
+            listEl.innerHTML = '';
+
+            if (arr.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'catalog-empty';
+                empty.textContent = t('dict_empty');
+                listEl.appendChild(empty);
+                return;
+            }
+
+            const sorted = arr.map((v, i) => ({ text: v, idx: i })).sort((a, b) => a.text.localeCompare(b.text, currentLang));
+            sorted.forEach(({ text, idx }) => {
+                const item = document.createElement('div');
+                item.className = 'catalog-item';
+                const textDiv = document.createElement('div');
+                textDiv.className = 'catalog-text'; textDiv.textContent = text;
+                item.appendChild(textDiv);
+
+                const usage = countUsage(kind, text);
+                const countBadge = document.createElement('span');
+                countBadge.className = 'catalog-count';
+                countBadge.textContent = `×${usage}`;
+                countBadge.title = currentLang === 'en' ? 'Used in schedule' : 'Использований в графике';
+                item.appendChild(countBadge);
+
+                const actions = document.createElement('div');
+                actions.className = 'catalog-actions';
+                const btnEdit = document.createElement('button');
+                btnEdit.className = 'edit'; btnEdit.textContent = '✏️';
+                btnEdit.onclick = () => editDictItem(kind, idx, text);
+                actions.appendChild(btnEdit);
+                const btnDel = document.createElement('button');
+                btnDel.className = 'del'; btnDel.textContent = '🗑';
+                btnDel.onclick = () => deleteDictItem(kind, idx, text);
+                actions.appendChild(btnDel);
+                item.appendChild(actions);
+                listEl.appendChild(item);
+            });
+        }
+        function addDictItem(kind) {
+            const arr = getDictArray(kind);
+            if (!arr) return;
+            const inputId = kind === 'element' ? 'dictNewElement' : (kind === 'stage' ? 'dictNewStage' : 'dictNewBrigade');
+            const input = document.getElementById(inputId);
+            const value = input.value.trim();
+            if (!value) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (value.length > 200) { showToast('⚠️ ' + (currentLang === 'en' ? 'Too long' : 'Слишком длинное')); return; }
+            if (arr.some(v => v.toLowerCase() === value.toLowerCase())) { showToast('⚠️ ' + t('dict_conflict')); return; }
+            arr.push(value);
+            saveDictionary();
+            input.value = '';
+            renderDictList(kind);
+            updateDatalists();
+            renderFilterOptions();
+            showToast('➕ ' + t('dict_added'));
+        }
+        function editDictItem(kind, idx, oldText) {
+            const arr = getDictArray(kind);
+            if (!arr) return;
+            const newText = prompt((currentLang === 'en' ? 'Edit: ' : 'Изменить: ') + `\n\n«${oldText}»`, oldText);
+            if (newText === null) return;
+            const trimmed = newText.trim();
+            if (!trimmed) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (arr.some((v, i) => i !== idx && v.toLowerCase() === trimmed.toLowerCase())) { showToast('⚠️ ' + t('dict_conflict')); return; }
+            if (trimmed === oldText) return;
+
+            arr[idx] = trimmed;
+            saveDictionary();
+
+            const field = getFieldName(kind);
+            let updated = 0;
+            ganttMatrix.forEach(row => {
+                if (row[field] === oldText) { row[field] = trimmed; updated++; }
+            });
+            if (updated > 0) { saveToStorage(); renderAll(); updateDatalists(); renderFilterOptions(); }
+
+            renderDictList(kind);
+            showToast(`✏️ ${t('dict_updated')}: ${updated}`);
+        }
+        function deleteDictItem(kind, idx, text) {
+            const arr = getDictArray(kind);
+            if (!arr) return;
+            const usage = countUsage(kind, text);
+            let msg = (currentLang === 'en' ? 'Delete ' : 'Удалить ') + `«${text}»?`;
+            if (usage > 0) {
+                msg += `\n\n⚠️ ${t('dict_confirm_delete')}${usage}.\n` +
+                    (currentLang === 'en'
+                        ? 'Value stays in existing schedule rows, but disappears from dropdown list.'
+                        : 'Значение останется в строках графика, но исчезнет из выпадающих списков.');
+            }
+            if (!confirm(msg)) return;
+            arr.splice(idx, 1);
+            saveDictionary();
+            renderDictList(kind);
+            updateDatalists();
+            renderFilterOptions();
+            showToast('🗑 ' + t('dict_all_deleted') + ` (${usage})`);
+        }
+
+        // ================== СМЕНА МЕСЯЦА ==================
+        function onMonthChange() {
+            const value = document.getElementById('monthPicker').value;
+            if (!value) return;
+            const m = getMonthFromValue(value);
+            currentYear = m.year; currentMonth = m.month; normalizeDaysCount();
+            ganttMatrix = normalizeMatrix(ganttMatrix, daysCount);
+            pencilSource = null; pencilHover = null;
+            collapsedDays.clear();
+            if (collapseAll) {
+                for (let d = 0; d < daysCount; d++) collapsedDays.add(d);
+            }
+            saveToStorage(); renderAll(); updateMonthInfo(); renderFilterOptions();
+            showToast(`📅 ${getMonthLabel(currentYear, currentMonth)} (${daysCount})`);
+        }
+        function updateMonthInfo() {
+            const label = getMonthLabel(currentYear, currentMonth);
+            document.getElementById('headerMonthLabel').textContent = label;
+            document.getElementById('monthInfo').textContent = `${label} · ${daysCount} ${currentLang === 'en' ? 'days' : 'дн.'}`;
+            document.getElementById('daysCount').textContent = daysCount;
+        }
+
+        // ================== ЦВЕТА ==================
+        function getCellColor(combo, dayData) {
+            if (dayData && dayData.color) return dayData.color;
+            if (combo.rowColor) return combo.rowColor;
+            return stageColors[combo.stage] || '#f1f5f9';
+        }
+        function renderGlobalPalette() {
+            const container = document.getElementById('globalPalette');
+            container.querySelectorAll('.swatch').forEach(el => el.remove());
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === globalSelectedColor ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = currentLang === 'en' ? 'auto' : 'авто';
+                else sw.style.backgroundColor = c.value;
+                sw.title = currentLang === 'en' ? c.nameEn : c.name;
+                sw.onclick = () => { globalSelectedColor = c.value; renderGlobalPalette(); showToast(`🎨 ${currentLang === 'en' ? c.nameEn : c.name}`); };
+                container.appendChild(sw);
+            });
+        }
+        function renderModalPalette() {
+            const container = document.getElementById('modalPalette');
+            container.innerHTML = '';
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === editingCellColor ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = currentLang === 'en' ? 'auto' : 'авто';
+                else sw.style.backgroundColor = c.value;
+                sw.title = currentLang === 'en' ? c.nameEn : c.name;
+                sw.onclick = () => { editingCellColor = c.value; renderModalPalette(); };
+                container.appendChild(sw);
+            });
+        }
+        function renderRowColorPalette(currentColor) {
+            const container = document.getElementById('rowColorPalette');
+            container.innerHTML = '';
+            const active = currentColor || 'auto';
+            PALETTE.forEach(c => {
+                const sw = document.createElement('div');
+                sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === active ? ' selected' : '');
+                if (c.value === 'auto') sw.textContent = currentLang === 'en' ? 'auto' : 'авто';
+                else sw.style.backgroundColor = c.value;
+                sw.title = currentLang === 'en' ? c.nameEn : c.name;
+                sw.dataset.chosen = c.value;
+                sw.onclick = () => {
+                    container.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+                    sw.classList.add('selected');
+                };
+                container.appendChild(sw);
+            });
+        }
+
+        // ================== РЕНДЕР ==================
+        function renderAll() {
+            renderTable();
+            renderCardView();
+            applyVersion();
+            updateStats();
+            updateCollapseButton();
+        }
+
+        function renderTable() {
+            const table = document.getElementById('ganttTable');
+            if (!table) return;
+            table.innerHTML = '';
+
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            const thFirst = document.createElement('th');
+            thFirst.textContent = currentLang === 'en' ? 'Element / Stage / Crew' : 'Конструкция / Этап / Бригада';
+            headerRow.appendChild(thFirst);
+            for (let d = 1; d <= daysCount; d++) {
+                const th = document.createElement('th'); th.textContent = d; headerRow.appendChild(th);
+            }
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            const filtered = getFilteredMatrix();
+
+            if (filtered.length === 0) {
+                const tr = document.createElement('tr');
+                const td = document.createElement('td');
+                td.colSpan = daysCount + 1;
+                td.textContent = ganttMatrix.length === 0 ? t('no_data') : t('nothing_found');
+                td.style.padding = '20px'; td.style.textAlign = 'center'; td.style.color = '#64748b';
+                tr.appendChild(td); tbody.appendChild(tr);
+            } else {
+                filtered.forEach((combo) => {
+                    const realIdx = ganttMatrix.indexOf(combo);
+                    const tr = document.createElement('tr');
+                    const tdName = document.createElement('td');
+                    const nameDiv = document.createElement('div');
+                    nameDiv.innerHTML = `<strong>${escapeHtml(combo.element)}</strong> — ${escapeHtml(combo.stage)}${combo.brigade ? `<br><span style="font-size:0.62rem;color:#64748b;">👷 ${escapeHtml(combo.brigade)}</span>` : ''}`;
+                    tdName.appendChild(nameDiv);
+
+                    const actionsDiv = document.createElement('div');
+                    actionsDiv.className = 'row-actions';
+                    const btnUp = document.createElement('button');
+                    btnUp.textContent = '⬆️'; btnUp.title = t('move_up');
+                    btnUp.className = 'up-btn';
+                    btnUp.disabled = realIdx <= 0;
+                    btnUp.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, -1); };
+                    actionsDiv.appendChild(btnUp);
+                    const btnDown = document.createElement('button');
+                    btnDown.textContent = '⬇️'; btnDown.title = t('move_down');
+                    btnDown.className = 'down-btn';
+                    btnDown.disabled = realIdx < 0 || realIdx >= ganttMatrix.length - 1;
+                    btnDown.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, 1); };
+                    actionsDiv.appendChild(btnDown);
+                    const btnRename = document.createElement('button');
+                    btnRename.textContent = '✏️'; btnRename.onclick = (e) => { e.stopPropagation(); renameRow(realIdx); };
+                    actionsDiv.appendChild(btnRename);
+                    const btnColor = document.createElement('button');
+                    btnColor.textContent = '🎨'; btnColor.className = 'color-btn';
+                    btnColor.onclick = (e) => { e.stopPropagation(); openRowColorModal(realIdx); };
+                    actionsDiv.appendChild(btnColor);
+                    const btnDel = document.createElement('button');
+                    btnDel.textContent = '🗑'; btnDel.className = 'del';
+                    btnDel.onclick = (e) => { e.stopPropagation(); deleteRow(realIdx); };
+                    actionsDiv.appendChild(btnDel);
+                    tdName.appendChild(actionsDiv);
+                    if (combo.rowColor) tdName.style.borderLeft = `5px solid ${combo.rowColor}`;
+                    tr.appendChild(tdName);
+
+                    for (let i = 0; i < daysCount; i++) {
+                        const td = document.createElement('td');
+                        td.className = 'cell';
+                        td.dataset.row = realIdx;
+                        td.dataset.day = i;
+                        const dayData = combo.days[i];
+                        if (dayData) {
+                            td.style.backgroundColor = getCellColor(combo, dayData);
+                            if (dayData.people > 0) { td.textContent = dayData.people; td.classList.add('filled'); }
+                            else { td.classList.add('planned-zero'); }
+                            // Класс примечания
+                            if (dayData.note) td.classList.add('has-note');
+                            // Тултип с примечанием
+                            td.title = buildCellTooltip(combo, dayData, i);
+                        } else {
+                            td.textContent = ''; td.classList.add('empty');
+                            td.style.backgroundColor = '#ffffff';
+                            td.title = `+ ${i+1}`;
+                        }
+                        td.onclick = (e) => {
+                            if (pencilMode) {
+                                e.stopPropagation();
+                                if (!pencilSource) selectPencilSource(realIdx, i);
+                                else applyPencilRange(realIdx, i);
+                            } else openCellEditor(realIdx, i);
+                        };
+                        td.onmouseenter = () => {
+                            if (pencilMode && pencilSource) { pencilHover = { rowIdx: realIdx, dayIdx: i }; updateRangeHighlight(); }
+                        };
+                        td.onmouseleave = () => {
+                            if (pencilMode && pencilSource && pencilHover) { pencilHover = null; updateRangeHighlight(); }
+                        };
+                        tr.appendChild(td);
+                    }
+                    tbody.appendChild(tr);
+                });
+            }
+
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            const tdTotalLabel = document.createElement('td');
+            tdTotalLabel.textContent = filtered.length === ganttMatrix.length
+                ? t('total')
+                : `${t('total')} (${filtered.length}/${ganttMatrix.length})`;
+            totalRow.appendChild(tdTotalLabel);
+            for (let i = 0; i < daysCount; i++) {
+                const td = document.createElement('td');
+                let total = 0;
+                filtered.forEach(combo => {
+                    const day = combo.days[i];
+                    if (day && day.people > 0) total += day.people;
+                });
+                const span = document.createElement('span');
+                span.className = 'total-val' + (total === 0 ? ' zero' : '');
+                span.textContent = total;
+                td.appendChild(span);
+                totalRow.appendChild(td);
+            }
+            tbody.appendChild(totalRow);
+            table.appendChild(tbody);
+            updateRangeHighlight();
+        }
+
+        function updateRangeHighlight() {
+            const table = document.getElementById('ganttTable');
+            if (table) {
+                table.querySelectorAll('td.cell').forEach(cell => cell.classList.remove('range-selected', 'range-source'));
+                if (pencilMode && pencilSource) {
+                    const srcCell = table.querySelector(`td.cell[data-row="${pencilSource.rowIdx}"][data-day="${pencilSource.dayIdx}"]`);
+                    if (srcCell) srcCell.classList.add('range-source');
+                }
+                if (pencilMode && pencilSource && pencilHover) {
+                    const r1 = Math.min(pencilSource.rowIdx, pencilHover.rowIdx);
+                    const r2 = Math.max(pencilSource.rowIdx, pencilHover.rowIdx);
+                    const d1 = Math.min(pencilSource.dayIdx, pencilHover.dayIdx);
+                    const d2 = Math.max(pencilSource.dayIdx, pencilHover.dayIdx);
+                    for (let r = r1; r <= r2; r++) {
+                        for (let d = d1; d <= d2; d++) {
+                            const c = table.querySelector(`td.cell[data-row="${r}"][data-day="${d}"]`);
+                            if (c) c.classList.add('range-selected');
+                        }
+                    }
+                }
+            }
+            const cardView = document.getElementById('cardView');
+            if (cardView) {
+                cardView.querySelectorAll('.card-day-chip').forEach(c => c.classList.remove('range-selected', 'range-source'));
+                if (pencilMode && pencilSource) {
+                    cardView.querySelectorAll(`[data-row="${pencilSource.rowIdx}"][data-day="${pencilSource.dayIdx}"]`).forEach(c => c.classList.add('range-source'));
+                }
+                if (pencilMode && pencilSource && pencilHover) {
+                    const r1 = Math.min(pencilSource.rowIdx, pencilHover.rowIdx);
+                    const r2 = Math.max(pencilSource.rowIdx, pencilHover.rowIdx);
+                    const d1 = Math.min(pencilSource.dayIdx, pencilHover.dayIdx);
+                    const d2 = Math.max(pencilSource.dayIdx, pencilHover.dayIdx);
+                    for (let r = r1; r <= r2; r++) {
+                        for (let d = d1; d <= d2; d++) {
+                            cardView.querySelectorAll(`[data-row="${r}"][data-day="${d}"]`).forEach(c => c.classList.add('range-selected'));
+                        }
+                    }
+                }
+            }
+        }
+
+        function updateStats() {
+            let maxPeople = 0;
+            ganttMatrix.forEach(combo => combo.days.forEach(day => {
+                if (day && day.people > 0) maxPeople = Math.max(maxPeople, day.people);
+            }));
+            document.getElementById('maxWorkers').textContent = maxPeople;
+            document.getElementById('rowCount').textContent = ganttMatrix.length;
+            document.getElementById('daysCount').textContent = daysCount;
+        }
+
+        function updateDatalists() {
+            const elements = new Set(), stages = new Set(), brigades = new Set();
+            ganttMatrix.forEach(c => {
+                if (c.element) elements.add(c.element);
+                if (c.stage) stages.add(c.stage);
+                if (c.brigade) brigades.add(c.brigade);
+            });
+            dictElements.forEach(v => elements.add(v));
+            dictStages.forEach(v => stages.add(v));
+            dictBrigades.forEach(v => brigades.add(v));
+
+            const dlEl = document.getElementById('elementList');
+            const dlSt = document.getElementById('stageList');
+            const dlBr = document.getElementById('brigadeList');
+            dlEl.innerHTML = ''; dlSt.innerHTML = ''; dlBr.innerHTML = '';
+            [...elements].sort().forEach(el => { const o = document.createElement('option'); o.value = el; dlEl.appendChild(o); });
+            [...stages].sort().forEach(st => { const o = document.createElement('option'); o.value = st; dlSt.appendChild(o); });
+            [...brigades].sort().forEach(br => { const o = document.createElement('option'); o.value = br; dlBr.appendChild(o); });
+        }
+
+        // ================== КАРТОЧКИ ==================
+        function renderCardView() {
+            const container = document.getElementById('cardView');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const filtered = getFilteredMatrix();
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'catalog-empty';
+                empty.textContent = ganttMatrix.length === 0 ? t('no_data') : t('nothing_found');
+                container.appendChild(empty);
+                return;
+            }
+            if (cardMode === 'days') renderCardsByDays(container, filtered);
+            else renderCardsByRows(container, filtered);
+            updateRangeHighlight();
+            updateCollapseButton();
+        }
+
+        function renderCardsByDays(container, filtered) {
+            const dayTotals = new Array(daysCount).fill(0);
+            const dayRows = new Array(daysCount).fill(null).map(() => []);
+            filtered.forEach(combo => {
+                const realIdx = ganttMatrix.indexOf(combo);
+                for (let i = 0; i < daysCount; i++) {
+                    const dayData = combo.days[i];
+                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note)) {
+                        dayTotals[i] += dayData.people || 0;
+                        dayRows[i].push({ combo, realIdx, dayIdx: i, dayData });
+                    }
+                }
+            });
+            for (let d = 0; d < daysCount; d++) {
+                const rows = dayRows[d];
+                if (rows.length === 0) continue;
+                const card = document.createElement('div');
+                card.className = 'card-day';
+                // Учитываем collapseAll
+                const isCollapsed = collapsedDays.has(d);
+                const header = document.createElement('div');
+                header.className = 'card-day-header' + (isCollapsed ? ' collapsed' : '');
+                header.onclick = () => {
+                    if (collapsedDays.has(d)) collapsedDays.delete(d);
+                    else collapsedDays.add(d);
+                    renderCardView();
+                };
+                header.innerHTML = `
+                    <div><span class="day-title">${t('day_prefix')} ${d + 1}</span></div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <span class="day-total">👷 ${dayTotals[d]}</span>
+                        <span class="chevron">▼</span>
+                    </div>
+                `;
+                card.appendChild(header);
+                const body = document.createElement('div');
+                body.className = 'card-day-body' + (isCollapsed ? ' collapsed' : '');
+                rows.forEach(({ combo, realIdx, dayIdx, dayData }) => {
+                    const item = document.createElement('div');
+                    item.className = 'card-row';
+                    const color = getCellColor(combo, dayData);
+                    item.innerHTML = `
+                        <div class="row-title">
+                            <div style="flex:1;min-width:0;">
+                                <div class="row-name">${escapeHtml(combo.element)}</div>
+                                <div class="row-badge">${escapeHtml(combo.stage)}</div>
+                            </div>
+                            <div class="row-people ${dayData.people === 0 ? 'zero' : ''}">${dayData.people === 0 ? '0' : '👷 ' + dayData.people}</div>
+                        </div>
+                        ${combo.brigade ? `<div class="row-brigade">👥 ${escapeHtml(combo.brigade)}</div>` : ''}
+                        ${dayData.work ? `<div class="row-work">${escapeHtml(dayData.work)}</div>` : ''}
+                        ${dayData.note ? `<div class="row-note">💬 ${escapeHtml(dayData.note)}</div>` : ''}
+                    `;
+                    item.style.borderLeft = `5px solid ${color}`;
+                    // Тултип с примечанием
+                    item.title = buildCellTooltip(combo, dayData, dayIdx);
+                    item.onclick = () => {
+                        if (pencilMode) {
+                            if (!pencilSource) selectPencilSource(realIdx, dayIdx);
+                            else applyPencilRange(realIdx, dayIdx);
+                        } else openCellEditor(realIdx, dayIdx);
+                    };
+                    body.appendChild(item);
+                });
+                card.appendChild(body);
+                container.appendChild(card);
+            }
+        }
+
+        function renderCardsByRows(container, filtered) {
+            filtered.forEach(combo => {
+                const realIdx = ganttMatrix.indexOf(combo);
+                const card = document.createElement('div');
+                card.className = 'card-row-stack';
+                const header = document.createElement('div');
+                header.className = 'card-row-stack-header';
+                header.innerHTML = `
+                    <div style="flex:1;min-width:0;">
+                        <div class="title">${escapeHtml(combo.element)} — ${escapeHtml(combo.stage)}</div>
+                        ${combo.brigade ? `<div class="brigade">👥 ${escapeHtml(combo.brigade)}</div>` : ''}
+                    </div>
+                `;
+                const actions = document.createElement('div');
+                actions.className = 'row-actions';
+                const btnUp = document.createElement('button');
+                btnUp.textContent = '⬆️'; btnUp.disabled = realIdx <= 0;
+                btnUp.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, -1); };
+                actions.appendChild(btnUp);
+                const btnDown = document.createElement('button');
+                btnDown.textContent = '⬇️'; btnDown.disabled = realIdx >= ganttMatrix.length - 1;
+                btnDown.onclick = (e) => { e.stopPropagation(); moveRow(realIdx, 1); };
+                actions.appendChild(btnDown);
+                const btnRename = document.createElement('button');
+                btnRename.textContent = '✏️';
+                btnRename.onclick = (e) => { e.stopPropagation(); renameRow(realIdx); };
+                actions.appendChild(btnRename);
+                const btnColor = document.createElement('button');
+                btnColor.textContent = '🎨';
+                btnColor.onclick = (e) => { e.stopPropagation(); openRowColorModal(realIdx); };
+                actions.appendChild(btnColor);
+                const btnDel = document.createElement('button');
+                btnDel.textContent = '🗑';
+                btnDel.onclick = (e) => { e.stopPropagation(); deleteRow(realIdx); };
+                actions.appendChild(btnDel);
+                header.appendChild(actions);
+                card.appendChild(header);
+
+                const chips = document.createElement('div');
+                chips.className = 'card-day-chips';
+                for (let i = 0; i < daysCount; i++) {
+                    const dayData = combo.days[i];
+                    const chip = document.createElement('div');
+                    chip.className = 'card-day-chip';
+                    chip.dataset.row = realIdx;
+                    chip.dataset.day = i;
+                    if (dayData) {
+                        if (dayData.people > 0) chip.classList.add('has-data');
+                        else chip.classList.add('planned-zero');
+                        const bg = getCellColor(combo, dayData);
+                        chip.style.background = bg;
+                        chip.style.borderColor = bg;
+                        if (dayData.note) chip.classList.add('has-note');
+                        chip.innerHTML = `
+                            <div class="chip-day">${i + 1}</div>
+                            <div class="chip-val">${dayData.people > 0 ? dayData.people : '0'}</div>
+                        `;
+                        chip.title = buildCellTooltip(combo, dayData, i);
+                    } else {
+                        chip.innerHTML = `<div class="chip-day">${i + 1}</div><div class="chip-val" style="color:#cbd5e1;">·</div>`;
+                    }
+                    chip.onclick = (e) => {
+                        e.stopPropagation();
+                        if (pencilMode) {
+                            if (!pencilSource) selectPencilSource(realIdx, i);
+                            else applyPencilRange(realIdx, i);
+                        } else openCellEditor(realIdx, i);
+                    };
+                    chips.appendChild(chip);
+                }
+                card.appendChild(chips);
+                container.appendChild(card);
+            });
+        }
+
+        // ================== ПЕРЕМЕЩЕНИЕ / РЕДАКТИРОВАНИЕ ==================
+        function moveRow(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= ganttMatrix.length) return;
+            const temp = ganttMatrix[index];
+            ganttMatrix[index] = ganttMatrix[newIndex];
+            ganttMatrix[newIndex] = temp;
+            pencilSource = null; pencilHover = null;
+            saveToStorage(); renderAll(); renderFilterOptions();
+            showToast(direction < 0 ? '⬆️ ' + t('move_up') : '⬇️ ' + t('move_down'));
+        }
+
+        function openCellEditor(rowIndex, dayIndex) {
+            editingRowIndex = rowIndex; editingDayIndex = dayIndex;
+            const combo = ganttMatrix[rowIndex];
+            const dayData = combo.days[dayIndex];
+
+            document.getElementById('modalTitle').textContent = t('edit_day');
+            document.getElementById('modalSubtitle').textContent = `${combo.element} — ${combo.stage}${combo.brigade ? ' · ' + combo.brigade : ''} · ${t('day_prefix')} ${dayIndex + 1}`;
+
+            fillWorkSelect();
+            const peopleInput = document.getElementById('modalPeople');
+            const workInput = document.getElementById('modalWork');
+            const noteInput = document.getElementById('modalNote');
+
+            if (dayData) {
+                peopleInput.value = dayData.people;
+                workInput.value = dayData.work || '';
+                noteInput.value = dayData.note || '';
+                document.getElementById('modalWorkSelect').value = worksCatalog.includes(dayData.work) ? dayData.work : '';
+                editingCellColor = dayData.color || 'auto';
+            } else {
+                peopleInput.value = 0; workInput.value = ''; noteInput.value = '';
+                document.getElementById('modalWorkSelect').value = '';
+                editingCellColor = globalSelectedColor;
+            }
+            renderModalPalette();
+            document.getElementById('modalOverlay').classList.add('active');
+            setTimeout(() => peopleInput.focus(), 50);
+        }
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            editingRowIndex = -1; editingDayIndex = -1;
+        }
+        function saveCell() {
+            if (editingRowIndex < 0 || editingDayIndex < 0) return;
+            const people = safeInt(document.getElementById('modalPeople').value, 0);
+            const work = document.getElementById('modalWork').value.trim();
+            const note = document.getElementById('modalNote').value.trim();
+            if (people < 0) { showToast('⚠️ ' + t('negative_warn')); return; }
+            const combo = ganttMatrix[editingRowIndex];
+            const isEmpty = (people === 0 && !work && !note && editingCellColor === 'auto');
+            if (isEmpty) combo.days[editingDayIndex] = null;
+            else combo.days[editingDayIndex] = { people, work, note, planned: true, color: editingCellColor === 'auto' ? null : editingCellColor };
+
+            if (work && !worksCatalog.some(w => w.toLowerCase() === work.toLowerCase())) {
+                worksCatalog.push(work); saveWorksCatalog();
+            }
+            saveToStorage(); renderAll(); closeModal();
+            showToast(isEmpty ? '🗑 ' + t('cleared') : '✅ ' + t('saved'));
+        }
+        function deleteCell() {
+            if (editingRowIndex < 0 || editingDayIndex < 0) return;
+            ganttMatrix[editingRowIndex].days[editingDayIndex] = null;
+            saveToStorage(); renderAll(); closeModal();
+            showToast('🗑 ' + t('deleted'));
+        }
+        document.getElementById('modalOverlay').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+
+        function openRowColorModal(rowIndex) {
+            rowColorTargetIndex = rowIndex;
+            const combo = ganttMatrix[rowIndex];
+            document.getElementById('rowColorTitle').textContent = t('row_color');
+            document.getElementById('rowColorSub').textContent = `${combo.element} — ${combo.stage}`;
+            renderRowColorPalette(combo.rowColor);
+            document.getElementById('rowColorModal').classList.add('active');
+        }
+        function closeRowColorModal() {
+            document.getElementById('rowColorModal').classList.remove('active');
+            rowColorTargetIndex = -1;
+        }
+        function saveRowColor() {
+            if (rowColorTargetIndex < 0) return;
+            const selected = document.querySelector('#rowColorPalette .swatch.selected');
+            if (!selected) { showToast('⚠️ ' + t('choose_color_warn')); return; }
+            const chosen = selected.dataset.chosen;
+            const combo = ganttMatrix[rowColorTargetIndex];
+            combo.rowColor = (chosen === 'auto') ? null : chosen;
+            saveToStorage(); renderAll(); closeRowColorModal();
+            showToast('🎨 ' + t('apply'));
+        }
+        document.getElementById('rowColorModal').addEventListener('click', function(e) {
+            if (e.target === this) closeRowColorModal();
+        });
+
+        function openHelp() { document.getElementById('helpModal').classList.add('active'); }
+        function closeHelp() { document.getElementById('helpModal').classList.remove('active'); }
+        document.getElementById('helpModal').addEventListener('click', function(e) {
+            if (e.target === this) closeHelp();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal(); closeRowColorModal(); closeCatalogEditor(); closeHelp();
+                if (pencilMode) exitPencilMode();
+            }
+        });
+
+        function addNewRow() {
+            const element = document.getElementById('newElement').value.trim();
+            const stage = document.getElementById('newStage').value.trim();
+            const brigade = document.getElementById('newBrigade').value.trim();
+            if (!element || !stage) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (ganttMatrix.some(c => c.element === element && c.stage === stage)) {
+                showToast('⚠️ ' + t('exists_warn')); return;
+            }
+            if (!dictElements.includes(element)) { dictElements.push(element); }
+            if (!dictStages.includes(stage)) { dictStages.push(stage); }
+            if (brigade && !dictBrigades.includes(brigade)) { dictBrigades.push(brigade); }
+            saveDictionary();
+
+            ganttMatrix.push({
+                element, stage, brigade,
+                days: new Array(daysCount).fill(null),
+                rowColor: globalSelectedColor === 'auto' ? null : globalSelectedColor
+            });
+            document.getElementById('newElement').value = '';
+            document.getElementById('newStage').value = '';
+            document.getElementById('newBrigade').value = '';
+            pencilSource = null;
+            saveToStorage(); renderAll(); updateDatalists(); renderFilterOptions();
+            renderDictList('element'); renderDictList('stage'); renderDictList('brigade');
+            showToast('➕ ' + t('added'));
+        }
+        function deleteRow(rowIndex) {
+            if (rowIndex < 0 || rowIndex >= ganttMatrix.length) return;
+            const combo = ganttMatrix[rowIndex];
+            if (!confirm(t('confirm_delete_row') + ` (${combo.element} — ${combo.stage})`)) return;
+            ganttMatrix.splice(rowIndex, 1);
+            pencilSource = null; pencilHover = null;
+            saveToStorage(); renderAll(); updateDatalists(); renderFilterOptions();
+            showToast('🗑 ' + t('deleted'));
+        }
+        function renameRow(rowIndex) {
+            const combo = ganttMatrix[rowIndex];
+            const newElement = prompt(t('element') + ':', combo.element);
+            if (newElement === null) return;
+            const newStage = prompt(t('stage') + ':', combo.stage);
+            if (newStage === null) return;
+            const newBrigade = prompt(t('brigade') + ':', combo.brigade || '');
+            if (newBrigade === null) return;
+            const el = newElement.trim(), st = newStage.trim(), br = newBrigade.trim();
+            if (!el || !st) { showToast('⚠️ ' + t('empty_warn')); return; }
+            if (ganttMatrix.some((c, i) => i !== rowIndex && c.element === el && c.stage === st)) {
+                showToast('⚠️ ' + t('exists_warn')); return;
+            }
+            combo.element = el; combo.stage = st; combo.brigade = br;
+            if (!dictElements.includes(el)) dictElements.push(el);
+            if (!dictStages.includes(st)) dictStages.push(st);
+            if (br && !dictBrigades.includes(br)) dictBrigades.push(br);
+            saveDictionary();
+            saveToStorage(); renderAll(); updateDatalists(); renderFilterOptions();
+            renderDictList('element'); renderDictList('stage'); renderDictList('brigade');
+            showToast('✏️ ' + t('renamed'));
+        }
+
+        function resetToDefaults() {
+            if (!confirm(t('confirm_reset'))) return;
+            ganttMatrix = normalizeDefaults();
+            pencilSource = null; pencilHover = null;
+            collapsedDays.clear();
+            collapseAll = false;
+            try { localStorage.setItem(COLLAPSE_KEY, '0'); } catch (e) { }
+            dictElements = getUniqueFromMatrix('element');
+            dictStages = getUniqueFromMatrix('stage');
+            dictBrigades = getUniqueFromMatrix('brigade');
+            saveDictionary();
+            saveToStorage(); renderAll(); updateDatalists(); renderFilterOptions();
+            renderDictList('element'); renderDictList('stage'); renderDictList('brigade');
+            showToast('🔄 ' + t('reset'));
+        }
+
+        // ================== JSON ==================
+        function saveProjectJSON() {
+            const project = {
+                version: PROJECT_VERSION,
+                savedAt: new Date().toISOString(),
+                year: currentYear, month: currentMonth, daysCount,
+                title: getMonthLabel(currentYear, currentMonth),
+                worksCatalog,
+                dictionary: { elements: dictElements, stages: dictStages, brigades: dictBrigades },
+                collapseAll: collapseAll,
+                rows: ganttMatrix
+            };
+            const json = JSON.stringify(project, null, 2);
+            const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Schedule_${getMonthValue(currentYear, currentMonth)}.json`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast('💾 ' + t('saved'));
+        }
+        function loadProjectJSON(event) {
+            const file = event.target.files && event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    let rows = null, projYear = currentYear, projMonth = currentMonth, catalog = null, dictionary = null, savedCollapse = null;
+                    if (Array.isArray(parsed)) rows = parsed;
+                    else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rows)) {
+                        rows = parsed.rows;
+                        if (parsed.year && parsed.month) {
+                            projYear = safeInt(parsed.year, currentYear);
+                            projMonth = safeInt(parsed.month, currentMonth);
+                            if (projMonth < 1 || projMonth > 12) projMonth = currentMonth;
+                        }
+                        if (Array.isArray(parsed.worksCatalog)) catalog = parsed.worksCatalog;
+                        if (parsed.dictionary) dictionary = parsed.dictionary;
+                        if (typeof parsed.collapseAll === 'boolean') savedCollapse = parsed.collapseAll;
+                    }
+                    if (!rows) throw new Error('No rows array');
+                    currentYear = projYear; currentMonth = projMonth;
+                    document.getElementById('monthPicker').value = getMonthValue(currentYear, currentMonth);
+                    normalizeDaysCount();
+                    const normalized = normalizeMatrix(rows, daysCount);
+                    if (normalized.length === 0) throw new Error('No valid rows');
+                    if (!confirm(t('load_confirm') + `\n${normalized.length} · ${getMonthLabel(currentYear, currentMonth)}`)) {
+                        event.target.value = ''; return;
+                    }
+                    if (catalog && catalog.length > 0) {
+                        const cleaned = catalog.filter(w => typeof w === 'string' && w.trim() !== '');
+                        if (cleaned.length > 0) { worksCatalog = cleaned; saveWorksCatalog(); }
+                    }
+                    if (dictionary) {
+                        if (Array.isArray(dictionary.elements)) dictElements = dictionary.elements.filter(x => typeof x === 'string' && x.trim());
+                        if (Array.isArray(dictionary.stages)) dictStages = dictionary.stages.filter(x => typeof x === 'string' && x.trim());
+                        if (Array.isArray(dictionary.brigades)) dictBrigades = dictionary.brigades.filter(x => typeof x === 'string' && x.trim());
+                        saveDictionary();
+                    }
+                    if (savedCollapse !== null) {
+                        collapseAll = savedCollapse;
+                        try { localStorage.setItem(COLLAPSE_KEY, collapseAll ? '1' : '0'); } catch (e) { }
+                    }
+                    ganttMatrix = normalized;
+                    pencilSource = null; pencilHover = null;
+                    collapsedDays.clear();
+                    if (collapseAll) {
+                        for (let d = 0; d < daysCount; d++) collapsedDays.add(d);
+                    }
+                    saveToStorage(); renderAll(); updateDatalists(); updateMonthInfo(); renderFilterOptions();
+                    renderDictList('element'); renderDictList('stage'); renderDictList('brigade');
+                    showToast(`📂 ${t('loaded')}: ${normalized.length}`);
+                } catch (err) {
+                    showToast('❌ ' + err.message);
+                } finally { event.target.value = ''; }
+            };
+            reader.readAsText(file, 'utf-8');
+        }
+
+        // ================== TOAST ==================
+        let toastTimer = null;
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message; toast.classList.add('show');
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+        }
+
+        // ================== HELP ==================
+        function renderHelpContent() {
+            const container = document.getElementById('helpContent');
+            if (!container) return;
+            if (currentLang === 'en') {
+                container.innerHTML = `
+                    <h4>📊 Purpose</h4>
+                    <p>Gantt chart for monthly RC works. Row = element + stage + crew. Cell = day. 💬 in cell means a note exists — hover to see it.</p>
+                    <h4>🔀 Version switch</h4>
+                    <ul>
+                        <li><b>📋 Classic</b> — full Gantt table (best on desktop).</li>
+                        <li><b>🎴 Cards</b> — card view optimized for phones (day or row mode).</li>
+                    </ul>
+                    <h4>🔽 Collapse / Expand</h4>
+                    <ul>
+                        <li>In <b>Cards → By days</b> mode a button appears above the cards.</li>
+                        <li><b>Свернуть всё / Collapse all</b> — hides all day cards.</li>
+                        <li><b>Развернуть всё / Expand all</b> — shows all day cards.</li>
+                        <li>State is saved and applied when switching back to Cards mode.</li>
+                        <li>Individual card: click header to toggle.</li>
+                    </ul>
+                    <h4>🌐 Language</h4>
+                    <p>Switch RU / EN at the top.</p>
+                    <h4>📚 Catalog</h4>
+                    <ul>
+                        <li><b>🔧 Works</b> — add, rename, delete works.</li>
+                        <li><b>🏗️ Elements / Stages / Crews</b> — manage dictionaries for form and filters.</li>
+                    </ul>
+                    <h4>🖱️ Editing</h4>
+                    <ul>
+                        <li><b>Click cell</b> — edit workers, work, note, color.</li>
+                        <li><b>0 workers</b> — cell stays colored (planned).</li>
+                        <li><b>TOTAL row</b> — sum of workers per day.</li>
+                    </ul>
+                    <h4>✏️ Pencil mode</h4>
+                    <p>Step 1: click sample. Step 2: click target — range filled with copies. Empty sample clears range.</p>
+                    <h4>🔎 Filters</h4>
+                    <p>Filter by element, stage, crew. Totals and exports respect the filter.</p>
+                    <h4>📤 Export</h4>
+                    <ul>
+                        <li><b>📥 Excel</b> — "Gantt" and "Details" sheets with hyperlinks.</li>
+                        <li><b>📄 CSV</b> — flat table + details block.</li>
+                        <li><b>💾 / 📂 JSON</b> — save and load full project (including dictionaries and collapse state).</li>
+                    </ul>
+                    <div class="tip">💡 All changes are auto-saved to your browser.</div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <h4>📊 Назначение</h4>
+                    <p>Диаграмма Ганта для планирования монолитных ЖБ работ. Строка = конструкция + этап + бригада. Ячейка = день. Значок 💬 в ячейке означает наличие примечания — наведите курсор, чтобы увидеть его.</p>
+                    <h4>🔀 Переключение версии</h4>
+                    <ul>
+                        <li><b>📋 Классика</b> — полноценная таблица Ганта.</li>
+                        <li><b>🎴 Карточки</b> — карточный вид для телефонов (по дням или по строкам).</li>
+                    </ul>
+                    <h4>🔽 Свернуть / Развернуть</h4>
+                    <ul>
+                        <li>В режиме <b>Карточки → По дням</b> над карточками появляется кнопка.</li>
+                        <li><b>Свернуть всё</b> — скрывает содержимое всех карточек-дней.</li>
+                        <li><b>Развернуть всё</b> — показывает содержимое всех карточек-дней.</li>
+                        <li>Состояние сохраняется и применяется при возврате в режим карточек.</li>
+                        <li>Отдельная карточка сворачивается кликом по её заголовку.</li>
+                    </ul>
+                    <h4>🌐 Язык</h4>
+                    <p>Переключение RU / EN вверху.</p>
+                    <h4>📚 Справочник</h4>
+                    <ul>
+                        <li><b>🔧 Работы</b> — добавление, переименование, удаление работ.</li>
+                        <li><b>🏗️ Конструкции / Этапы / Бригады</b> — управление словарями для формы добавления строки и фильтров.</li>
+                    </ul>
+                    <h4>🖱️ Редактирование</h4>
+                    <ul>
+                        <li><b>Клик по ячейке</b> — рабочие, описание, примечание, цвет.</li>
+                        <li><b>0 рабочих</b> — ячейка остаётся закрашенной (план).</li>
+                        <li><b>Строка «ИТОГО»</b> — сумма рабочих по дню.</li>
+                    </ul>
+                    <h4>✏️ Карандаш</h4>
+                    <p>Шаг 1: клик по образцу. Шаг 2: клик по конечной ячейке — диапазон заполняется копиями. Пустой образец очищает диапазон.</p>
+                    <h4>🔎 Фильтры</h4>
+                    <p>Фильтр по конструкции, этапу, бригаде. Итоги и экспорт учитывают фильтр.</p>
+                    <h4>📤 Экспорт</h4>
+                    <ul>
+                        <li><b>📥 Excel</b> — листы «Гант» и «Детализация» с гиперссылками.</li>
+                        <li><b>📄 CSV</b> — плоская таблица + блок детализации.</li>
+                        <li><b>💾 / 📂 JSON</b> — сохранение и загрузка проекта (включая словари и состояние свёрнутости).</li>
+                    </ul>
+                    <div class="tip">💡 Все изменения автоматически сохраняются в браузере.</div>
+                `;
+            }
+        }
+
+        // ================== EXCEL ==================
+        function exportToExcel() {
+            const filtered = getFilteredMatrix();
+            const allDetailRows = [];
+            ganttMatrix.forEach((combo, rowIdx) => {
+                combo.days.forEach((day, dayIdx) => {
+                    if (day && (day.people > 0 || day.work || day.note || day.planned)) {
+                        allDetailRows.push({
+                            rowIdx, dayIdx, day: dayIdx + 1,
+                            date: `${String(dayIdx + 1).padStart(2, '0')}.${String(currentMonth).padStart(2, '0')}.${currentYear}`,
+                            element: combo.element, stage: combo.stage, brigade: combo.brigade || '',
+                            people: day.people || 0, work: day.work || '', note: day.note || '',
+                            planned: day.people === 0 ? 'Yes' : 'No',
+                            color: day.color || combo.rowColor || stageColors[combo.stage] || ''
+                        });
+                    }
+                });
+            });
+            allDetailRows.sort((a, b) => a.day - b.day || a.rowIdx - b.rowIdx);
+            const DETAIL_HEADER_ROWS = 4;
+            const detailLinkMap = new Map();
+            allDetailRows.forEach((r, index) => {
+                detailLinkMap.set(`${r.rowIdx}:${r.dayIdx}`, DETAIL_HEADER_ROWS + 1 + index);
+            });
+
+            const SHEET1_NAME = currentLang === 'en' ? 'Gantt' : 'Гант';
+            const SHEET2_NAME = currentLang === 'en' ? 'Details' : 'Детализация';
+
+            let ganttHtml = `<h3>${getMonthLabel(currentYear, currentMonth)}</h3>
+                <p style="font-size:11px;color:#666;">💡 Click number → jump to "${SHEET2_NAME}".</p>
+                <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:11px;text-align:center;">
+                <thead><tr style="background:#0f172a;color:#fff;">
+                    <th style="text-align:left;min-width:200px;">${currentLang === 'en' ? 'Element / Stage / Crew' : 'Конструкция / Этап / Бригада'}</th>`;
+            for (let d = 1; d <= daysCount; d++) ganttHtml += `<th>${d}</th>`;
+            ganttHtml += `</tr></thead><tbody>`;
+
+            filtered.forEach((combo) => {
+                const realRowIdx = ganttMatrix.indexOf(combo);
+                ganttHtml += `<tr><td style="text-align:left;background:#f8fafc;font-weight:bold;">
+                    ${escapeHtml(combo.element)} — ${escapeHtml(combo.stage)}
+                    ${combo.brigade ? `<br><span style="font-size:10px;color:#64748b;">👷 ${escapeHtml(combo.brigade)}</span>` : ''}
+                </td>`;
+                for (let i = 0; i < daysCount; i++) {
+                    const dayData = combo.days[i];
+                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note || dayData.planned)) {
+                        const bg = dayData.color || combo.rowColor || stageColors[combo.stage] || '#f1f5f9';
+                        const targetRowNum = detailLinkMap.get(`${realRowIdx}:${i}`);
+                        const displayText = dayData.people > 0 ? dayData.people : '0';
+                        const noteIcon = dayData.note ? ' 💬' : '';
+                        if (targetRowNum) {
+                            ganttHtml += `<td style="background:${bg};"><a href="#'${SHEET2_NAME}'!A${targetRowNum}" style="color:#1a56db;text-decoration:none;font-weight:bold;display:block;">${displayText}${noteIcon}</a></td>`;
+                        } else {
+                            ganttHtml += `<td style="background:${bg};">${displayText}${noteIcon}</td>`;
+                        }
+                    } else {
+                        ganttHtml += `<td style="background:#fff;"></td>`;
+                    }
+                }
+                ganttHtml += `</tr>`;
+            });
+
+            ganttHtml += `<tr style="background:#0f172a;color:#fff;font-weight:bold;"><td style="text-align:left;background:#1e293b;">${t('total')}</td>`;
+            for (let i = 0; i < daysCount; i++) {
+                let total = 0;
+                filtered.forEach(c => { const d = c.days[i]; if (d && d.people > 0) total += d.people; });
+                ganttHtml += `<td style="background:#0f172a;color:${total === 0 ? '#64748b' : '#4ade80'};">${total}</td>`;
+            }
+            ganttHtml += `</tr></tbody></table>`;
+
+            let detailHtml = `<h3>${currentLang === 'en' ? 'Details' : 'Детализация'} — ${getMonthLabel(currentYear, currentMonth)}</h3>
+                <p>${allDetailRows.length}</p>
+                <table border="1" cellspacing="0" cellpadding="4" style="border-collapse:collapse;font-family:Segoe UI,sans-serif;font-size:11px;">
+                <thead><tr style="background:#0f172a;color:#fff;">
+                    <th>#</th><th>${currentLang === 'en' ? 'Day' : 'День'}</th><th>${currentLang === 'en' ? 'Date' : 'Дата'}</th>
+                    <th>${t('element')}</th><th>${t('stage')}</th><th>${t('brigade')}</th>
+                    <th>${t('people_count')}</th><th>${t('work_desc')}</th><th>${t('note')}</th>
+                    <th>Plan</th><th>Color</th>
+                </tr></thead><tbody>`;
+
+            allDetailRows.forEach((r, index) => {
+                const rowNum = DETAIL_HEADER_ROWS + 1 + index;
+                detailHtml += `<tr>
+                    <td style="text-align:center;background:#f8fafc;"><a href="#'${SHEET1_NAME}'!A${r.rowIdx + 5}" style="color:#1a56db;text-decoration:none;font-weight:bold;">${rowNum}</a></td>
+                    <td style="text-align:center;font-weight:bold;">${r.day}</td>
+                    <td style="text-align:center;">${r.date}</td>
+                    <td>${escapeHtml(r.element)}</td>
+                    <td>${escapeHtml(r.stage)}</td>
+                    <td>${escapeHtml(r.brigade)}</td>
+                    <td style="text-align:center;font-weight:bold;background:${r.color || '#fff'};">${r.people}</td>
+                    <td>${escapeHtml(r.work)}</td>
+                    <td>${escapeHtml(r.note)}</td>
+                    <td style="text-align:center;">${r.planned}</td>
+                    <td style="text-align:center;background:${r.color || '#fff'};">${r.color || '—'}</td>
+                </tr>`;
+            });
+            detailHtml += `</tbody></table>`;
+
+            const fullHtml = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office"
+                      xmlns:x="urn:schemas-microsoft-com:office:excel"
+                      xmlns="http://www.w3.org/TR/REC-html40">
+                <head><meta charset="UTF-8">
+                    <!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets>
+                        <x:ExcelWorksheet><x:Name>${SHEET1_NAME}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                        <x:ExcelWorksheet><x:Name>${SHEET2_NAME}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet>
+                    </x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+                    <style>
+                        body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11px; }
+                        table { border-collapse: collapse; }
+                        th, td { border: 1px solid #999; padding: 3px 5px; vertical-align: top; }
+                        th { background: #0f172a; color: #fff; }
+                        a { color: #1a56db; text-decoration: none; font-weight: bold; }
+                        h3 { color: #0f172a; }
+                    </style>
+                </head>
+                <body>
+                    <div>${ganttHtml}</div>
+                    <br style="page-break-before:always;">
+                    <div>${detailHtml}</div>
+                </body></html>`;
+
+            const blob = new Blob(['\ufeff' + fullHtml], { type: 'application/vnd.ms-excel;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Schedule_${getMonthValue(currentYear, currentMonth)}.xls`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            showToast(`📥 ${t('export_excel')}: ${allDetailRows.length}`);
+        }
+
+        // ================== CSV ==================
+        function exportToCSV() {
+            const filtered = getFilteredMatrix();
+            const headers = [currentLang === 'en' ? 'Element / Stage / Crew' : 'Конструкция / Этап / Бригада'];
+            for (let i = 1; i <= daysCount; i++) headers.push(`${currentLang === 'en' ? 'Day' : 'День'} ${i}`);
+            const rows = filtered.map(combo => {
+                const name = `${combo.element} — ${combo.stage}${combo.brigade ? ' / ' + combo.brigade : ''}`;
+                const row = [name];
+                for (let i = 0; i < daysCount; i++) {
+                    const d = combo.days[i];
+                    if (d && d.people > 0) {
+                        row.push(d.people + (d.note ? ' 💬' : ''));
+                    } else if (d && d.planned) {
+                        row.push('0 (plan)' + (d.note ? ' 💬' : ''));
+                    } else {
+                        row.push('');
+                    }
+                }
+                return row;
+            });
+            const totalRow = [t('total')];
+            for (let i = 0; i < daysCount; i++) {
+                let total = 0;
+                filtered.forEach(c => { const d = c.days[i]; if (d && d.people > 0) total += d.people; });
+                totalRow.push(total);
+            }
+            rows.push(totalRow);
+            rows.push([]);
+            rows.push([`=== ${currentLang === 'en' ? 'DETAILS' : 'ДЕТАЛИЗАЦИЯ'} ===`]);
+            rows.push([currentLang === 'en' ? 'Day' : 'День', currentLang === 'en' ? 'Date' : 'Дата',
+                t('element'), t('stage'), t('brigade'), t('people_count'), t('work_desc'), t('note'), 'Plan']);
+            ganttMatrix.forEach(combo => {
+                combo.days.forEach((day, idx) => {
+                    if (day && (day.people > 0 || day.work || day.note)) {
+                        rows.push([
+                            idx + 1,
+                            `${String(idx+1).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}.${currentYear}`,
+                            combo.element, combo.stage, combo.brigade || '',
+                            day.people || 0, day.work || '', day.note || '',
+                            day.people === 0 ? 'Yes' : 'No'
+                        ]);
+                    }
+                });
+            });
+            let csv = '\uFEFF' + headers.join(';') + '\n';
+            rows.forEach(r => {
+                csv += r.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(';') + '\n';
+            });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `Schedule_${getMonthValue(currentYear, currentMonth)}.csv`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+            showToast('📄 ' + t('csv_ready'));
+        }
+
+        // ================== СТАРТ ==================
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
