@@ -421,7 +421,7 @@
             margin-bottom: 12px; overflow: hidden;
         }
         .card-day-header {
-            background: linear-gradient(135deg, #0f172a, #1e3a5f);
+            background: linear-gradient(135deg, #10233f, #24548a);
             color: #fff; padding: 12px 16px;
             display: flex; justify-content: space-between; align-items: center;
             cursor: pointer;
@@ -444,13 +444,14 @@
         .card-day-body.collapsed { display: none; }
 
         .card-row {
-            padding: 12px 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid #f1f5f9;
             cursor: pointer;
             transition: background 0.15s;
         }
         .card-row:last-child { border-bottom: none; }
         .card-row:active { background: #f0f4ff; }
+        .card-row:hover { background:#f8fbff; }
 
         .card-row .row-title {
             display: flex; justify-content: space-between; align-items: flex-start;
@@ -488,6 +489,12 @@
             font-size: 0.72rem; color: var(--text-light);
             font-style: italic; margin-top: 4px;
         }
+        .card-row .row-actions { margin-top: 9px; padding-top: 7px; border-top: 1px solid #eef2f7; }
+        .card-row .row-actions button, .card-row-stack .row-actions button {
+            min-width: 32px; min-height: 28px; font-size: 0.72rem; padding: 4px 7px;
+            border-radius: 7px; background: #f8fafc;
+        }
+        .card-row .row-actions button:focus-visible, .card-row-stack .row-actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
         .card-row-stack {
             background: #fff; border-radius: var(--radius);
@@ -790,6 +797,16 @@
             text-align: center; color: var(--text-light); font-size: 0.78rem;
             padding: 12px; border-top: 1px solid var(--border); background: #fafbfc;
         }
+        .user-ad-block { margin: 22px auto 14px; padding: 16px; max-width: 1100px; border: 1px dashed #94a3b8; border-radius: 14px; background: linear-gradient(135deg,#f8fafc,#eef4ff); color: #334155; }
+        .user-ad-heading { display:flex; align-items:center; justify-content:space-between; gap:12px; font-weight:800; font-size:.88rem; margin-bottom:9px; }
+        .ad-edit-btn,.ad-editor-actions button { border:1px solid #cbd5e1; border-radius:8px; padding:7px 11px; background:#fff; color:#334155; font-weight:700; cursor:pointer; }
+        .user-ad-preview { min-height:54px; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; border-radius:9px; background:rgba(255,255,255,.8); white-space:pre-wrap; line-height:1.5; }
+        .user-ad-preview a { color:#1d4ed8; font-weight:700; }
+        .user-ad-editor { margin-top:12px; padding-top:12px; border-top:1px solid #dbe3ef; }
+        .user-ad-editor label { display:block; font-size:.76rem; font-weight:700; margin:8px 0 4px; }
+        .user-ad-editor textarea,.user-ad-editor input { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font:inherit; background:#fff; }
+        .ad-editor-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:9px; }
+        @media(max-width:600px) { .user-ad-block{margin:16px 4px;padding:12px}.user-ad-heading{align-items:flex-start;flex-direction:column}.card-row .row-actions{gap:5px}.card-row .row-actions button{flex:0 0 auto} }
 
         .pencil-panel {
             display: none;
@@ -944,8 +961,20 @@
             .catalog-tab-btn { font-size: 0.68rem; padding: 7px 8px; }
         }
 
+        .print-sheet-container { display:block; margin:16px 0 24px; padding:16px 18px; border:1px solid var(--border); border-radius:12px; background:var(--card); color:var(--text); box-shadow:var(--shadow); }
+        .print-organization { display:flex; align-items:center; gap:12px; margin:12px 0; font-size:11pt; }
+        .print-organization label { font-weight:700; white-space:nowrap; }
+        .print-organization input { flex:1; min-width:0; border:0; border-bottom:1px solid #777; border-radius:0; padding:6px 4px; background:transparent; color:inherit; font:inherit; }
+        .print-organization input:focus { outline:2px solid var(--accent); outline-offset:2px; }
+        body[data-theme="night"] .print-sheet-container { color:var(--text); }
+        @media(max-width:600px){ .print-sheet-container{padding:12px;font-size:.85rem}.print-signature{gap:8px;flex-direction:column}.print-organization{align-items:flex-start;flex-direction:column;gap:4px}.print-organization input{width:100%} }
+        .print-header h2 { margin:0 0 12px; font-size:18pt; letter-spacing:.04em; }
+        .print-header p,.print-signature p { margin:8px 0; font-size:11pt; }
+        .print-signature { margin-top:26px; display:flex; justify-content:space-between; gap:28px; flex-wrap:wrap; }
+        
         @media print {
-            body { background: #fff; padding: 0; }
+            body { background: #fff !important; color:#111 !important; padding: 0; }
+            .print-sheet-container { display:block !important; page-break-inside:avoid; margin:18px 0 0; padding:18px 8px 0; border-top:1px solid #777; color:#111 !important; }
             .toolbar, .legend, .edit-panel, .header-badge, .toast,
             .month-selector, .palette, .filters-panel, .pencil-panel,
             .switches-row, .card-mode-toggle, .card-view, .card-controls { display: none !important; }
@@ -959,8 +988,68 @@
             .gantt-table tbody td {
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-            .row-actions { display: none; }
+            .gantt-table .row-actions { display: none; }
+            .footer-links, .user-ad-block, .footer-bottom, .footer-note { display:none !important; }
+            .print-sheet-container { background:#fff !important; box-shadow:none !important; border-radius:0 !important; }
+            .print-organization input { color:#111 !important; background:transparent !important; }
+            .card-view .row-actions { display: flex !important; }
         }
+
+        /* ===== Темы оформления: 5 вариантов + ночной режим ===== */
+        body[data-theme="ocean"] { --bg:#eef4fb; --card:#ffffff; --border:#d7e2f0; --text:#172b4d; --text-light:#60748b; --accent:#2563eb; --accent-hover:#1d4ed8; }
+        body[data-theme="forest"] { --bg:#eef5f0; --card:#ffffff; --border:#d5e5d9; --text:#18372a; --text-light:#627b6b; --accent:#16804a; --accent-hover:#11683c; }
+        body[data-theme="graphite"] { --bg:#edf0f3; --card:#ffffff; --border:#d5dbe2; --text:#202833; --text-light:#66717e; --accent:#475569; --accent-hover:#334155; }
+        body[data-theme="sand"] { --bg:#f7f2e9; --card:#fffdf8; --border:#e8ddca; --text:#433629; --text-light:#82715d; --accent:#b7791f; --accent-hover:#975f13; }
+        body[data-theme="violet"] { --bg:#f4f0fb; --card:#ffffff; --border:#e2d9f2; --text:#32234e; --text-light:#76658e; --accent:#7952b3; --accent-hover:#603c96; }
+        body[data-theme="night"] { --bg:#0b1220; --card:#141e2e; --border:#2b3a50; --text:#e5edf7; --text-light:#9aabc0; --accent:#60a5fa; --accent-hover:#3b82f6; --shadow:0 8px 28px rgba(0,0,0,.28); }
+        body[data-theme="night"] .switch-group, body[data-theme="night"] .stat-chip,
+        body[data-theme="night"] .month-selector, body[data-theme="night"] .legend,
+        body[data-theme="night"] .palette, body[data-theme="night"] .filters-panel,
+        body[data-theme="night"] .edit-panel, body[data-theme="night"] .table-wrapper,
+        body[data-theme="night"] .modal, body[data-theme="night"] .card-day,
+        body[data-theme="night"] .card-row, body[data-theme="night"] .footer-links,
+        body[data-theme="night"] .ad-block { background:var(--card)!important; color:var(--text)!important; border-color:var(--border)!important; }
+        body[data-theme="night"] input, body[data-theme="night"] select, body[data-theme="night"] textarea,
+        body[data-theme="night"] .month-selector input { background:#0e1726!important; color:var(--text)!important; border-color:var(--border)!important; }
+        body[data-theme="night"] .legend-item { background:#1c293b; color:#c3d0df; }
+        body[data-theme="night"] .gantt-table tbody td { color:#e5edf7; border-color:#34445a; }
+        body[data-theme="night"] .gantt-table tbody td:first-child { background:#f8fafc !important; color:#172033 !important; border-right:2px solid #cbd5e1 !important; }
+        body[data-theme="night"] .gantt-table tbody td:first-child strong { color:#172033 !important; }
+        body[data-theme="night"] .gantt-table tbody td:first-child span { color:#64748b !important; }
+        body[data-theme="night"] .gantt-table tbody td.cell.empty { background:#111b2a!important; }
+        body[data-theme="night"] .gantt-table tbody td.cell.empty:hover { background:#1d2c42!important; }
+        body[data-theme="night"] .gantt-table thead th { background:#1e2c40; color:#f1f5f9; }
+        body[data-theme="night"] .card-day-header, body[data-theme="night"] .card-row-header { background:#1c2a3e; color:#e5edf7; }
+        body[data-theme="night"] .modal-sub, body[data-theme="night"] .footer-note { color:var(--text-light); }
+        .theme-controls { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+        .theme-controls select { border:1px solid var(--border); border-radius:30px; padding:8px 12px; background:var(--card); color:var(--text); font:600 .78rem var(--font); }
+        .theme-controls .btn { box-shadow:none; }
+        .custom-color-control { display:inline-flex; align-items:center; gap:7px; padding:4px 9px; border:1px solid var(--border); border-radius:22px; background:var(--card); color:var(--text); font-size:.72rem; font-weight:600; }
+        .custom-color-control input[type=color] { width:30px; height:28px; padding:1px; border:0; background:transparent; cursor:pointer; }
+        .equipment-edit-btn { background:#e0e7ff!important; color:#3730a3!important; border:0; border-radius:7px; padding:5px 8px!important; cursor:pointer; }
+        body[data-theme="night"] .equipment-edit-btn { background:#263a5b!important; color:#bfdbfe!important; }
+        .equipment-form-actions { display:flex; gap:6px; flex-wrap:wrap; }
+        .equipment-entries { display:grid; gap:8px; margin:7px 0; }
+        .equipment-entry { display:grid; grid-template-columns:minmax(140px,2fr) minmax(90px,1fr) auto; gap:8px; align-items:center; padding:9px; border:1px solid var(--border); border-radius:9px; background:var(--bg); }
+        .equipment-entry input { min-width:0; width:100%; }
+        .equipment-entry button { padding:7px 10px; border:0; border-radius:7px; cursor:pointer; }
+        @media(max-width:600px){
+            #classicView .gantt-table { min-width:900px; font-size:.62rem; }
+            #classicView .gantt-table thead th:first-child { width:155px; min-width:155px; max-width:155px; padding-left:5px; font-size:.58rem; }
+            #classicView .gantt-table tbody td:first-child { width:155px; min-width:155px; max-width:155px; padding:2px 4px; font-size:.6rem; line-height:1.15; }
+            #classicView .gantt-table thead th:not(:first-child) { padding:5px 1px; font-size:.58rem; }
+            #classicView .gantt-table tbody td.cell { padding:1px; font-size:.62rem; height:30px; }
+            .equipment-entry{grid-template-columns:1fr 1fr}.equipment-entry input:first-child{grid-column:1/-1}.equipment-entry button{grid-column:1/-1}}
+        .cell-progress { display:block; font-size:10px; font-weight:700; line-height:1.2; opacity:.9; }
+        body[data-theme="night"] .cell-progress { color:#172033!important; background:rgba(255,255,255,.78); border-radius:8px; padding:1px 3px; width:max-content; margin:2px auto 0; }
+        .theme-controls select:focus, .custom-color-control input:focus { outline:2px solid var(--accent); outline-offset:2px; }
+        #equipmentCatalogList table th { background:var(--bg); color:var(--text); position:sticky; top:0; }
+        #equipmentCatalogList table td { color:var(--text); border-color:var(--border)!important; }
+        body[data-theme="night"] #equipmentCatalogList table th { background:#1d2b40; color:#e5edf7; }
+        body[data-theme="night"] #equipmentCalcPreview { background:#1e2c40!important; color:#e5edf7; }
+        @media(max-width:650px) { .theme-controls { width:100%; } .theme-controls select { flex:1; min-width:150px; } }
+
+        
     </style>
 </head>
 <body>
@@ -968,7 +1057,7 @@
         <div class="header">
             <div>
                 <h1 data-i18n="app_title">📊 Месячный график работ</h1>
-                <div class="subtitle"><span data-i18n="app_subtitle">Диаграмма Ганта by ProgrammYankov V.1</span> · <span id="headerMonthLabel">Июнь 2025</span></div>
+                <div class="subtitle"><span data-i18n="app_subtitle"> by ProgrammYankov V.1.12</span> · <span id="headerMonthLabel">Июнь 2025</span></div>
             </div>
             <div class="header-badge">
                 <span class="dot"></span>
@@ -987,11 +1076,16 @@
                 <button class="switch-btn active" id="langRu" onclick="setLanguage('ru')">🇷🇺 RU</button>
                 <button class="switch-btn" id="langEn" onclick="setLanguage('en')">en EN</button>
             </div>
+            <div class="theme-controls" aria-label="Настройки оформления">
+               
+                </select>
+                <button class="btn btn-csv" id="nightModeBtn" onclick="toggleNightMode()" type="button">🌙 Ночной режим</button>
+            </div>
         </div>
 
         <div class="month-selector">
             <label for="monthPicker">📅 <span data-i18n="month">Месяц:</span></label>
-            <input type="month" id="monthPicker" value="2025-06">
+            <input type="month" id="monthPicker" value="2027-01">
             <span class="month-info" id="monthInfo"></span>
         </div>
 
@@ -1032,6 +1126,7 @@
         <div class="palette" id="globalPalette">
             <span class="palette-title" data-i18n="color_title">🎨 Цвет:</span>
             <span class="palette-hint" data-i18n="color_hint">Выберите цвет для новых ячеек/строк. «Авто» — цвет по этапу.</span>
+            <label class="custom-color-control"><span data-i18n="own_color">Свой цвет</span> <input type="color" id="globalCustomColor" value="#bfdbfe" onchange="setGlobalCustomColor(this.value)" title="Выбрать произвольный цвет"></label>
         </div>
 
         <div class="filters-panel">
@@ -1079,18 +1174,21 @@
                 </div>
                 <button class="btn btn-add" onclick="addNewRow()">➕ <span data-i18n="add">Добавить</span></button>
             </div>
-	</div>		
-            <p style="font-size:0.72rem;color:var(--text-light);margin-top:10px;" data-i18n="edit_hint">
+			
+			<p style="font-size:0.72rem;color:var(--text-light);margin-top:10px;" data-i18n="edit_hint">
                 💡 Клик по ячейке — редактирование. ⬆️⬇️ — перемещение. «✏️ Карандаш» — копирование образца.
             </p>
 			            <button class="btn btn-pencil" id="pencilBtn" onclick="togglePencilMode()" title="Pencil">✏️<span class="btn-text" data-i18n="pencil"> Карандаш</span></button>
             <button class="btn btn-catalog" onclick="openCatalogEditor()" title="Catalog">📚<span class="btn-text" data-i18n="catalog"> Справочник</span></button>
+            <button class="btn btn-catalog" onclick="openEquipmentCatalog()" title="Equipment catalog">🚜<span class="btn-text" data-i18n="equipment_catalog"> Техника</span></button>
 			<div class="pencil-panel" id="pencilPanel">
             <div class="pencil-info">✏️ <b data-i18n="pencil_mode">Карандаш</b></div>
             <div class="pencil-source" id="pencilSourceInfo" data-i18n="sample_not_selected">Образец не выбран</div>
             <div class="pencil-hint"><span id="pencilStep" data-i18n="step1">Шаг 1: выберите ячейку-образец</span></div>
             <button class="btn-cancel-pencil" onclick="exitPencilMode()">✖ <span data-i18n="exit">Выйти</span></button>
         </div>
+	</div>		
+            
 		   <!-- Панель управления карточками: свернуть/развернуть всё -->
         <div class="card-controls" id="cardControls">
             <button class="btn-collapse" id="btnCollapseAll" onclick="toggleCollapseAll()">
@@ -1108,7 +1206,7 @@
                 <table class="gantt-table" id="ganttTable"></table>
             </div>
             <div class="footer-note" data-i18n="table_footer">
-                Каждая закрашенная ячейка — этап в этот день. Число — количество рабочих. 💬 — есть примечание.
+                Закрашенная ячейка — этап в этот день. Число — количество рабочих. 💬 — есть примечание.
             </div>
         </div>
 
@@ -1128,10 +1226,27 @@
             <input type="number" id="modalPeople" min="0" max="999" value="0">
             <label for="modalWork" data-i18n="work_desc">Описание работ</label>
             <textarea id="modalWork" placeholder="Например: Бетонирование колонн, 24 м³"></textarea>
+            <label for="modalActualVolume" data-i18n="actual_volume_label">📐 Фактически выполненный объём</label>
+            <div style="display:grid;grid-template-columns:minmax(0,1fr) 90px;gap:8px;align-items:center;margin:4px 0 6px;">
+                <input type="range" id="modalActualVolumeSlider" min="0" max="1000" step="0.1" value="0" oninput="syncActualVolume('slider')" style="width:100%;accent-color:#2563eb;">
+                <input type="number" id="modalActualVolume" min="0" step="0.1" value="0" oninput="syncActualVolume('number')" style="width:100%;">
+            </div>
+            <label for="modalProgress" data-i18n="progress_label">📈 Процент выполнения, %</label>
+            <input type="number" id="modalProgress" min="0" max="100" step="1" value="0" placeholder="0–100">
+            <div style="display:flex;gap:8px;align-items:center;margin:0 0 12px;">
+                <label for="modalVolumeUnit" data-i18n="volume_unit_label" style="margin:0;white-space:nowrap;">Ед. изм.</label>
+                <input type="text" id="modalVolumeUnit" value="" placeholder="— укажите ед. изм. —" style="max-width:120px;">
+            </div>
             <label for="modalNote" data-i18n="note">Примечание</label>
             <input type="text" id="modalNote" placeholder="Класс бетона B25">
+            <label data-i18n="equipment_label">🚜 Техника (можно добавить несколько единиц)</label>
+            <datalist id="equipmentOptions"></datalist>
+            <div id="equipmentEntries" class="equipment-entries"></div>
+            <button type="button" class="btn btn-add" data-i18n="add_equipment" onclick="addEquipmentEntryRow()">＋ Добавить единицу техники</button>
+            <div id="equipmentCalcPreview" style="font-size:0.82rem;padding:8px 10px;margin:6px 0 12px;background:#f1f5f9;border-radius:8px;line-height:1.6;" data-i18n="equipment_calc_empty">Машино-смены: 0 · Затраты: —</div>
             <label data-i18n="cell_color">Цвет ячейки</label>
             <div class="modal-palette" id="modalPalette"></div>
+            <label class="custom-color-control"><span data-i18n="own_cell_color">Свой цвет ячейки</span> <input type="color" id="modalCustomColor" value="#bfdbfe" onchange="setModalCustomColor(this.value)"></label>
             <div class="modal-actions">
                 <button class="btn btn-delete" onclick="deleteCell()">🗑 <span data-i18n="clear">Очистить</span></button>
                 <button class="btn btn-cancel" onclick="closeModal()" data-i18n="cancel">Отмена</button>
@@ -1147,6 +1262,7 @@
             <div class="modal-sub" id="rowColorSub"></div>
             <label data-i18n="choose_color">Выберите цвет:</label>
             <div class="modal-palette" id="rowColorPalette"></div>
+            <label class="custom-color-control">Произвольный цвет строки <input type="color" id="rowCustomColor" value="#bfdbfe" onchange="setRowCustomColor(this.value)"></label>
             <div class="modal-actions">
                 <button class="btn btn-cancel" onclick="closeRowColorModal()" data-i18n="cancel">Отмена</button>
                 <button class="btn btn-save" onclick="saveRowColor()">💾 <span data-i18n="apply">Применить</span></button>
@@ -1218,6 +1334,25 @@
         </div>
     </div>
 
+    <!-- Справочник техники -->
+    <div class="modal-overlay" id="equipmentCatalogModal">
+        <div class="modal" style="max-width:760px;">
+            <h3 data-i18n="equipment_catalog_title">🚜 Справочник техники</h3>
+            <div class="modal-sub" data-i18n="equipment_catalog_sub">Укажите наименование, стоимость машино-часа (можно оставить пустой) и длительность машино-смены.</div>
+            <div style="display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;margin:12px 0;">
+                <div><label for="newEquipmentName" data-i18n="equipment_name">Наименование техники</label><input id="newEquipmentName" type="text" placeholder="Экскаватор JCB" maxlength="120"></div>
+                <div><label for="newEquipmentRate" data-i18n="equipment_rate">Цена за машино-час</label><input id="newEquipmentRate" type="number" min="0" step="0.01" placeholder="—"></div>
+                <div><label for="newEquipmentShift" data-i18n="shift_hours">Часов в смене</label><input id="newEquipmentShift" type="number" min="0.5" step="0.5" value="8"></div>
+                <div class="equipment-form-actions">
+                    <button class="btn btn-add" id="equipmentSubmitBtn" onclick="addEquipmentCatalogItem()">➕ Добавить</button>
+                    <button class="btn btn-cancel" id="equipmentCancelEditBtn" onclick="cancelEquipmentEdit()" style="display:none;">Отмена</button>
+                </div>
+            </div>
+            <div id="equipmentCatalogList" style="max-height:45vh;overflow:auto;"></div>
+            <div class="modal-actions"><button class="btn btn-cancel" onclick="closeEquipmentCatalog()" data-i18n="close">Закрыть</button></div>
+        </div>
+    </div>
+
     <!-- Модальное окно инструкции -->
     <div class="modal-overlay" id="helpModal">
         <div class="modal" style="max-width:640px;">
@@ -1232,6 +1367,25 @@
 
     <div class="toast" id="toast"></div>
 	</div>
+	
+</div> 
+         
+        <!-- Отдельная ведомость для печати, ниже графика -->
+        <section class="print-sheet-container" id="printSheetContainer">
+            <div class="print-header">
+                <h2 data-i18n="statement_title">Ведомость</h2>
+                <p><strong data-i18n="generated_date">Дата формирования:</strong> <span id="printDate"></span></p>
+            </div>
+            <div class="print-organization">
+                <label for="printOrganization" data-i18n="organization">Организация:</label>
+                <input id="printOrganization" type="text" placeholder="Введите название организации" autocomplete="organization">
+            </div>
+            <div class="print-signature">
+                <p><strong data-i18n="signature">Подпись:</strong> ______________________________________________</p>
+                <p><strong data-i18n="signature_date">Дата:</strong> "___" ____________________ 20___ г.</p>
+            </div>
+        </section>
+
     <!-- Footer -->
            <!-- Футер -->
         <div class="footer-links">
@@ -1239,13 +1393,14 @@
                 <a href="https://t.me/ProgrammYankov" target="_blank">🧮 ProgrammYankov</a> |
                 <a href="https://t.me/GeoLisp" target="_blank">📢  Канал GeoLisp</a> |
                 <a href="https://yankov.alex.gen@gmail.com" target="_blank">📐 Mail</a>
-				<a href="mailto:yankov.alex.gen@gmail.com" class="contact-item">
-        <span class="icon">
-          
-        ПОЧТА
-      </a>
+				
+				<a href="mailto:yankov.alex.gen@gmail.com" target="contact-item"> <span class="icon">ПОЧТА</a>
+
     </div>
-	<a href="https://yoomoney.ru/to/4100119651846362/100" target="_blank">Благодарность Автору по ссылке или QR CODE</a>
+	
+	
+	
+	
             </p>
 			<?xml version="1.0" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN"
@@ -1357,14 +1512,29 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
 85 0 85 170 0 170 0 0 85 0 85 -255 0 -255 0 0 -425z"/>
 </g>
 </svg>
+<a href="https://yoomoney.ru/to/4100119651846362/100" target="_blank">Благодарность Автору по ссылке или QR CODE</a>
 
         </div>
 		  </div>
+            <section class="user-ad-block" aria-label="Рекламный блок пользователя">
+                <div class="ad-block">
+  <div class="ad-header">
+    <h2>📢 Размещение рекламы</h2>
+    <p>Расскажите о своём продукте нашей аудитории</p>
+  </div>
+  <!-- Кнопка звонка -->
+      <a class="btn-phone" href="tel:+79937293375">
+        📞 Позвонить
+      </a>
+    </div>
+                </div>
+            </section>
             <div class="footer-bottom">
 			<p>&copy; 2026 ProgrammYankov.  Все права защищены.</p>
                 <p>По вопросам разработки,использования,а так же сотрудничества.</p>
             </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.min.js"></script>
     <script>
         // ================== КОНСТАНТЫ ==================
         const STORAGE_KEY = 'gantt_schedule_v11';
@@ -1456,8 +1626,8 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
         // ================== ПЕРЕВОДЫ ==================
         const I18N = {
             ru: {
-                app_title: '📊 Месячный график монолитных ЖБ работ',
-                app_subtitle: 'Диаграмма Ганта by ProgrammYankov V.1', autosave: 'Автосохранение',
+                app_title: '📊 Месячный график  работ',
+                app_subtitle: ' by ProgrammYankov V.1.12', autosave: 'Автосохранение',
                 version: 'Версия', version_classic: '📋 Классика', version_cards: '🎴 Карточки',
                 language: 'Язык', month: 'Месяц:',
                 excel: 'Excel', csv: 'CSV', print: 'Печать',
@@ -1473,6 +1643,12 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 stage_arm: 'Арматурные', stage_beton: 'Бетонирование',
                 stage_tech: 'Технологический', stage_other: 'Прочие',
                 color_title: '🎨 Цвет:', color_hint: 'Выберите цвет для новых ячеек/строк. «Авто» — цвет по этапу.',
+                theme_ocean: '🌊 Океан — сине-голубой', theme_forest: '🌿 Эко — зелёный', theme_graphite: '⚙️ Графит — строгий', theme_sand: '🏜️ Песочный — тёплый', theme_violet: '💜 Аметист — фиолетовый',
+                equipment_catalog: ' Техника', equipment_catalog_title: '🚜 Справочник техники', equipment_catalog_sub: 'Укажите наименование, стоимость машино-часа (можно оставить пустой) и длительность машино-смены.', equipment_saved: 'Техника сохранена', choose_custom_color: 'Выбрать произвольный цвет',
+                own_color: 'Свой цвет', own_cell_color: 'Свой цвет ячейки', night_mode: '🌙 Ночной режим', day_mode: '☀️ Дневной режим',
+                equipment_label: '🚜 Техника (можно добавить несколько единиц)', equipment_rate: 'Цена за машино-час', shift_hours: 'Часов в смене', equipment_calc_empty: 'Машино-смены: 0 · Затраты: —', add_equipment: '＋ Добавить единицу техники', equipment_name: 'Наименование техники', equipment_hours: 'Часы', delete_equipment: 'Удалить единицу', machine_shifts: 'Машино-смены', costs: 'Затраты', equipment_count: 'Единиц', hours_label: 'Часы', equipment_empty: 'Справочник пуст. Добавьте первую позицию.', equipment_table_name: 'Техника', equipment_table_rate: 'Цена / маш.-ч', equipment_table_shift: 'Часов / смена', edit_equipment: 'Редактировать', delete: 'Удалить', equipment_delete_confirm: 'Удалить «{name}» из справочника? Записи в графике сохранятся.',
+                progress_label: '📈 Процент выполнения, %', actual_volume_label: '📐 Фактически выполненный объём', volume_unit_label: 'Ед. изм.',
+                statement_title: 'Ведомость', generated_date: 'Дата формирования:', organization: 'Организация:', organization_placeholder: 'Введите название организации', signature: 'Подпись:', signature_date: 'Дата:',
                 filter_element: '🏗️ Конструкция', filter_stage: '⚙️ Этап', filter_brigade: '👷 Бригада',
                 all: 'Все', reset_filters: 'Сбросить',
                 manage_rows: 'Управление строками',
@@ -1538,6 +1714,12 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 stage_arm: 'Rebar', stage_beton: 'Concreting',
                 stage_tech: 'Technological', stage_other: 'Other',
                 color_title: '🎨 Color:', color_hint: 'Choose color for new cells/rows. "Auto" — stage color.',
+                theme_ocean: '🌊 Ocean — blue', theme_forest: '🌿 Eco — green', theme_graphite: '⚙️ Graphite — neutral', theme_sand: '🏜️ Sand — warm', theme_violet: '💜 Amethyst — violet',
+                equipment_catalog: ' Equipment', equipment_catalog_title: '🚜 Equipment catalog', equipment_catalog_sub: 'Enter the equipment name, machine-hour rate (optional), and shift duration.', equipment_saved: 'Equipment saved', choose_custom_color: 'Choose a custom color',
+                own_color: 'Custom color', own_cell_color: 'Custom cell color', night_mode: '🌙 Night mode', day_mode: '☀️ Day mode',
+                equipment_label: '🚜 Equipment (multiple units allowed)', equipment_rate: 'Rate per machine-hour', shift_hours: 'Hours per shift', equipment_calc_empty: 'Machine shifts: 0 · Costs: —', add_equipment: '＋ Add equipment unit', equipment_name: 'Equipment name', equipment_hours: 'Hours', delete_equipment: 'Remove unit', machine_shifts: 'Machine shifts', costs: 'Costs', equipment_count: 'Units', hours_label: 'Hours', equipment_empty: 'Catalog is empty. Add the first item.', equipment_table_name: 'Equipment', equipment_table_rate: 'Rate / machine-hour', equipment_table_shift: 'Hours / shift', edit_equipment: 'Edit', delete: 'Delete', equipment_delete_confirm: 'Delete “{name}” from the catalog? Schedule entries will remain.',
+                progress_label: '📈 Completion, %', actual_volume_label: '📐 Actual completed volume', volume_unit_label: 'Unit',
+                statement_title: 'Statement', generated_date: 'Generated:', organization: 'Organization:', organization_placeholder: 'Enter organization name', signature: 'Signature:', signature_date: 'Date:',
                 filter_element: '🏗️ Element', filter_stage: '⚙️ Stage', filter_brigade: '👷 Crew',
                 all: 'All', reset_filters: 'Reset',
                 manage_rows: 'Manage rows',
@@ -1596,6 +1778,8 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
         let currentMonth = 6;
         let daysCount = 30;
         let worksCatalog = [];
+        let equipmentCatalog = [];
+        const EQUIPMENT_STORAGE_KEY = "monthlyScheduleEquipmentCatalogV1";
         let globalSelectedColor = 'auto';
         let rowColorTargetIndex = -1;
 
@@ -1657,7 +1841,11 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             if (combo.brigade) lines.push(`👷 ${combo.brigade}`);
             lines.push(`${t('day_prefix')} ${dayIdx + 1}: ${dayData.people > 0 ? dayData.people : 0} 👷`);
             if (dayData.work) lines.push(`📝 ${dayData.work}`);
+            if (Number(dayData.progress||0)>0) lines.push(`📈 Выполнение: ${Number(dayData.progress)}%`);
+            if (Number(dayData.actualVolume || 0) > 0) lines.push(`📐 ${currentLang === 'en' ? 'Actually completed' : 'Фактически выполнено'}: ${dayData.actualVolume} ${dayData.actualVolumeUnit || '—'}`);
             if (dayData.note) lines.push(`💬 ${dayData.note}`);
+            const eqs=Array.isArray(dayData.equipmentItems)?dayData.equipmentItems:(dayData.equipment?[{name:dayData.equipment,hours:dayData.equipmentHours||0,rate:dayData.equipmentRate,shiftHours:dayData.equipmentShiftHours||8}]:[]);
+            eqs.forEach(x=>{const catalog=equipmentByName(x.name);const rate=x.rate!=null?x.rate:(catalog?catalog.rate:null);const shift=x.shiftHours|| (catalog?catalog.shiftHours:8);lines.push(`🚜 ${x.name}: ${x.hours} ч · ${(x.hours/shift).toFixed(2)} маш.-смен · ${rate==null?'—':formatEquipmentMoney(x.hours*rate)}`);});
             return lines.join('\n');
         }
 
@@ -1669,12 +1857,27 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const people = Number(raw.people);
             const hasWork = typeof raw.work === 'string' && raw.work.trim() !== '';
             const hasNote = typeof raw.note === 'string' && raw.note.trim() !== '';
+            const legacyEquipment = typeof raw.equipment === 'string' && raw.equipment.trim() !== '';
+            const equipmentItems = Array.isArray(raw.equipmentItems) ? raw.equipmentItems.filter(x=>x && String(x.name||'').trim()).map(x=>({name:String(x.name).trim(),hours:Math.max(0,Number(x.hours)||0),rate:x.rate===null||x.rate===''||x.rate===undefined?null:Number(x.rate),shiftHours:Number(x.shiftHours)>0?Number(x.shiftHours):8})) : (legacyEquipment ? [{name:raw.equipment.trim(),hours:Math.max(0,Number(raw.equipmentHours)||0),rate:raw.equipmentRate==null?null:Number(raw.equipmentRate),shiftHours:Number(raw.equipmentShiftHours)>0?Number(raw.equipmentShiftHours):8}] : []);
+            const hasEquipment = equipmentItems.length > 0;
+            const equipmentHours = equipmentItems.reduce((a,x)=>a+x.hours,0);
+            const progress = Math.max(0,Math.min(100,Number(raw.progress)||0));
+            const actualVolume = Number(raw.actualVolume || 0);
+            const actualVolumeUnit = typeof raw.actualVolumeUnit === 'string' ? raw.actualVolumeUnit.trim() : '';
             const planned = raw.planned === true;
-            if ((!isNaN(people) && people > 0) || planned || hasWork || hasNote) {
+            if ((!isNaN(people) && people > 0) || planned || hasWork || hasNote || hasEquipment || equipmentHours > 0 || actualVolume > 0) {
                 return {
                     people: !isNaN(people) && people >= 0 ? people : 0,
                     work: hasWork ? raw.work : '',
                     note: hasNote ? raw.note : '',
+                    equipment: equipmentItems.map(x=>x.name).join('; '),
+                    equipmentItems,
+                    equipmentHours: Number.isFinite(equipmentHours) && equipmentHours >= 0 ? equipmentHours : 0,
+                    progress,
+                    actualVolume: Number.isFinite(actualVolume) && actualVolume >= 0 ? actualVolume : 0,
+                    actualVolumeUnit,
+                    equipmentRate: raw.equipmentRate === null || raw.equipmentRate === '' || raw.equipmentRate === undefined ? null : (Number.isFinite(Number(raw.equipmentRate)) && Number(raw.equipmentRate) >= 0 ? Number(raw.equipmentRate) : null),
+                    equipmentShiftHours: Number.isFinite(Number(raw.equipmentShiftHours)) && Number(raw.equipmentShiftHours) > 0 ? Number(raw.equipmentShiftHours) : 8,
                     planned: true,
                     color: typeof raw.color === 'string' && raw.color ? raw.color : null
                 };
@@ -1776,6 +1979,121 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             try { localStorage.setItem(DICT_STORAGE_KEY, JSON.stringify({ elements: dictElements, stages: dictStages, brigades: dictBrigades })); } catch (e) { console.warn(e); }
         }
 
+        function loadEquipmentCatalog() {
+            try {
+                const raw = JSON.parse(localStorage.getItem(EQUIPMENT_STORAGE_KEY) || '[]');
+                equipmentCatalog = Array.isArray(raw) ? raw.filter(x => x && typeof x.name === 'string' && x.name.trim()).map(x => ({
+                    id: x.id || ('eq_' + Math.random().toString(36).slice(2, 10)), name: x.name.trim(),
+                    rate: x.rate === null || x.rate === '' || x.rate === undefined ? null : (Number.isFinite(Number(x.rate)) && Number(x.rate) >= 0 ? Number(x.rate) : null),
+                    shiftHours: Number.isFinite(Number(x.shiftHours)) && Number(x.shiftHours) > 0 ? Number(x.shiftHours) : 8
+                })) : [];
+            } catch (e) { equipmentCatalog = []; }
+        }
+        function saveEquipmentCatalog() {
+            try { localStorage.setItem(EQUIPMENT_STORAGE_KEY, JSON.stringify(equipmentCatalog)); } catch (e) { console.warn(e); }
+        }
+        function equipmentByName(name) { return equipmentCatalog.find(x => x.name.toLowerCase() === String(name || '').trim().toLowerCase()); }
+        function formatEquipmentMoney(value) {
+            if (value === null || value === undefined || value === '' || !Number.isFinite(Number(value))) return '—';
+            return Number(value).toLocaleString(currentLang === 'en' ? 'en-US' : 'ru-RU', {minimumFractionDigits:2, maximumFractionDigits:2});
+        }
+        function renderEquipmentOptions() {
+            const dl = document.getElementById('equipmentOptions');
+            if (dl) dl.innerHTML = equipmentCatalog.map(x => `<option value="${escapeHtml(x.name)}"></option>`).join('');
+        }
+        function openEquipmentCatalog() {
+            renderEquipmentCatalog();
+            document.getElementById('equipmentCatalogModal').classList.add('active');
+        }
+        function closeEquipmentCatalog() { document.getElementById('equipmentCatalogModal').classList.remove('active'); }
+        let equipmentEditingId = null;
+        function cancelEquipmentEdit() {
+            equipmentEditingId = null;
+            document.getElementById('newEquipmentName').value = '';
+            document.getElementById('newEquipmentRate').value = '';
+            document.getElementById('newEquipmentShift').value = '8';
+            document.getElementById('equipmentSubmitBtn').textContent = '➕ ' + t('add');
+            document.getElementById('equipmentCancelEditBtn').textContent = t('cancel');
+            document.getElementById('equipmentCancelEditBtn').style.display = 'none';
+        }
+        function editEquipmentCatalogItem(id) {
+            const item = equipmentCatalog.find(x => x.id === id); if (!item) return;
+            equipmentEditingId = id;
+            document.getElementById('newEquipmentName').value = item.name;
+            document.getElementById('newEquipmentRate').value = item.rate == null ? '' : item.rate;
+            document.getElementById('newEquipmentShift').value = item.shiftHours;
+            document.getElementById('equipmentSubmitBtn').textContent = '💾 ' + t('save_btn');
+            document.getElementById('equipmentCancelEditBtn').textContent = t('cancel');
+            document.getElementById('equipmentCancelEditBtn').style.display = 'inline-flex';
+            document.getElementById('newEquipmentName').focus();
+        }
+        function addEquipmentCatalogItem() {
+            const name = document.getElementById('newEquipmentName').value.trim();
+            const rateText = document.getElementById('newEquipmentRate').value.trim();
+            const shiftHours = Number(document.getElementById('newEquipmentShift').value || 8);
+            const rate = rateText === '' ? null : Number(rateText);
+            if (!name) { showToast('⚠️ Укажите наименование техники'); return; }
+            if (rate !== null && (!Number.isFinite(rate) || rate < 0)) { showToast('⚠️ Цена должна быть неотрицательной'); return; }
+            if (!Number.isFinite(shiftHours) || shiftHours <= 0) { showToast('⚠️ Часов в смене должно быть больше нуля'); return; }
+            const existing = equipmentByName(name);
+            if (existing && existing.id !== equipmentEditingId) { showToast('⚠️ Такая техника уже есть в справочнике'); return; }
+            if (equipmentEditingId) {
+                const item = equipmentCatalog.find(x => x.id === equipmentEditingId);
+                if (item) { item.name = name; item.rate = rate; item.shiftHours = shiftHours; }
+            } else equipmentCatalog.push({id:'eq_' + Date.now().toString(36), name, rate, shiftHours});
+            saveEquipmentCatalog(); renderEquipmentCatalog(); renderEquipmentOptions();
+            cancelEquipmentEdit();
+            showToast('✅ ' + t('equipment_saved'));
+        }
+        function renderEquipmentCatalog() {
+            const host = document.getElementById('equipmentCatalogList'); if (!host) return;
+            if (!equipmentCatalog.length) { host.innerHTML = `<p style="padding:12px;color:var(--text-light)">${t('equipment_empty')}</p>`; return; }
+            host.innerHTML = `<table style="width:100%;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:8px">${t('equipment_table_name')}</th><th style="padding:8px">${t('equipment_table_rate')}</th><th style="padding:8px">${t('equipment_table_shift')}</th><th></th></tr></thead><tbody>${equipmentCatalog.map(x => `<tr style="border-top:1px solid #ddd"><td style="padding:8px">${escapeHtml(x.name)}</td><td style="padding:8px;text-align:center">${x.rate === null ? '—' : formatEquipmentMoney(x.rate)}</td><td style="padding:8px;text-align:center">${x.shiftHours}</td><td style="padding:8px;text-align:right;white-space:nowrap"><button class="equipment-edit-btn" title="${t('edit_equipment')}" aria-label="${t('edit_equipment')}" onclick="editEquipmentCatalogItem('${x.id}')">✏️</button> <button class="btn btn-delete" style="padding:5px 8px" title="${t('delete')}" onclick="deleteEquipmentCatalogItem('${x.id}')">🗑</button></td></tr>`).join('')}</tbody></table>`;
+        }
+        function deleteEquipmentCatalogItem(id) {
+            const item = equipmentCatalog.find(x => x.id === id); if (!item) return;
+            if (!confirm(t('equipment_delete_confirm').replace('{name}', item.name))) return;
+            equipmentCatalog = equipmentCatalog.filter(x => x.id !== id); if (equipmentEditingId === id) cancelEquipmentEdit(); saveEquipmentCatalog(); renderEquipmentCatalog(); renderEquipmentOptions();
+        }
+        function syncActualVolume(source) {
+            const slider = document.getElementById('modalActualVolumeSlider');
+            const number = document.getElementById('modalActualVolume');
+            if (!slider || !number) return;
+            if (source === 'slider') number.value = Number(slider.value).toString();
+            else {
+                const value = Math.max(0, Number(number.value || 0));
+                number.value = value;
+                slider.max = Math.max(1000, value);
+                slider.value = Math.min(value, Number(slider.max));
+            }
+        }
+
+        function addEquipmentEntryRow(item={name:'',hours:0}) {
+            const host=document.getElementById('equipmentEntries'); if(!host) return;
+            const row=document.createElement('div'); row.className='equipment-entry';
+            const name=document.createElement('input'); name.type='text'; name.setAttribute('list','equipmentOptions'); name.placeholder=t('equipment_name'); name.value=item.name||''; name.className='equipment-entry-name';
+            const hours=document.createElement('input'); hours.type='number'; hours.min='0'; hours.step='0.5'; hours.placeholder=t('equipment_hours'); hours.value=Number(item.hours||0); hours.className='equipment-entry-hours';
+            const del=document.createElement('button'); del.type='button'; del.textContent='✕'; del.title=t('delete_equipment'); del.onclick=()=>{row.remove(); if(!host.children.length) addEquipmentEntryRow(); updateEquipmentCalc();};
+            name.addEventListener('input',updateEquipmentCalc); hours.addEventListener('input',updateEquipmentCalc); row.append(name,hours,del); host.appendChild(row);
+        }
+        function getEquipmentEntriesFromForm() {
+            return [...document.querySelectorAll('#equipmentEntries .equipment-entry')].map(row=>{
+                const name=row.querySelector('.equipment-entry-name').value.trim(); const hours=Math.max(0,Number(row.querySelector('.equipment-entry-hours').value)||0); const item=equipmentByName(name);
+                return name?{name,hours,rate:item?item.rate:null,shiftHours:item?item.shiftHours:8}:null;
+            }).filter(Boolean);
+        }
+        function setEquipmentEntriesInForm(items) {
+            const host=document.getElementById('equipmentEntries'); if(!host)return; host.innerHTML='';
+            (items&&items.length?items:[{name:'',hours:0}]).forEach(x=>addEquipmentEntryRow(x));
+        }
+
+        function updateEquipmentCalc() {
+            const items=getEquipmentEntriesFromForm(); let shifts=0,cost=0,hasCost=false,totalHours=0;
+            items.forEach(x=>{totalHours+=x.hours; shifts+=x.hours/x.shiftHours; if(x.rate!==null){cost+=x.hours*x.rate;hasCost=true;}});
+            const preview=document.getElementById('equipmentCalcPreview');
+            if(preview) preview.textContent=`${t('equipment_count')}: ${items.length} · ${t('hours_label')}: ${totalHours.toFixed(1)} · ${t('machine_shifts')}: ${shifts.toFixed(2)} · ${t('costs')}: ${hasCost?formatEquipmentMoney(cost):'—'}`;
+        }
+
         function loadFromStorage() {
             try {
                 const saved = localStorage.getItem(STORAGE_KEY);
@@ -1797,12 +2115,49 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             } catch (e) { console.warn(e); }
         }
 
+        // ================== ТЕМЫ И НОЧНОЙ РЕЖИМ ==================
+        const THEME_STORAGE_KEY = 'gantt_theme_choice_v1';
+        let currentTheme = 'ocean';
+        function setTheme(theme) {
+            const allowed = ['ocean','forest','graphite','sand','violet'];
+            if (!allowed.includes(theme)) theme = 'ocean';
+            currentTheme = theme;
+            document.body.dataset.theme = theme;
+            try { localStorage.setItem(THEME_STORAGE_KEY, theme); localStorage.setItem(THEME_STORAGE_KEY + '_night', '0'); } catch(e) {}
+            const sel = document.getElementById('themeSelect'); if (sel) sel.value = theme;
+            const btn = document.getElementById('nightModeBtn'); if (btn) btn.textContent = t('night_mode');
+        }
+        window.addEventListener('beforeprint', () => { const d=document.getElementById('printDate'); if(d) d.textContent=new Date().toLocaleDateString(currentLang==='en'?'en-GB':'ru-RU'); });
+        document.addEventListener('DOMContentLoaded',()=>{const org=document.getElementById('printOrganization');if(org){try{org.value=localStorage.getItem('gantt_print_organization')||'';}catch(e){}org.addEventListener('input',()=>{try{localStorage.setItem('gantt_print_organization',org.value);}catch(e){}});}});
+
+        function toggleNightMode() {
+            const isNight = document.body.dataset.theme === 'night';
+            if (isNight) { setTheme(currentTheme || 'ocean'); }
+            else {
+                const active = document.body.dataset.theme;
+                if (['ocean','forest','graphite','sand','violet'].includes(active)) currentTheme = active;
+                document.body.dataset.theme = 'night';
+                try { localStorage.setItem(THEME_STORAGE_KEY + '_night', '1'); localStorage.setItem(THEME_STORAGE_KEY, currentTheme); } catch(e) {}
+                const btn = document.getElementById('nightModeBtn'); if (btn) btn.textContent = t('day_mode');
+            }
+        }
+        function loadTheme() {
+            let saved = 'ocean', night = false;
+            try { saved = localStorage.getItem(THEME_STORAGE_KEY) || 'ocean'; night = localStorage.getItem(THEME_STORAGE_KEY + '_night') === '1'; } catch(e) {}
+            currentTheme = ['ocean','forest','graphite','sand','violet'].includes(saved) ? saved : 'ocean';
+            setTheme(currentTheme);
+            if (night) { document.body.dataset.theme = 'night'; const btn=document.getElementById('nightModeBtn'); if(btn) btn.textContent='☀️ Дневной режим'; }
+        }
+
         // ================== ИНИЦИАЛИЗАЦИЯ ==================
         function init() {
+            loadTheme();
             const savedMonth = localStorage.getItem(MONTH_STORAGE_KEY);
             if (savedMonth) { const m = getMonthFromValue(savedMonth); currentYear = m.year; currentMonth = m.month; }
             document.getElementById('monthPicker').value = getMonthValue(currentYear, currentMonth);
             normalizeDaysCount();
+            loadEquipmentCatalog(); renderEquipmentOptions();
+            loadAdBlock();
 
             const savedVersion = localStorage.getItem(VERSION_KEY);
             if (savedVersion === 'cards' || savedVersion === 'classic') currentVersion = savedVersion;
@@ -1831,6 +2186,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             renderModalPalette();
             renderFilterOptions();
             renderCatalogList();
+            renderEquipmentCatalog();
             renderDictList('element');
             renderDictList('stage');
             renderDictList('brigade');
@@ -1884,7 +2240,9 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             renderFilterOptions();
             renderGlobalPalette();
             renderModalPalette();
+            if(document.getElementById('modalOverlay')?.classList.contains('active')) setEquipmentEntriesInForm(getEquipmentEntriesFromForm());
             renderCatalogList();
+            if(document.getElementById('equipmentCatalogModal')?.classList.contains('active')) renderEquipmentCatalog();
             renderDictList('element');
             renderDictList('stage');
             renderDictList('brigade');
@@ -1903,6 +2261,12 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             renderHelpContent();
             document.getElementById('modalTitle').textContent = t('edit_day');
             document.getElementById('rowColorTitle').textContent = t('row_color');
+            const globalColor=document.getElementById('globalCustomColor'); if(globalColor) globalColor.title=t('choose_custom_color');
+            const modalColor=document.getElementById('modalCustomColor'); if(modalColor) modalColor.title=t('choose_custom_color');
+            const nightBtn=document.getElementById('nightModeBtn'); if(nightBtn) nightBtn.textContent=(document.body.dataset.theme==='night'?t('day_mode'):t('night_mode'));
+            const org=document.getElementById('printOrganization'); if(org){ org.placeholder=t('organization_placeholder'); try{org.value=localStorage.getItem('gantt_print_organization')||org.value;}catch(e){} }
+            const submit=document.getElementById('equipmentSubmitBtn'); if(submit) submit.textContent=(equipmentEditingId?'💾 '+t('save_btn'):'➕ '+t('add'));
+            const cancel=document.getElementById('equipmentCancelEditBtn'); if(cancel) cancel.textContent=t('cancel');
         }
 
         function updateSwitches() {
@@ -2077,6 +2441,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 if (dayData.people > 0) parts.push(`👷 ${dayData.people}`);
                 else parts.push('👷 0');
                 if (dayData.work) parts.push(`📝 ${dayData.work.substring(0, 30)}${dayData.work.length > 30 ? '…' : ''}`);
+                if (Number(dayData.actualVolume || 0) > 0) parts.push(`📐 ${dayData.actualVolume} ${dayData.actualVolumeUnit || '—'}`);
                 if (dayData.note) parts.push(`💬 ${dayData.note.substring(0, 20)}${dayData.note.length > 20 ? '…' : ''}`);
                 info.textContent = '📋 ' + parts.join(' · ');
                 info.style.color = '#0f172a';
@@ -2397,7 +2762,26 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             if (combo.rowColor) return combo.rowColor;
             return stageColors[combo.stage] || '#f1f5f9';
         }
+        function setGlobalCustomColor(value) {
+            if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+            globalSelectedColor = value; renderGlobalPalette();
+            showToast('🎨 Цвет выбран для новых ячеек и строк');
+        }
+        function setModalCustomColor(value) {
+            if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+            editingCellColor = value; renderModalPalette();
+        }
+        function setRowCustomColor(value) {
+            if (!/^#[0-9a-f]{6}$/i.test(value)) return;
+            const container = document.getElementById('rowColorPalette');
+            container.querySelectorAll('.swatch').forEach(el => el.classList.remove('selected'));
+            let sw = container.querySelector('[data-custom="1"]');
+            if (!sw) { sw=document.createElement('div'); sw.className='swatch'; sw.dataset.custom='1'; sw.title='Свой цвет'; container.appendChild(sw); }
+            sw.dataset.chosen=value; sw.style.background=value; sw.classList.add('selected');
+        }
+
         function renderGlobalPalette() {
+            const picker = document.getElementById('globalCustomColor'); if (picker && /^#[0-9a-f]{6}$/i.test(globalSelectedColor)) picker.value = globalSelectedColor;
             const container = document.getElementById('globalPalette');
             container.querySelectorAll('.swatch').forEach(el => el.remove());
             PALETTE.forEach(c => {
@@ -2411,6 +2795,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             });
         }
         function renderModalPalette() {
+            const picker = document.getElementById('modalCustomColor'); if (picker && /^#[0-9a-f]{6}$/i.test(editingCellColor)) picker.value = editingCellColor;
             const container = document.getElementById('modalPalette');
             container.innerHTML = '';
             PALETTE.forEach(c => {
@@ -2427,6 +2812,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const container = document.getElementById('rowColorPalette');
             container.innerHTML = '';
             const active = currentColor || 'auto';
+            const customPicker = document.getElementById('rowCustomColor'); if (customPicker && /^#[0-9a-f]{6}$/i.test(active)) customPicker.value = active;
             PALETTE.forEach(c => {
                 const sw = document.createElement('div');
                 sw.className = 'swatch' + (c.value === 'auto' ? ' auto' : '') + (c.value === active ? ' selected' : '');
@@ -2525,6 +2911,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                             td.style.backgroundColor = getCellColor(combo, dayData);
                             if (dayData.people > 0) { td.textContent = dayData.people; td.classList.add('filled'); }
                             else { td.classList.add('planned-zero'); }
+                            if (Number(dayData.progress||0)>0) { const pct=document.createElement('span'); pct.className='cell-progress'; pct.textContent=Number(dayData.progress)+'%'; td.appendChild(pct); }
                             // Класс примечания
                             if (dayData.note) td.classList.add('has-note');
                             // Тултип с примечанием
@@ -2676,7 +3063,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 const realIdx = ganttMatrix.indexOf(combo);
                 for (let i = 0; i < daysCount; i++) {
                     const dayData = combo.days[i];
-                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note)) {
+                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note || Number(dayData.actualVolume || 0) > 0 || dayData.equipment || Number(dayData.equipmentHours || 0) > 0)) {
                         dayTotals[i] += dayData.people || 0;
                         dayRows[i].push({ combo, realIdx, dayIdx: i, dayData });
                     }
@@ -2716,12 +3103,21 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                                 <div class="row-name">${escapeHtml(combo.element)}</div>
                                 <div class="row-badge">${escapeHtml(combo.stage)}</div>
                             </div>
-                            <div class="row-people ${dayData.people === 0 ? 'zero' : ''}">${dayData.people === 0 ? '0' : '👷 ' + dayData.people}</div>
+                            <div class="row-people ${dayData.people === 0 ? 'zero' : ''}">${dayData.people === 0 ? '0' : '👷 ' + dayData.people}${Number(dayData.progress||0)>0?`<span class="cell-progress">${Number(dayData.progress)}%</span>`:''}</div>
                         </div>
                         ${combo.brigade ? `<div class="row-brigade">👥 ${escapeHtml(combo.brigade)}</div>` : ''}
                         ${dayData.work ? `<div class="row-work">${escapeHtml(dayData.work)}</div>` : ''}
                         ${dayData.note ? `<div class="row-note">💬 ${escapeHtml(dayData.note)}</div>` : ''}
                     `;
+                    const rowActions = document.createElement('div');
+                    rowActions.className = 'row-actions';
+                    const makeAction = (label, title, handler, cls='') => { const b=document.createElement('button'); b.type='button'; b.textContent=label; b.title=title; if(cls) b.className=cls; b.onclick=(e)=>{e.stopPropagation();handler();}; rowActions.appendChild(b); };
+                    makeAction('✏️', 'Редактировать запись', () => openCellEditor(realIdx, dayIdx));
+                    makeAction('⬆️', 'Переместить строку вверх', () => moveRow(realIdx, -1), 'up-btn');
+                    makeAction('⬇️', 'Переместить строку вниз', () => moveRow(realIdx, 1), 'down-btn');
+                    makeAction('🎨', 'Цвет строки', () => openRowColorModal(realIdx), 'color-btn');
+                    makeAction('🗑', 'Удалить строку', () => deleteRow(realIdx), 'del');
+                    item.appendChild(rowActions);
                     item.style.borderLeft = `5px solid ${color}`;
                     // Тултип с примечанием
                     item.title = buildCellTooltip(combo, dayData, dayIdx);
@@ -2793,7 +3189,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                         if (dayData.note) chip.classList.add('has-note');
                         chip.innerHTML = `
                             <div class="chip-day">${i + 1}</div>
-                            <div class="chip-val">${dayData.people > 0 ? dayData.people : '0'}</div>
+                            <div class="chip-val">${dayData.people > 0 ? dayData.people : '0'}</div>${Number(dayData.progress||0)>0?`<span class="cell-progress">${Number(dayData.progress)}%</span>`:''}
                         `;
                         chip.title = buildCellTooltip(combo, dayData, i);
                     } else {
@@ -2837,19 +3233,30 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const peopleInput = document.getElementById('modalPeople');
             const workInput = document.getElementById('modalWork');
             const noteInput = document.getElementById('modalNote');
+            const equipmentInput = document.getElementById('equipmentEntries');
+            const actualVolumeInput = document.getElementById('modalActualVolume');
+            const actualVolumeSlider = document.getElementById('modalActualVolumeSlider');
+            const actualVolumeUnitInput = document.getElementById('modalVolumeUnit');
 
             if (dayData) {
                 peopleInput.value = dayData.people;
                 workInput.value = dayData.work || '';
                 noteInput.value = dayData.note || '';
+                setEquipmentEntriesInForm(dayData.equipmentItems || (dayData.equipment ? [{name:dayData.equipment,hours:Number(dayData.equipmentHours||0)}] : []));
+                document.getElementById('modalProgress').value = Number(dayData.progress||0);
+                actualVolumeInput.value = Number(dayData.actualVolume || 0); actualVolumeSlider.max = Math.max(1000, Number(dayData.actualVolume || 0)); actualVolumeSlider.value = Number(dayData.actualVolume || 0); actualVolumeUnitInput.value = dayData.actualVolumeUnit || ''; 
                 document.getElementById('modalWorkSelect').value = worksCatalog.includes(dayData.work) ? dayData.work : '';
                 editingCellColor = dayData.color || 'auto';
             } else {
                 peopleInput.value = 0; workInput.value = ''; noteInput.value = '';
+                setEquipmentEntriesInForm([]);
+                document.getElementById('modalProgress').value = 0;
+                actualVolumeInput.value = 0; actualVolumeSlider.max = 1000; actualVolumeSlider.value = 0; actualVolumeUnitInput.value = ''; 
                 document.getElementById('modalWorkSelect').value = '';
                 editingCellColor = globalSelectedColor;
             }
             renderModalPalette();
+            updateEquipmentCalc();
             document.getElementById('modalOverlay').classList.add('active');
             setTimeout(() => peopleInput.focus(), 50);
         }
@@ -2862,11 +3269,20 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const people = safeInt(document.getElementById('modalPeople').value, 0);
             const work = document.getElementById('modalWork').value.trim();
             const note = document.getElementById('modalNote').value.trim();
-            if (people < 0) { showToast('⚠️ ' + t('negative_warn')); return; }
+            const equipmentItems = getEquipmentEntriesFromForm();
+            const equipment = equipmentItems.map(x=>x.name).join('; ');
+            const equipmentHours = equipmentItems.reduce((a,x)=>a+x.hours,0);
+            const progress = Math.max(0,Math.min(100,Number(document.getElementById('modalProgress').value||0)));
+            const actualVolume = Number(document.getElementById('modalActualVolume').value || 0);
+            const actualVolumeUnit = document.getElementById('modalVolumeUnit').value.trim();
+            const equipmentItem = equipmentByName(equipmentItems[0]?.name || '');
+            const equipmentRate = equipmentItem ? equipmentItem.rate : null;
+            const equipmentShiftHours = equipmentItem ? equipmentItem.shiftHours : 8;
+            if (people < 0 || !Number.isFinite(equipmentHours) || equipmentHours < 0 || !Number.isFinite(actualVolume) || actualVolume < 0 || !Number.isFinite(progress)) { showToast('⚠️ ' + t('negative_warn')); return; }
             const combo = ganttMatrix[editingRowIndex];
-            const isEmpty = (people === 0 && !work && !note && editingCellColor === 'auto');
+            const isEmpty = (people === 0 && !work && !note && !equipmentItems.length && equipmentHours === 0 && actualVolume === 0 && progress === 0 && editingCellColor === 'auto');
             if (isEmpty) combo.days[editingDayIndex] = null;
-            else combo.days[editingDayIndex] = { people, work, note, planned: true, color: editingCellColor === 'auto' ? null : editingCellColor };
+            else combo.days[editingDayIndex] = { people, work, note, equipment, equipmentItems, equipmentHours, actualVolume, actualVolumeUnit, progress, equipmentRate, equipmentShiftHours, planned: true, color: editingCellColor === 'auto' ? null : editingCellColor };
 
             if (work && !worksCatalog.some(w => w.toLowerCase() === work.toLowerCase())) {
                 worksCatalog.push(work); saveWorksCatalog();
@@ -2910,6 +3326,31 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             if (e.target === this) closeRowColorModal();
         });
 
+        const AD_BLOCK_KEY = 'gantt_user_ad_block_v1';
+        function loadAdBlock() {
+            let data = {}; try { data = JSON.parse(localStorage.getItem(AD_BLOCK_KEY) || '{}'); } catch(e) {}
+            renderAdBlock(data.text || '', data.url || '');
+        }
+        function renderAdBlock(text, url) {
+            const preview = document.getElementById('adPreview'); if (!preview) return;
+            preview.replaceChildren();
+            const content = document.createElement('span'); content.textContent = text || 'Здесь может быть объявление, информация  или реклама .';
+            preview.appendChild(content);
+            if (url && /^https?:\/\//i.test(url)) { const a=document.createElement('a'); a.href=url; a.target='_blank'; a.rel='noopener noreferrer'; a.textContent='Открыть ссылку'; a.style.marginLeft='10px'; preview.appendChild(a); }
+        }
+        function editAdBlock() {
+            let data={}; try { data=JSON.parse(localStorage.getItem(AD_BLOCK_KEY)||'{}'); } catch(e) {}
+            document.getElementById('adTextInput').value=data.text||''; document.getElementById('adUrlInput').value=data.url||'';
+            document.getElementById('adEditor').hidden=false; document.getElementById('adTextInput').focus();
+        }
+        function saveAdBlock() {
+            const text=document.getElementById('adTextInput').value.trim(); const url=document.getElementById('adUrlInput').value.trim();
+            if (url && !/^https?:\/\//i.test(url)) { showToast('⚠️ Ссылка должна начинаться с http:// или https://'); return; }
+            const data={text,url}; try { localStorage.setItem(AD_BLOCK_KEY,JSON.stringify(data)); } catch(e) { showToast('⚠️ Не удалось сохранить объявление в браузере'); return; }
+            renderAdBlock(text,url); document.getElementById('adEditor').hidden=true; showToast('✅ Рекламный блок сохранён на этом устройстве');
+        }
+        function cancelAdEdit() { document.getElementById('adEditor').hidden=true; }
+
         function openHelp() { document.getElementById('helpModal').classList.add('active'); }
         function closeHelp() { document.getElementById('helpModal').classList.remove('active'); }
         document.getElementById('helpModal').addEventListener('click', function(e) {
@@ -2928,9 +3369,6 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const stage = document.getElementById('newStage').value.trim();
             const brigade = document.getElementById('newBrigade').value.trim();
             if (!element || !stage) { showToast('⚠️ ' + t('empty_warn')); return; }
-            if (ganttMatrix.some(c => c.element === element && c.stage === stage)) {
-                showToast('⚠️ ' + t('exists_warn')); return;
-            }
             if (!dictElements.includes(element)) { dictElements.push(element); }
             if (!dictStages.includes(stage)) { dictStages.push(stage); }
             if (brigade && !dictBrigades.includes(brigade)) { dictBrigades.push(brigade); }
@@ -2968,9 +3406,6 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             if (newBrigade === null) return;
             const el = newElement.trim(), st = newStage.trim(), br = newBrigade.trim();
             if (!el || !st) { showToast('⚠️ ' + t('empty_warn')); return; }
-            if (ganttMatrix.some((c, i) => i !== rowIndex && c.element === el && c.stage === st)) {
-                showToast('⚠️ ' + t('exists_warn')); return;
-            }
             combo.element = el; combo.stage = st; combo.brigade = br;
             if (!dictElements.includes(el)) dictElements.push(el);
             if (!dictStages.includes(st)) dictStages.push(st);
@@ -3005,6 +3440,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 year: currentYear, month: currentMonth, daysCount,
                 title: getMonthLabel(currentYear, currentMonth),
                 worksCatalog,
+                equipmentCatalog,
                 dictionary: { elements: dictElements, stages: dictStages, brigades: dictBrigades },
                 collapseAll: collapseAll,
                 rows: ganttMatrix
@@ -3026,7 +3462,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             reader.onload = function(e) {
                 try {
                     const parsed = JSON.parse(e.target.result);
-                    let rows = null, projYear = currentYear, projMonth = currentMonth, catalog = null, dictionary = null, savedCollapse = null;
+                    let rows = null, projYear = currentYear, projMonth = currentMonth, catalog = null, equipmentList = null, dictionary = null, savedCollapse = null;
                     if (Array.isArray(parsed)) rows = parsed;
                     else if (parsed && typeof parsed === 'object' && Array.isArray(parsed.rows)) {
                         rows = parsed.rows;
@@ -3036,6 +3472,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                             if (projMonth < 1 || projMonth > 12) projMonth = currentMonth;
                         }
                         if (Array.isArray(parsed.worksCatalog)) catalog = parsed.worksCatalog;
+                        if (Array.isArray(parsed.equipmentCatalog)) equipmentList = parsed.equipmentCatalog;
                         if (parsed.dictionary) dictionary = parsed.dictionary;
                         if (typeof parsed.collapseAll === 'boolean') savedCollapse = parsed.collapseAll;
                     }
@@ -3052,6 +3489,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                         const cleaned = catalog.filter(w => typeof w === 'string' && w.trim() !== '');
                         if (cleaned.length > 0) { worksCatalog = cleaned; saveWorksCatalog(); }
                     }
+                    if (equipmentList) { equipmentCatalog = equipmentList.filter(x => x && typeof x.name === 'string' && x.name.trim()).map(x => ({id:x.id || ('eq_' + Date.now()), name:x.name.trim(), rate:x.rate === null || x.rate === '' || x.rate === undefined ? null : Number(x.rate), shiftHours:Number(x.shiftHours) > 0 ? Number(x.shiftHours) : 8})); saveEquipmentCatalog(); renderEquipmentOptions(); }
                     if (dictionary) {
                         if (Array.isArray(dictionary.elements)) dictElements = dictionary.elements.filter(x => typeof x === 'string' && x.trim());
                         if (Array.isArray(dictionary.stages)) dictStages = dictionary.stages.filter(x => typeof x === 'string' && x.trim());
@@ -3159,7 +3597,7 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                     </ul>
                     <h4>🖱️ Редактирование</h4>
                     <ul>
-                        <li><b>Клик по ячейке</b> — рабочие, описание, примечание, цвет.</li>
+                        <li><b>Клик по ячейке</b> — рабочие, описание, примечание, техника и отработанные часы, цвет.</li>
                         <li><b>0 рабочих</b> — ячейка остаётся закрашенной (план).</li>
                         <li><b>Строка «ИТОГО»</b> — сумма рабочих по дню.</li>
                     </ul>
@@ -3184,12 +3622,13 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             const allDetailRows = [];
             ganttMatrix.forEach((combo, rowIdx) => {
                 combo.days.forEach((day, dayIdx) => {
-                    if (day && (day.people > 0 || day.work || day.note || day.planned)) {
+                    if (day && (day.people > 0 || day.work || day.note || day.planned || day.equipment || day.equipmentHours > 0 || day.actualVolume > 0)) {
                         allDetailRows.push({
                             rowIdx, dayIdx, day: dayIdx + 1,
                             date: `${String(dayIdx + 1).padStart(2, '0')}.${String(currentMonth).padStart(2, '0')}.${currentYear}`,
                             element: combo.element, stage: combo.stage, brigade: combo.brigade || '',
-                            people: day.people || 0, work: day.work || '', note: day.note || '',
+                            people: day.people || 0, work: day.work || '', note: day.note || '', actualVolume: Number(day.actualVolume || 0), actualVolumeUnit: day.actualVolumeUnit || '', progress:Number(day.progress||0),
+                            equipment: (Array.isArray(day.equipmentItems)?day.equipmentItems.map(x=>x.name).join('; '):(day.equipment||'')), equipmentRate: (Array.isArray(day.equipmentItems)?day.equipmentItems.map(x=>{const q=equipmentByName(x.name);const v=x.rate!=null?x.rate:(q?q.rate:null);return `${x.name}: ${v==null?'—':v}`;}).join('; '):(day.equipmentRate??null)), equipmentHours: (Array.isArray(day.equipmentItems)?day.equipmentItems.reduce((a,x)=>a+Number(x.hours||0),0):Number(day.equipmentHours||0)), equipmentShiftHours: 8, equipmentShifts: (Array.isArray(day.equipmentItems)?day.equipmentItems.reduce((a,x)=>a+Number(x.hours||0)/(Number(x.shiftHours)||8),0):Number(day.equipmentHours||0)/Number(day.equipmentShiftHours||8)), equipmentCost: (()=>{const es=Array.isArray(day.equipmentItems)?day.equipmentItems:(day.equipment?[{name:day.equipment,hours:day.equipmentHours||0,rate:day.equipmentRate}]:[]);let sum=0,found=false;es.forEach(x=>{const q=equipmentByName(x.name);const rate=x.rate!=null?x.rate:(q?q.rate:null);if(rate!=null){sum+=Number(x.hours||0)*Number(rate);found=true;}});return found?sum:null;})(),
                             planned: day.people === 0 ? 'Yes' : 'No',
                             color: day.color || combo.rowColor || stageColors[combo.stage] || ''
                         });
@@ -3197,6 +3636,117 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 });
             });
             allDetailRows.sort((a, b) => a.day - b.day || a.rowIdx - b.rowIdx);
+
+            // Настоящий XLSX с оформлением и рабочими внутренними гиперссылками.
+            // Используется xlsx-js-style: в отличие от базового SheetJS он сохраняет стили ячеек.
+            if (window.XLSX && window.XLSX.utils) {
+                const wb = XLSX.utils.book_new();
+                const sheet1Name = currentLang === 'en' ? 'Gantt' : 'Гант';
+                const sheet2Name = currentLang === 'en' ? 'Details' : 'Детализация';
+                const titleStyle = { font: { name: 'Arial', sz: 14, bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '172554' } }, alignment: { horizontal: 'left', vertical: 'center' } };
+                const headerStyle = { font: { name: 'Arial', sz: 10, bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: '0F172A' } }, alignment: { horizontal: 'center', vertical: 'center', wrapText: true }, border: { top: { style: 'thin', color: { rgb: '64748B' } }, bottom: { style: 'thin', color: { rgb: '64748B' } }, left: { style: 'thin', color: { rgb: 'CBD5E1' } }, right: { style: 'thin', color: { rgb: 'CBD5E1' } } } };
+                const linkStyle = { font: { name: 'Arial', sz: 10, bold: true, color: { rgb: '0563C1' }, underline: true }, alignment: { horizontal: 'center', vertical: 'center' }, border: { bottom: { style: 'thin', color: { rgb: 'CBD5E1' } }, right: { style: 'thin', color: { rgb: 'E2E8F0' } } } };
+                const thinBorder = { top: { style: 'thin', color: { rgb: 'D1D5DB' } }, bottom: { style: 'thin', color: { rgb: 'D1D5DB' } }, left: { style: 'thin', color: { rgb: 'D1D5DB' } }, right: { style: 'thin', color: { rgb: 'D1D5DB' } } };
+                const rgb = value => String(value || 'FFFFFF').replace('#', '').toUpperCase().slice(0, 6).padEnd(6, 'F');
+                const cell = (ws, address) => ws[address];
+                const setStyle = (ws, address, style) => { if (ws[address]) ws[address].s = style; };
+
+                // Лист 1: диаграмма Ганта
+                const ganttAoa = [[`${currentLang === 'en' ? 'WORK SCHEDULE' : 'ГРАФИК ПРОИЗВОДСТВА РАБОТ'} — ${getMonthLabel(currentYear, currentMonth)}`],
+                    [currentLang === 'en' ? 'Element / Stage / Crew' : 'Конструкция / Этап / Бригада',
+                     ...Array.from({length: daysCount}, (_, i) => i + 1)]];
+                const ganttRowForMatrix = new Map();
+                filtered.forEach((combo, visibleIndex) => {
+                    const realRowIdx = ganttMatrix.indexOf(combo);
+                    ganttRowForMatrix.set(realRowIdx, visibleIndex + 3); // Excel row, 1-based
+                    const row = [`${combo.element} — ${combo.stage}${combo.brigade ? ' / ' + combo.brigade : ''}`];
+                    for (let i = 0; i < daysCount; i++) {
+                        const d = combo.days[i];
+                        row.push(d && (d.people > 0 || d.work || d.note || d.planned || d.equipment || d.equipmentHours > 0 || d.actualVolume > 0)
+                            ? `${Number(d.people || 0)}` : '');
+                    }
+                    ganttAoa.push(row);
+                });
+                const peopleTotals = [t('total')];
+                const equipmentTotals = [currentLang === 'en' ? 'EQUIPMENT HOURS TOTAL' : 'ИТОГО ЧАСОВ ТЕХНИКИ'];
+                const equipmentCostTotals = [currentLang === 'en' ? 'EQUIPMENT COST TOTAL' : 'ИТОГО ЗАТРАТ НА ТЕХНИКУ'];
+                for (let i = 0; i < daysCount; i++) {
+                    let people = 0, hours = 0, cost = 0, hasRate = false;
+                    filtered.forEach(c => {
+                        const d = c.days[i];
+                        if (d) {
+                            people += Number(d.people || 0);
+                            const items=Array.isArray(d.equipmentItems)?d.equipmentItems:(d.equipment?[{name:d.equipment,hours:d.equipmentHours||0,rate:d.equipmentRate}]:[]);
+                            items.forEach(x=>{hours+=Number(x.hours||0);const cat=equipmentByName(x.name);const rate=x.rate!=null?x.rate:(cat?cat.rate:null);if(rate!==null&&rate!==undefined&&rate!==''){cost+=Number(x.hours||0)*Number(rate);hasRate=true;}});
+                        }
+                    });
+                    peopleTotals.push(people); equipmentTotals.push(hours); equipmentCostTotals.push(hasRate ? cost : '—');
+                }
+                ganttAoa.push(peopleTotals, equipmentTotals, equipmentCostTotals);
+                const ganttWs = XLSX.utils.aoa_to_sheet(ganttAoa);
+                ganttWs['!cols'] = [{wch: 38}, ...Array.from({length: daysCount}, () => ({wch: 9}))];
+                ganttWs['!merges'] = [{s:{r:0,c:0},e:{r:0,c:daysCount}}];
+                ganttWs['!rows'] = [{hpt:26},{hpt:32}];
+                const ganttRange = XLSX.utils.decode_range(ganttWs['!ref']);
+                for (let c = 0; c <= daysCount; c++) setStyle(ganttWs, XLSX.utils.encode_cell({r:0,c}), titleStyle);
+                for (let c = 0; c <= daysCount; c++) setStyle(ganttWs, XLSX.utils.encode_cell({r:1,c}), headerStyle);
+                filtered.forEach((combo, visibleIndex) => {
+                    const excelRow = visibleIndex + 3;
+                    const labelAddr = XLSX.utils.encode_cell({r:excelRow-1,c:0});
+                    setStyle(ganttWs, labelAddr, {font:{name:'Arial',sz:10,bold:true,color:{rgb:'1E293B'}},fill:{fgColor:{rgb:'F1F5F9'}},alignment:{vertical:'center',wrapText:true},border:thinBorder});
+                    for (let dayIdx = 0; dayIdx < daysCount; dayIdx++) {
+                        const d = combo.days[dayIdx];
+                        const addr = XLSX.utils.encode_cell({r:excelRow-1,c:dayIdx+1});
+                        const active = d && (d.people > 0 || d.work || d.note || d.planned || d.equipment || d.equipmentHours > 0 || d.actualVolume > 0);
+                        const bg = active ? rgb(d.color || combo.rowColor || stageColors[combo.stage] || '#F1F5F9') : 'FFFFFF';
+                        setStyle(ganttWs, addr, {font:{name:'Arial',sz:10,bold:!!active,color:{rgb:active?'1E3A8A':'FFFFFF'}},fill:{fgColor:{rgb:bg}},alignment:{horizontal:'center',vertical:'center',wrapText:true},border:thinBorder});
+                        if (active) {
+                            const detailIndex = allDetailRows.findIndex(r => r.rowIdx === ganttMatrix.indexOf(combo) && r.dayIdx === dayIdx);
+                            if (detailIndex >= 0 && ganttWs[addr]) ganttWs[addr].l = {Target:`#'${sheet2Name}'!A${detailIndex+3}`, Tooltip: currentLang === 'en' ? 'Open detail record' : 'Перейти к записи детализации'};
+                        }
+                    }
+                });
+                const totalStartRow = 2 + filtered.length;
+                [
+                    {row:totalStartRow, fill:'0F172A', font:'FFFFFF'},
+                    {row:totalStartRow+1, fill:'DBEAFE', font:'1E3A8A'},
+                    {row:totalStartRow+2, fill:'FEF3C7', font:'92400E'}
+                ].forEach(item => {
+                    for (let c=0;c<=daysCount;c++) setStyle(ganttWs, XLSX.utils.encode_cell({r:item.row,c}), {font:{name:'Arial',sz:10,bold:true,color:{rgb:item.font}},fill:{fgColor:{rgb:item.fill}},alignment:{horizontal:c===0?'left':'center',vertical:'center'},border:thinBorder});
+                });
+                ganttWs['!freeze'] = {xSplit:1,ySplit:2,topLeftCell:'B3',activePane:'bottomRight',state:'frozen'};
+                XLSX.utils.book_append_sheet(wb, ganttWs, sheet1Name);
+
+                // Лист 2: детализация с обратными ссылками на строку и день графика
+                const detailHeaders = [currentLang === 'en' ? 'No.' : '№', currentLang === 'en' ? 'Day' : 'День', currentLang === 'en' ? 'Date' : 'Дата', t('element'), t('stage'), t('brigade'), t('people_count'), t('work_desc'), currentLang === 'en' ? 'Actually completed' : 'Фактически выполнено', currentLang === 'en' ? 'Unit' : 'Ед. изм.', t('note'), currentLang === 'en' ? 'Equipment' : 'Техника', currentLang === 'en' ? 'Equipment hours' : 'Часы техники', currentLang === 'en' ? 'Machine shifts' : 'Машино-смены', currentLang === 'en' ? 'Rate / machine-hour' : 'Цена машино-часа', currentLang === 'en' ? 'Equipment cost' : 'Затраты на технику', currentLang === 'en' ? 'Plan' : 'План', currentLang === 'en' ? 'Color' : 'Цвет', currentLang === 'en' ? 'Completion, %' : 'Выполнение, %'];
+                const detailAoa = [[`${currentLang === 'en' ? 'WORK DETAILS' : 'ДЕТАЛИЗАЦИЯ РАБОТ'} — ${getMonthLabel(currentYear, currentMonth)}`], detailHeaders];
+                allDetailRows.forEach((r, index) => detailAoa.push([index+1, r.day, r.date, r.element, r.stage, r.brigade, r.people, r.work, r.actualVolume > 0 ? r.actualVolume : '—', (r.actualVolumeUnit || '—'), r.note, r.equipment, r.equipmentHours, Number(r.equipmentShifts.toFixed(3)), r.equipmentRate === null ? '—' : r.equipmentRate, r.equipmentCost === null ? '—' : r.equipmentCost, r.planned, r.color, r.progress]));
+                const detailWs = XLSX.utils.aoa_to_sheet(detailAoa);
+                detailWs['!cols'] = [{wch:7},{wch:7},{wch:13},{wch:26},{wch:20},{wch:18},{wch:12},{wch:38},{wch:20},{wch:11},{wch:30},{wch:22},{wch:15},{wch:14},{wch:19},{wch:19},{wch:10},{wch:14},{wch:14}];
+                detailWs['!merges'] = [{s:{r:0,c:0},e:{r:0,c:detailHeaders.length-1}}];
+                detailWs['!rows'] = [{hpt:26},{hpt:34}];
+                for (let c=0;c<detailHeaders.length;c++) { setStyle(detailWs, XLSX.utils.encode_cell({r:0,c}), titleStyle); setStyle(detailWs, XLSX.utils.encode_cell({r:1,c}), headerStyle); }
+                allDetailRows.forEach((r,index) => {
+                    const row = index + 3;
+                    const visibleGanttRow = ganttRowForMatrix.get(r.rowIdx);
+                    const idAddr = XLSX.utils.encode_cell({r:row-1,c:0});
+                    if (detailWs[idAddr]) detailWs[idAddr].l = {Target:`#'${sheet1Name}'!A${visibleGanttRow || 3}`, Tooltip: currentLang === 'en' ? 'Return to Gantt row' : 'Вернуться к строке графика'};
+                    for (let c=0;c<detailHeaders.length;c++) {
+                        const addr = XLSX.utils.encode_cell({r:row-1,c});
+                        const fill = c===6 && r.color ? rgb(r.color) : (c===8 ? 'DCFCE7' : (index%2 ? 'F8FAFC' : 'FFFFFF'));
+                        setStyle(detailWs, addr, {font:{name:'Arial',sz:10,color:{rgb:'1F2937'}},fill:{fgColor:{rgb:fill}},alignment:{vertical:'center',horizontal:[0,1,2,6,10,11,12,13,14].includes(c)?'center':'left',wrapText:true},border:thinBorder});
+                    }
+                    setStyle(detailWs, idAddr, linkStyle);
+                    [8,13,14,15].forEach(c => { const a=XLSX.utils.encode_cell({r:row-1,c}); if(detailWs[a] && typeof detailWs[a].v==='number') detailWs[a].z = '#,##0.00'; });
+                });
+                detailWs['!autofilter'] = {ref:`A2:S${Math.max(2,allDetailRows.length+2)}`};
+                detailWs['!freeze'] = {xSplit:3,ySplit:2,topLeftCell:'D3',activePane:'bottomRight',state:'frozen'};
+                XLSX.utils.book_append_sheet(wb, detailWs, sheet2Name);
+                XLSX.writeFile(wb, `Schedule_${getMonthValue(currentYear, currentMonth)}.xlsx`);
+                showToast(`📥 ${t('export_excel')}: ${allDetailRows.length}`);
+                return;
+            }
+
             const DETAIL_HEADER_ROWS = 4;
             const detailLinkMap = new Map();
             allDetailRows.forEach((r, index) => {
@@ -3222,15 +3772,16 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 </td>`;
                 for (let i = 0; i < daysCount; i++) {
                     const dayData = combo.days[i];
-                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note || dayData.planned)) {
+                    if (dayData && (dayData.people > 0 || dayData.work || dayData.note || dayData.planned || dayData.equipment || dayData.equipmentHours > 0 || dayData.actualVolume > 0)) {
                         const bg = dayData.color || combo.rowColor || stageColors[combo.stage] || '#f1f5f9';
                         const targetRowNum = detailLinkMap.get(`${realRowIdx}:${i}`);
-                        const displayText = dayData.people > 0 ? dayData.people : '0';
+                        const displayText = `${dayData.people > 0 ? dayData.people : '0'}`;
                         const noteIcon = dayData.note ? ' 💬' : '';
+                        const equipmentHint = Number(dayData.equipmentHours || 0) > 0 ? `<br><small>🚜 ${Number(dayData.equipmentHours)} h</small>` : '';
                         if (targetRowNum) {
-                            ganttHtml += `<td style="background:${bg};"><a href="#'${SHEET2_NAME}'!A${targetRowNum}" style="color:#1a56db;text-decoration:none;font-weight:bold;display:block;">${displayText}${noteIcon}</a></td>`;
+                            ganttHtml += `<td style="background:${bg};"><a href="#'${SHEET2_NAME}'!A${targetRowNum}" style="color:#1a56db;text-decoration:none;font-weight:bold;display:block;">${displayText}${noteIcon}${equipmentHint}</a></td>`;
                         } else {
-                            ganttHtml += `<td style="background:${bg};">${displayText}${noteIcon}</td>`;
+                            ganttHtml += `<td style="background:${bg};">${displayText}${noteIcon}${equipmentHint}</td>`;
                         }
                     } else {
                         ganttHtml += `<td style="background:#fff;"></td>`;
@@ -3245,6 +3796,20 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 filtered.forEach(c => { const d = c.days[i]; if (d && d.people > 0) total += d.people; });
                 ganttHtml += `<td style="background:#0f172a;color:${total === 0 ? '#64748b' : '#4ade80'};">${total}</td>`;
             }
+            ganttHtml += `</tr>`;
+            ganttHtml += `<tr style="background:#e0f2fe;color:#0f172a;font-weight:bold;"><td style="text-align:left;">${currentLang === 'en' ? 'EQUIPMENT HOURS TOTAL' : 'ИТОГО ЧАСОВ ТЕХНИКИ'}</td>`;
+            for (let i = 0; i < daysCount; i++) {
+                let hoursTotal = 0;
+                filtered.forEach(c => { const d = c.days[i]; if (d) hoursTotal += Number(d.equipmentHours || 0); });
+                ganttHtml += `<td style="background:#e0f2fe;">${hoursTotal ? hoursTotal + ' h' : '—'}</td>`;
+            }
+            ganttHtml += `</tr>`;
+            ganttHtml += `<tr style="background:#fef3c7;color:#0f172a;font-weight:bold;"><td style="text-align:left;">${currentLang === 'en' ? 'EQUIPMENT COST TOTAL' : 'ИТОГО ЗАТРАТ НА ТЕХНИКУ'}</td>`;
+            for (let i = 0; i < daysCount; i++) {
+                let costTotal = 0, hasRate = false;
+                filtered.forEach(c => { const d = c.days[i]; if (d) { const eq = equipmentByName(d.equipment); const rate = d.equipmentRate != null ? d.equipmentRate : (eq ? eq.rate : null); if (rate !== null && rate !== undefined && rate !== '') { costTotal += Number(d.equipmentHours || 0) * Number(rate); hasRate = true; } } });
+                ganttHtml += `<td style="background:#fef3c7;">${hasRate ? formatEquipmentMoney(costTotal) : '—'}</td>`;
+            }
             ganttHtml += `</tr></tbody></table>`;
 
             let detailHtml = `<h3>${currentLang === 'en' ? 'Details' : 'Детализация'} — ${getMonthLabel(currentYear, currentMonth)}</h3>
@@ -3253,8 +3818,11 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 <thead><tr style="background:#0f172a;color:#fff;">
                     <th>#</th><th>${currentLang === 'en' ? 'Day' : 'День'}</th><th>${currentLang === 'en' ? 'Date' : 'Дата'}</th>
                     <th>${t('element')}</th><th>${t('stage')}</th><th>${t('brigade')}</th>
-                    <th>${t('people_count')}</th><th>${t('work_desc')}</th><th>${t('note')}</th>
-                    <th>Plan</th><th>Color</th>
+                    <th>${t('people_count')}</th><th>${t('work_desc')}</th><th>${currentLang === 'en' ? 'Actually completed' : 'Фактически выполнено'}</th><th>${currentLang === 'en' ? 'Unit' : 'Ед. изм.'}</th><th>${t('note')}</th>
+                    <th>${currentLang === 'en' ? 'Equipment' : 'Техника'}</th>
+                    <th>${currentLang === 'en' ? 'Equipment hours' : 'Часы техники'}</th>
+                    <th>${currentLang === 'en' ? 'Machine shifts' : 'Машино-смены'}</th><th>${currentLang === 'en' ? 'Rate / machine-hour' : 'Цена машино-часа'}</th><th>${currentLang === 'en' ? 'Equipment cost' : 'Затраты на технику'}</th>
+                    <th>Plan</th><th>Color</th><th>Выполнение, %</th>
                 </tr></thead><tbody>`;
 
             allDetailRows.forEach((r, index) => {
@@ -3268,9 +3836,14 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                     <td>${escapeHtml(r.brigade)}</td>
                     <td style="text-align:center;font-weight:bold;background:${r.color || '#fff'};">${r.people}</td>
                     <td>${escapeHtml(r.work)}</td>
+                    <td style="text-align:center;font-weight:bold;background:#dcfce7;">${r.actualVolume > 0 ? r.actualVolume : '—'}</td>
+                    <td style="text-align:center;">${escapeHtml(r.actualVolumeUnit || '—')}</td>
                     <td>${escapeHtml(r.note)}</td>
+                    <td>${escapeHtml(r.equipment)}</td>
+                    <td style="text-align:center;">${r.equipmentHours}</td><td style="text-align:center;">${r.equipmentShifts.toFixed(2)}</td><td style="text-align:center;">${r.equipmentRate === null ? "—" : r.equipmentRate}</td><td style="text-align:center;">${r.equipmentCost === null ? "—" : r.equipmentCost}</td>
                     <td style="text-align:center;">${r.planned}</td>
                     <td style="text-align:center;background:${r.color || '#fff'};">${r.color || '—'}</td>
+                    <td style="text-align:center;">${r.progress||0}%</td>
                 </tr>`;
             });
             detailHtml += `</tbody></table>`;
@@ -3319,8 +3892,8 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
                 const row = [name];
                 for (let i = 0; i < daysCount; i++) {
                     const d = combo.days[i];
-                    if (d && d.people > 0) {
-                        row.push(d.people + (d.note ? ' 💬' : ''));
+                    if (d && (d.people > 0 || Number(d.actualVolume || 0) > 0)) {
+                        row.push(`${d.people || 0}${d.note ? ' 💬' : ''}`);
                     } else if (d && d.planned) {
                         row.push('0 (plan)' + (d.note ? ' 💬' : ''));
                     } else {
@@ -3339,15 +3912,18 @@ m1020 0 l0 -425 -425 0 -425 0 0 425 0 425 425 0 425 0 0 -425z"/>
             rows.push([]);
             rows.push([`=== ${currentLang === 'en' ? 'DETAILS' : 'ДЕТАЛИЗАЦИЯ'} ===`]);
             rows.push([currentLang === 'en' ? 'Day' : 'День', currentLang === 'en' ? 'Date' : 'Дата',
-                t('element'), t('stage'), t('brigade'), t('people_count'), t('work_desc'), t('note'), 'Plan']);
+                t('element'), t('stage'), t('brigade'), t('people_count'), t('work_desc'), currentLang === 'en' ? 'Actually completed' : 'Фактически выполнено', currentLang === 'en' ? 'Unit' : 'Ед. изм.', t('note'),
+                currentLang === 'en' ? 'Equipment' : 'Техника',
+                currentLang === 'en' ? 'Equipment hours' : 'Часы техники', currentLang === 'en' ? 'Machine shifts' : 'Машино-смены', currentLang === 'en' ? 'Rate / machine-hour' : 'Цена машино-часа', currentLang === 'en' ? 'Equipment cost' : 'Затраты на технику', 'Plan']);
             ganttMatrix.forEach(combo => {
                 combo.days.forEach((day, idx) => {
-                    if (day && (day.people > 0 || day.work || day.note)) {
+                    if (day && (day.people > 0 || day.work || day.note || day.equipment || day.equipmentHours > 0 || day.actualVolume > 0)) {
                         rows.push([
                             idx + 1,
                             `${String(idx+1).padStart(2,'0')}.${String(currentMonth).padStart(2,'0')}.${currentYear}`,
                             combo.element, combo.stage, combo.brigade || '',
-                            day.people || 0, day.work || '', day.note || '',
+                            day.people || 0, day.work || '', Number(day.actualVolume || 0) > 0 ? Number(day.actualVolume) : '—', day.actualVolumeUnit || '', day.note || '',
+                            day.equipment || '', Number(day.equipmentHours || 0), Number((Number(day.equipmentHours || 0) / Number(day.equipmentShiftHours || (equipmentByName(day.equipment)?.shiftHours) || 8)).toFixed(3)), (day.equipmentRate ?? equipmentByName(day.equipment)?.rate) ?? '—', ((day.equipmentRate ?? equipmentByName(day.equipment)?.rate) == null ? '—' : Number(day.equipmentHours || 0) * Number(day.equipmentRate ?? equipmentByName(day.equipment).rate)),
                             day.people === 0 ? 'Yes' : 'No'
                         ]);
                     }
